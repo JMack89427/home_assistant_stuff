@@ -10,6 +10,13 @@ views:
           # Welcome to the Dark Side
           Awaiting command input, Lord Vader. The fleet is at your disposal.
       
+      - type: button
+        name: Sync Imperial Fleet Config
+        icon: mdi:github
+        tap_action:
+          action: call-service
+          service: script.sync_github_config
+      
       - type: vertical-stack
         cards:
           - type: entities

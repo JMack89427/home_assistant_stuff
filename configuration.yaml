@@ -44,6 +44,10 @@ http:
   # ssl_certificate: !secret ssl_certificate
   # ssl_key: !secret ssl_key
 
+# ── Shell Commands ────────────────────────────────────────────────────────────
+shell_command:
+  git_pull_config: "cd /config && git fetch --all && git reset --hard origin/main"
+
 # ── Automations, Scripts, Scenes ─────────────────────────────────────────────
 automation: !include automations.yaml
 script:      !include scripts.yaml

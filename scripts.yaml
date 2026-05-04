@@ -32,3 +32,12 @@ movie_mode:
     #   target:
     #     entity_id: media_player.living_room_tv
   mode: single
+
+# ── Imperial Command Center Sync ──────────────────────────────────────────────
+sync_github_config:
+  alias: "Sync Configuration from GitHub"
+  description: "Pulls the latest configuration from GitHub and updates the system."
+  icon: mdi:github
+  sequence:
+    - service: shell_command.git_pull_config
+  mode: single
