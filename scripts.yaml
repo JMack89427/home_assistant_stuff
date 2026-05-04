@@ -40,4 +40,6 @@ sync_github_config:
   icon: mdi:github
   sequence:
     - service: shell_command.git_pull_config
+    - delay: "00:00:05" # Wait 5 seconds for the git pull to finish
+    - service: homeassistant.restart
   mode: single
