@@ -1,0 +1,14 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# customize.yaml  —  Entity customization (friendly names, icons, hidden, etc.)
+# ─────────────────────────────────────────────────────────────────────────────
+# See https://www.home-assistant.io/docs/configuration/customizing-devices/
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Example entries — replace or remove as needed:
+# light.living_room:
+#   friendly_name: "Living Room Light"
+#   icon: mdi:ceiling-light
+
+# switch.porch_light:
+#   friendly_name: "Porch Light"
+#   icon: mdi:outdoor-lamp

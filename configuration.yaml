@@ -1,0 +1,48 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# configuration.yaml  —  Main Home Assistant configuration
+# ─────────────────────────────────────────────────────────────────────────────
+# Secrets are stored in secrets.yaml (git-ignored).  Reference them with the
+# !secret <key> syntax.  See secrets.yaml.example for all required keys.
+# ─────────────────────────────────────────────────────────────────────────────
+
+homeassistant:
+  name: !secret home_name           # e.g. "My Home"
+  latitude: !secret home_latitude
+  longitude: !secret home_longitude
+  elevation: !secret home_elevation
+  unit_system: imperial             # or "metric"
+  currency: USD
+  country: US
+  time_zone: !secret home_timezone  # e.g. "America/Chicago"
+  customize: !include customize.yaml
+  packages: !include_dir_named packages
+
+# ── Default config entries (enabled by the UI) ────────────────────────────────
+default_config:
+
+# ── Frontend / Lovelace ───────────────────────────────────────────────────────
+frontend:
+  themes: !include_dir_merge_named themes
+
+lovelace:
+  mode: storage   # "storage" = UI-managed dashboards; change to "yaml" for
+                  # full file-based control
+
+# ── HTTP ──────────────────────────────────────────────────────────────────────
+http:
+  # TODO: set ip_ban_enabled and login_attempts_threshold for production
+  # ip_ban_enabled: true
+  # login_attempts_threshold: 5
+  # ssl_certificate: !secret ssl_certificate
+  # ssl_key: !secret ssl_key
+
+# ── Automations, Scripts, Scenes ─────────────────────────────────────────────
+automation: !include automations.yaml
+script:      !include scripts.yaml
+scene:       !include scenes.yaml
+
+# ── Logger ────────────────────────────────────────────────────────────────────
+logger:
+  default: warning
+  logs:
+    homeassistant.components.automation: info

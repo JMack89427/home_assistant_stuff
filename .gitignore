@@ -1,0 +1,34 @@
+# Home Assistant secrets — never commit real secrets
+secrets.yaml
+
+# Home Assistant database and internal state files
+home-assistant_v2.db
+home-assistant_v2.db-shm
+home-assistant_v2.db-wal
+home-assistant.log
+home-assistant.log.1
+home-assistant.log.fault
+
+# Core storage and runtime files
+.storage/
+.cloud/
+.HA_VERSION
+.uuid
+
+# Python / dependencies
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# Editor / OS artifacts
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
