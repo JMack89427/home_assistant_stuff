@@ -27,7 +27,7 @@ frontend:
 lovelace:
   resource_mode: yaml
   dashboards:
-    imperial:
+    imperial-dashboard:
       mode: yaml
       filename: ui-lovelace.yaml
       title: Imperial Command Center
