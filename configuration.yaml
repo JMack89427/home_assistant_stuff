@@ -27,12 +27,13 @@ frontend:
 lovelace:
   resource_mode: yaml
   dashboards:
-    lovelace:
+    imperial:
       mode: yaml
       filename: ui-lovelace.yaml
       title: Imperial Command Center
       icon: mdi:space-station
       show_in_sidebar: true
+      require_admin: false
 
 
 # ── HTTP ──────────────────────────────────────────────────────────────────────
