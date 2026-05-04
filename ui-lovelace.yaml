@@ -10,19 +10,30 @@ views:
           # Welcome to the Dark Side
           Awaiting command input, Lord Vader. The fleet is at your disposal.
       
-      - type: horizontal-stack
+      - type: vertical-stack
         cards:
-          - type: button
-            name: Deflector Shields
-            icon: mdi:shield-sun
-            tap_action:
-              action: none
-          - type: button
-            name: Hyperdrive
-            icon: mdi:flash-outline
-            tap_action:
-              action: none
-            
+          - type: entities
+            title: Life Support Systems
+            entities:
+              - entity: sensor.temperature_and_humidity_sensor_air_temperature
+                name: Atmospheric Temperature
+              - entity: sensor.temperature_and_humidity_sensor_humidity
+                name: Atmospheric Humidity
+      
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: "## Ship Communications"
+          - type: media-control
+            entity: media_player.living_room
+            name: Emperor's Throne Room
+          - type: media-control
+            entity: media_player.family_room
+            name: Officers' Quarters
+          - type: media-control
+            entity: media_player.crafting_room
+            name: Engineering Bay
+
   - title: Detention Block
     path: detention
     icon: mdi:door-closed-lock
@@ -30,7 +41,49 @@ views:
       - type: markdown
         content: |
           ## Level 5, Block AA-23
-          Security monitoring systems online. No rebel activity detected.
+          Surveillance monitoring grid active.
+      
+      - type: horizontal-stack
+        cards:
+          - type: picture-entity
+            entity: camera.front_door_live_view
+            name: Main Airlock
+            show_state: false
+            show_name: true
+            camera_view: auto
+          - type: picture-entity
+            entity: camera.front_live_view
+            name: Forward Sector
+            show_state: false
+            show_name: true
+            camera_view: auto
+            
+      - type: horizontal-stack
+        cards:
+          - type: picture-entity
+            entity: camera.garage_live_view
+            name: Hangar Bay Alpha
+            show_state: false
+            show_name: true
+            camera_view: auto
+          - type: picture-entity
+            entity: camera.side_live_view
+            name: Starboard Sector
+            show_state: false
+            show_name: true
+            camera_view: auto
+
+      - type: entities
+        title: Perimeter Defense Systems
+        entities:
+          - entity: switch.front_door_motion_detection
+            name: Main Airlock Sensors
+          - entity: switch.front_motion_detection
+            name: Forward Sector Sensors
+          - entity: switch.garage_motion_detection
+            name: Hangar Bay Alpha Sensors
+          - entity: switch.side_motion_detection
+            name: Starboard Sector Sensors
 
   - title: Hangar Bay
     path: hangar
@@ -39,4 +92,20 @@ views:
       - type: markdown
         content: |
           ## TIE Fighter Status
-          All squadrons fueled and ready for deployment.
+          Docking bays awaiting deployment orders.
+          
+      - type: entities
+        title: Docking Bay Illumination
+        entities:
+          - entity: light.garage_light
+            name: Hangar Alpha Lights
+          - entity: light.front_light
+            name: Forward Exterior Lights
+          - entity: light.side_light
+            name: Starboard Exterior Lights
+            
+      - type: entities
+        title: Network Status
+        entities:
+          - entity: sensor.eero_external_ip
+            name: Holonet Uplink IP
