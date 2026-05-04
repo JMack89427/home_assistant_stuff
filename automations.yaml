@@ -1,0 +1,36 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# automations.yaml  —  Home Assistant automation rules
+# ─────────────────────────────────────────────────────────────────────────────
+# Add automations here or create them through the UI (they will be written to
+# this file automatically when the file is referenced by configuration.yaml).
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Example: notify when someone arrives home ─────────────────────────────────
+- id: notify_someone_arrived_home
+  alias: "Notify: Someone arrived home"
+  description: Send a notification when a person arrives home.
+  trigger:
+    - platform: state
+      entity_id: person.example_person   # TODO: replace with your person entity
+      to: home
+  condition: []
+  action:
+    - service: notify.mobile_app         # TODO: replace with your notification target
+      data:
+        title: "Welcome home!"
+        message: "{{ trigger.to_state.name }} just arrived."
+  mode: single
+
+# ── Example: turn off all lights at midnight ──────────────────────────────────
+- id: lights_off_at_midnight
+  alias: "Lights: Turn off at midnight"
+  description: Turn off every light at midnight.
+  trigger:
+    - platform: time
+      at: "00:00:00"
+  condition: []
+  action:
+    - service: light.turn_off
+      target:
+        area_id: all
+  mode: single
