@@ -1,0 +1,42 @@
+title: Imperial Command Center
+views:
+  - title: Bridge
+    path: bridge
+    icon: mdi:space-station
+    badges: []
+    cards:
+      - type: markdown
+        content: |
+          # Welcome to the Dark Side
+          Awaiting command input, Lord Vader. The fleet is at your disposal.
+      
+      - type: horizontal-stack
+        cards:
+          - type: button
+            name: Deflector Shields
+            icon: mdi:shield-sun
+            tap_action:
+              action: none
+          - type: button
+            name: Hyperdrive
+            icon: mdi:flash-outline
+            tap_action:
+              action: none
+            
+  - title: Detention Block
+    path: detention
+    icon: mdi:door-closed-lock
+    cards:
+      - type: markdown
+        content: |
+          ## Level 5, Block AA-23
+          Security monitoring systems online. No rebel activity detected.
+
+  - title: Hangar Bay
+    path: hangar
+    icon: mdi:rocket-launch
+    cards:
+      - type: markdown
+        content: |
+          ## TIE Fighter Status
+          All squadrons fueled and ready for deployment.

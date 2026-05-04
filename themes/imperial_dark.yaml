@@ -1,0 +1,54 @@
+imperial_dark:
+  # Backgrounds
+  primary-background-color: "#080808"     # Deep space black
+  secondary-background-color: "#121212"   # Dark grey panels
+  card-background-color: "#18181A"        # Imperial console grey
+  dialog-background-color: "#18181A"
+  clear-background-color: "transparent"
+  
+  # Colors
+  primary-color: "#D00000"                # Sith Lightsaber Red
+  accent-color: "#4A4A4A"                 # Imperial Grey
+  light-primary-color: "#FF3333"
+  
+  # Text
+  primary-text-color: "#E0E0E0"           # Light grey text
+  text-primary-color: "#FFFFFF"           # White text
+  secondary-text-color: "#A0A0A0"         # Muted text
+  disabled-text-color: "#505050"
+  
+  # Card styling (Harsh, angular look)
+  ha-card-border-radius: "0px"            # No rounded corners in the Empire!
+  ha-card-border-width: "1px"
+  ha-card-border-color: "rgba(208, 0, 0, 0.3)" # Subtle red outline
+  ha-card-box-shadow: "0 0 10px rgba(208, 0, 0, 0.1)" # Faint red glow
+  ha-card-background: "var(--card-background-color)"
+  
+  # Sidebar
+  sidebar-background-color: "var(--primary-background-color)"
+  sidebar-text-color: "var(--primary-text-color)"
+  sidebar-icon-color: "var(--secondary-text-color)"
+  sidebar-selected-icon-color: "var(--primary-color)"
+  sidebar-selected-text-color: "var(--primary-color)"
+  
+  # Switches / Sliders
+  switch-checked-button-color: "#080808"
+  switch-checked-track-color: "var(--primary-color)"
+  switch-unchecked-button-color: "var(--disabled-text-color)"
+  switch-unchecked-track-color: "var(--secondary-background-color)"
+  
+  # State colors
+  state-on-color: "var(--primary-color)"
+  state-off-color: "var(--disabled-text-color)"
+  
+  # Header
+  app-header-background-color: "var(--primary-background-color)"
+  app-header-text-color: "var(--primary-text-color)"
+  
+  # Additional Imperial Touches
+  mdc-theme-primary: "var(--primary-color)"
+  mdc-theme-secondary: "var(--accent-color)"
+  input-idle-line-color: "rgba(208, 0, 0, 0.2)"
+  input-hover-line-color: "rgba(208, 0, 0, 0.5)"
+  paper-item-icon-color: "var(--state-off-color)"
+  paper-item-icon-active-color: "var(--state-on-color)"
