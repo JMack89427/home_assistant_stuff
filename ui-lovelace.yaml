@@ -80,15 +80,15 @@ views:
       - type: horizontal-stack
         cards:
           - type: picture-glance
-            entity: camera.front_door_live_view
             title: Main Airlock
+            camera_image: camera.front_door_live_view
             camera_view: auto
             entities:
               - entity: switch.front_door_motion_detection
                 icon: mdi:motion-sensor
           - type: picture-glance
-            entity: camera.front_live_view
             title: Forward Sector
+            camera_image: camera.front_live_view
             camera_view: auto
             entities:
               - entity: switch.front_motion_detection
@@ -97,15 +97,15 @@ views:
       - type: horizontal-stack
         cards:
           - type: picture-glance
-            entity: camera.garage_live_view
             title: Hangar Bay Alpha
+            camera_image: camera.garage_live_view
             camera_view: auto
             entities:
               - entity: switch.garage_motion_detection
                 icon: mdi:motion-sensor
           - type: picture-glance
-            entity: camera.side_live_view
             title: Starboard Sector
+            camera_image: camera.side_live_view
             camera_view: auto
             entities:
               - entity: switch.side_motion_detection
