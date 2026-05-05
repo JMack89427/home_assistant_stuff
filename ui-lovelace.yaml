@@ -20,12 +20,12 @@ views:
       - type: horizontal-stack
         cards:
           - type: custom:imperial-readout
-            entity: weather.forecast_home_2
+            entity: weather.forecast_home_3
             attribute: temperature
             name: Outside Temp
             color: amber
           - type: custom:imperial-readout
-            entity: weather.forecast_home_2
+            entity: weather.forecast_home_3
             attribute: humidity
             name: Outside Humidity
             color: green
@@ -33,22 +33,22 @@ views:
       - type: custom:imperial-panel
         title: Atmospheric Conditions
         entities:
-          - entity: weather.forecast_home_2
+          - entity: weather.forecast_home_3
             name: Conditions
             icon: mdi:weather-cloudy
-          - entity: weather.forecast_home_2
+          - entity: weather.forecast_home_3
             name: Wind Speed
             icon: mdi:weather-windy
             attribute: wind_speed
-          - entity: weather.forecast_home_2
+          - entity: weather.forecast_home_3
             name: Pressure
             icon: mdi:gauge
             attribute: pressure
-          - entity: weather.forecast_home_2
+          - entity: weather.forecast_home_3
             name: UV Index
             icon: mdi:sun-wireless
             attribute: uv_index
-          - entity: weather.forecast_home_2
+          - entity: weather.forecast_home_3
             name: Cloud Cover
             icon: mdi:cloud-percent
             attribute: cloud_coverage
