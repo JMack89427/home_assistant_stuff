@@ -9,13 +9,13 @@ views:
   # ═══════════════════════════════════════════════════════════════════════════
   - title: Bridge
     path: bridge
-    icon: fa-brands:empire
+    icon: local:empire
     badges: []
     cards:
       - type: custom:imperial-header
         title: Imperial Command Center
         subtitle: All systems nominal — awaiting orders
-        icon: fa-brands:empire
+        icon: local:empire
 
       - type: horizontal-stack
         cards:
@@ -72,13 +72,13 @@ views:
   # ═══════════════════════════════════════════════════════════════════════════
   - title: Detention Block
     path: detention
-    icon: fa-brands:first-order
+    icon: local:first-order
     badges: []
     cards:
       - type: custom:imperial-header
         title: Detention Block AA-23
         subtitle: Surveillance grid active — no unauthorized movement tolerated
-        icon: fa-brands:first-order
+        icon: local:first-order
 
       - type: horizontal-stack
         cards:
@@ -135,13 +135,13 @@ views:
   # ═══════════════════════════════════════════════════════════════════════════
   - title: Ship Comms
     path: communications
-    icon: fa-brands:galactic-senate
+    icon: local:galactic-senate
     badges: []
     cards:
       - type: custom:imperial-header
         title: Ship Communications Array
         subtitle: Holographic broadcast systems online
-        icon: fa-brands:galactic-senate
+        icon: local:galactic-senate
 
       - type: media-control
         entity: media_player.living_room
@@ -160,13 +160,13 @@ views:
   # ═══════════════════════════════════════════════════════════════════════════
   - title: Operations
     path: operations
-    icon: fa-brands:sith
+    icon: local:sith
     badges: []
     cards:
       - type: custom:imperial-header
         title: Imperial Operations Console
         subtitle: Execute standing orders with precision
-        icon: fa-brands:sith
+        icon: local:sith
 
       - type: grid
         columns: 2
