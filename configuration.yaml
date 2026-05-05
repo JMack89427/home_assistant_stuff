@@ -26,9 +26,6 @@ frontend:
 
 lovelace:
   resource_mode: yaml
-  resources:
-    - url: /local/imperial-cards.js
-      type: module
   dashboards:
     imperial-dashboard:
       mode: yaml

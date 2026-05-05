@@ -1,4 +1,7 @@
 title: Imperial Command Center
+resources:
+  - url: /local/imperial-cards.js
+    type: module
 views:
 
   # ═══════════════════════════════════════════════════════════════════════════
