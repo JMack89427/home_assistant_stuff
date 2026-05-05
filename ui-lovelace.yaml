@@ -20,13 +20,39 @@ views:
       - type: horizontal-stack
         cards:
           - type: custom:imperial-readout
-            entity: sensor.temperature_and_humidity_sensor_air_temperature
-            name: Atmospheric Temp
+            entity: weather.forecast_home_2
+            attribute: temperature
+            name: Outside Temp
             color: amber
           - type: custom:imperial-readout
-            entity: sensor.temperature_and_humidity_sensor_humidity
-            name: Atmospheric Humidity
+            entity: weather.forecast_home_2
+            attribute: humidity
+            name: Outside Humidity
             color: green
+
+      - type: custom:imperial-panel
+        title: Atmospheric Conditions
+        entities:
+          - entity: weather.forecast_home_2
+            name: Conditions
+            icon: mdi:weather-cloudy
+          - entity: weather.forecast_home_2
+            name: Wind Speed
+            icon: mdi:weather-windy
+            attribute: wind_speed
+          - entity: weather.forecast_home_2
+            name: Pressure
+            icon: mdi:gauge
+            attribute: pressure
+          - entity: weather.forecast_home_2
+            name: UV Index
+            icon: mdi:sun-wireless
+            attribute: uv_index
+          - entity: weather.forecast_home_2
+            name: Cloud Cover
+            icon: mdi:cloud-percent
+            attribute: cloud_coverage
+            unit: "%"
 
       - type: custom:imperial-panel
         title: Perimeter Illumination Grid

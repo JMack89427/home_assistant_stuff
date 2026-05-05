@@ -134,9 +134,17 @@
         const nm  = e.name  || h?.states[id]?.attributes?.friendly_name || id;
         const ic  = e.icon  || h?.states[id]?.attributes?.icon || icon(id);
         const so  = st(h, id);
-        const c2  = col(so);
-        const tx  = txt(so);
-        const tog = TOGGLE_DOMAINS.has(id.split('.')[0]);
+        const tog = TOGGLE_DOMAINS.has(id.split('.')[0]) && !e.attribute;
+        let c2, tx;
+        if (e.attribute) {
+          const val = so?.attributes?.[e.attribute];
+          const u   = e.unit ?? so?.attributes?.[`${e.attribute}_unit`] ?? '';
+          tx = val !== undefined ? `${val}${u ? ' ' + u : ''}`.toUpperCase() : 'N/A';
+          c2 = 'var(--itextd)';
+        } else {
+          c2 = col(so);
+          tx = txt(so);
+        }
         return `<div class="row${tog?' tog':''}" data-id="${id}">
           <ha-icon icon="${ic}" style="color:${c2}"></ha-icon>
           <span class="nm">${nm.toUpperCase()}</span>
@@ -190,12 +198,15 @@
     set hass(h) { this._h = h; this._r(); }
     _r() {
       if (!this.shadowRoot || !this._c) return;
-      const { entity, name, color = 'green' } = this._c;
+      const { entity, name, color = 'green', attribute, unit: unitOverride } = this._c;
       const so    = st(this._h, entity);
-      const state = so?.state || '---';
-      const unit  = so?.attributes?.unit_of_measurement || '';
+      const state = attribute
+        ? String(so?.attributes?.[attribute] ?? '---')
+        : (so?.state || '---');
+      const unit  = unitOverride
+        ?? (attribute ? (so?.attributes?.[`${attribute}_unit`] ?? '') : (so?.attributes?.unit_of_measurement ?? ''));
       const label = name || so?.attributes?.friendly_name || entity;
-      const dead  = ['unavailable','unknown','none','---'].includes(state);
+      const dead  = ['unavailable','unknown','none','---'].includes(state) || so?.state === 'unavailable';
       const pal   = {
         green: ['#00C853','rgba(0,200,83,.55)','rgba(0,200,83,.12)'],
         amber: ['#FFB300','rgba(255,179,0,.55)','rgba(255,179,0,.12)'],
