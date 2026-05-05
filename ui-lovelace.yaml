@@ -1,6 +1,6 @@
 title: Imperial Command Center
 resources:
-  - url: /local/imperial-cards.js
+  - url: /local/imperial-cards.js?v=2
     type: module
 views:
 
