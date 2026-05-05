@@ -2,73 +2,54 @@ title: Imperial Command Center
 views:
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 1: BRIDGE — Command Overview
+  # VIEW 1: BRIDGE
   # ═══════════════════════════════════════════════════════════════════════════
   - title: Bridge
     path: bridge
     icon: mdi:space-station
     badges: []
     cards:
-      - type: markdown
-        content: |
-          # ⬡ IMPERIAL COMMAND CENTER ⬡
-          All systems nominal. The fleet stands ready, Lord Vader.
+      - type: custom:imperial-header
+        title: Imperial Command Center
+        subtitle: All systems nominal — awaiting orders
+        icon: mdi:space-station
 
-      - type: glance
-        title: Life Support Systems
-        show_name: true
-        show_state: true
-        show_icon: true
-        entities:
-          - entity: sensor.temperature_and_humidity_sensor_air_temperature
-            name: Temperature
-            icon: mdi:thermometer
-          - entity: sensor.temperature_and_humidity_sensor_humidity
-            name: Humidity
-            icon: mdi:water-percent
-          - entity: sensor.eero_external_ip
-            name: Holonet IP
-            icon: mdi:ip-network-outline
-
-      - type: sensor
-        entity: sensor.temperature_and_humidity_sensor_air_temperature
-        name: Atmospheric Temperature — 24h
-        graph: line
-        hours_to_show: 24
-        detail: 2
-
-      - type: markdown
-        content: "## Perimeter Illumination Grid"
-
-      - type: grid
-        columns: 3
-        square: false
+      - type: horizontal-stack
         cards:
-          - type: tile
-            entity: light.garage_light
+          - type: custom:imperial-readout
+            entity: sensor.temperature_and_humidity_sensor_air_temperature
+            name: Atmospheric Temp
+            color: amber
+          - type: custom:imperial-readout
+            entity: sensor.temperature_and_humidity_sensor_humidity
+            name: Atmospheric Humidity
+            color: green
+
+      - type: custom:imperial-panel
+        title: Perimeter Illumination Grid
+        entities:
+          - entity: light.garage_light
             name: Hangar Alpha
             icon: mdi:light-flood-down
-          - type: tile
-            entity: light.front_light
+          - entity: light.front_light
             name: Forward Array
             icon: mdi:outdoor-lamp
-          - type: tile
-            entity: light.side_light
+          - entity: light.side_light
             name: Starboard Array
             icon: mdi:wall-sconce-flat
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 2: DETENTION BLOCK — Surveillance Grid
+  # VIEW 2: DETENTION BLOCK
   # ═══════════════════════════════════════════════════════════════════════════
   - title: Detention Block
     path: detention
     icon: mdi:cctv
     badges: []
     cards:
-      - type: markdown
-        content: |
-          ## Level 5, Block AA-23
-          Surveillance grid active. No unauthorized movement tolerated.
+      - type: custom:imperial-header
+        title: Detention Block AA-23
+        subtitle: Surveillance grid active — no unauthorized movement tolerated
+        icon: mdi:cctv
 
       - type: horizontal-stack
         cards:
@@ -104,36 +85,34 @@ views:
               - entity: switch.side_motion_detection
                 icon: mdi:motion-sensor
 
-      - type: glance
+      - type: custom:imperial-panel
         title: Perimeter Defense Systems
-        show_name: true
-        show_state: true
         entities:
           - entity: switch.front_door_motion_detection
-            name: Main Airlock
+            name: Main Airlock Sensors
             icon: mdi:shield-lock
           - entity: switch.front_motion_detection
-            name: Forward Sector
+            name: Forward Sector Sensors
             icon: mdi:shield-lock
           - entity: switch.garage_motion_detection
-            name: Hangar Bay
+            name: Hangar Bay Sensors
             icon: mdi:shield-lock
           - entity: switch.side_motion_detection
-            name: Starboard
+            name: Starboard Sensors
             icon: mdi:shield-lock
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 3: SHIP COMMUNICATIONS — Holographic Broadcast Systems
+  # VIEW 3: SHIP COMMUNICATIONS
   # ═══════════════════════════════════════════════════════════════════════════
   - title: Ship Comms
     path: communications
     icon: mdi:radio-tower
     badges: []
     cards:
-      - type: markdown
-        content: |
-          ## Ship Communications Array
-          Holographic broadcast systems online. Awaiting transmission.
+      - type: custom:imperial-header
+        title: Ship Communications Array
+        subtitle: Holographic broadcast systems online
+        icon: mdi:radio-tower
 
       - type: media-control
         entity: media_player.living_room
@@ -148,36 +127,40 @@ views:
         name: Engineering Bay
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 4: IMPERIAL OPERATIONS — Standing Orders & Fleet Status
+  # VIEW 4: IMPERIAL OPERATIONS
   # ═══════════════════════════════════════════════════════════════════════════
   - title: Operations
     path: operations
     icon: mdi:cog-outline
     badges: []
     cards:
-      - type: markdown
-        content: |
-          ## Imperial Operations Console
-          Execute standing orders with Imperial precision. Failure is not an option.
+      - type: custom:imperial-header
+        title: Imperial Operations Console
+        subtitle: Execute standing orders with precision
+        icon: mdi:cog-outline
 
       - type: grid
         columns: 2
         square: false
         cards:
-          - type: button
+          - type: custom:imperial-button
             name: Good Night Protocol
             icon: mdi:power-sleep
-            tap_action:
-              action: call-service
-              service: script.good_night
-          - type: button
+            service: script.turn_on
+            service_data:
+              entity_id: script.good_night
+            entity: script.good_night
+            color: red
+          - type: custom:imperial-button
             name: Movie Mode
             icon: mdi:movie-open
-            tap_action:
-              action: call-service
-              service: script.movie_mode
+            service: script.turn_on
+            service_data:
+              entity_id: script.movie_mode
+            entity: script.movie_mode
+            color: amber
 
-      - type: entities
+      - type: custom:imperial-panel
         title: Holonet Status
         entities:
           - entity: sensor.eero_external_ip
