@@ -57,13 +57,6 @@ views:
             name: Starboard Array
             icon: mdi:wall-sconce-flat
 
-      - type: button
-        name: Sync Fleet Configuration
-        icon: mdi:sync
-        tap_action:
-          action: call-service
-          service: script.sync_github_config
-
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 2: DETENTION BLOCK — Surveillance Grid
   # ═══════════════════════════════════════════════════════════════════════════
@@ -183,12 +176,6 @@ views:
             tap_action:
               action: call-service
               service: script.movie_mode
-          - type: button
-            name: Sync Fleet Config
-            icon: mdi:github
-            tap_action:
-              action: call-service
-              service: script.sync_github_config
 
       - type: entities
         title: Holonet Status
