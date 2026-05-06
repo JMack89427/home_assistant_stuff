@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '1.0.0';
+  const VERSION = '1.1.0';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -314,22 +314,158 @@
     }
   }
 
+  // ============================================================================
+  // imperial-printer-status  (fleet overview block — one per printer)
+  // ============================================================================
+  class ImperialPrinterStatus extends HTMLElement {
+    setConfig(c) {
+      if (!c.prefix) throw new Error('imperial-printer-status: prefix required');
+      this._c = c;
+      if (!this.shadowRoot) this.attachShadow({ mode: 'open' });
+    }
+    set hass(h) { this._h = h; this._r(); }
+    _r() {
+      if (!this.shadowRoot || !this._c) return;
+      const { prefix, name } = this._c;
+      const h   = this._h;
+      const eid = id => h?.states[`${prefix}_${id}`];
+
+      const online      = eid('online');
+      const statusEnt   = eid('print_status');
+      const progressEnt = eid('print_progress');
+      const taskEnt     = eid('task_name');
+      const remainEnt   = eid('remaining_time');
+      const curLayEnt   = eid('current_layer');
+      const totLayEnt   = eid('total_layer_count');
+      const nozzEnt     = eid('nozzle_temperature');
+      const bedEnt      = eid('bed_temperature');
+      const errEnt      = eid('print_error');
+      const nameEnt     = eid('printer_name');
+
+      const isOnline  = online?.state === 'on';
+      const sv        = statusEnt?.state || 'unavailable';
+      const pct       = Math.min(100, Math.max(0, parseFloat(progressEnt?.state) || 0));
+      const hasError  = errEnt?.state === 'on';
+
+      const PRINTING  = new Set(['running','prepare','slicing']);
+      const isPrinting = PRINTING.has(sv);
+      const isPaused   = sv === 'pause';
+      const isDone     = sv === 'finish';
+      const isFailed   = sv === 'failed';
+      const isOffline  = sv === 'unavailable' || sv === 'offline' || !isOnline;
+
+      let statusColor, statusLabel;
+      if (hasError || isFailed)  { statusColor = 'var(--ir)'; statusLabel = 'ERROR'; }
+      else if (isPrinting)       { statusColor = 'var(--ia)'; statusLabel = 'PRINTING'; }
+      else if (isPaused)         { statusColor = 'var(--ia)'; statusLabel = 'PAUSED'; }
+      else if (isDone)           { statusColor = 'var(--ig)'; statusLabel = 'COMPLETE'; }
+      else if (isOffline)        { statusColor = 'var(--igrey)'; statusLabel = 'OFFLINE'; }
+      else                       { statusColor = 'var(--igreyl)'; statusLabel = 'IDLE'; }
+
+      const displayName = name || nameEnt?.state || prefix;
+
+      const clean = (ent) => (!ent || ['unavailable','unknown','none',''].includes(ent.state)) ? null : ent.state;
+      const taskStr  = clean(taskEnt);
+      const remVal   = clean(remainEnt);
+      const remStr   = remVal ? (parseFloat(remVal) < 1
+        ? `${Math.round(parseFloat(remVal)*60)}M`
+        : `${parseFloat(remVal).toFixed(1)}H`) : '---';
+      const layerStr = (clean(curLayEnt) && clean(totLayEnt))
+        ? `${curLayEnt.state}/${totLayEnt.state}` : '---';
+      const nozzStr  = clean(nozzEnt) ? `${nozzEnt.state}°` : '---';
+      const bedStr   = clean(bedEnt)  ? `${bedEnt.state}°`  : '---';
+      const barColor = isPrinting ? 'var(--ir)' : isDone ? 'var(--ig)' : 'var(--igreyl)';
+      const barGlow  = isPrinting ? 'box-shadow:0 0 8px rgba(204,0,0,.7)' : '';
+
+      this.shadowRoot.innerHTML = `
+        <style>
+          :host{display:block}
+          .card{${V} background:var(--ipanel);border:1px solid rgba(204,0,0,.3);
+            position:relative;overflow:hidden}
+          ${PIPS} ${SCAN}
+          .hd{display:flex;align-items:center;gap:10px;padding:10px 14px;
+            border-bottom:1px solid rgba(204,0,0,.12);position:relative;z-index:1}
+          .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;
+            background:${statusColor};
+            ${isPrinting?`box-shadow:0 0 8px ${statusColor};animation:pulse 1.8s ease-in-out infinite`:''}}
+          @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+          .pn{flex:1;font-family:var(--iui);font-size:12px;font-weight:700;
+            letter-spacing:2.5px;text-transform:uppercase;color:#fff}
+          .sb{font-family:var(--imono);font-size:9px;letter-spacing:2px;
+            padding:3px 8px;border:1px solid ${statusColor};
+            color:${statusColor};background:${statusColor}22;flex-shrink:0}
+          .pb{height:3px;background:var(--igrey);position:relative;z-index:1}
+          .pf{height:100%;width:${pct}%;background:${barColor};${barGlow};transition:width .6s}
+          .pct{position:absolute;right:6px;top:50%;transform:translateY(-50%);
+            font-family:var(--imono);font-size:8px;color:${barColor};opacity:.7;z-index:2;
+            ${pct===0?'display:none':''}}
+          .st{display:grid;grid-template-columns:repeat(4,1fr);position:relative;z-index:1;
+            border-bottom:1px solid rgba(204,0,0,.08)}
+          .sc{padding:9px 10px;text-align:center;border-right:1px solid rgba(204,0,0,.08)}
+          .sc:last-child{border-right:none}
+          .sl2{font-family:var(--imono);font-size:8px;letter-spacing:1.5px;
+            color:var(--itextd);text-transform:uppercase}
+          .sv{font-family:var(--imono);font-size:13px;color:var(--itext);margin-top:3px}
+          .jb{padding:8px 14px;position:relative;z-index:1;
+            display:flex;align-items:center;gap:8px;
+            border-top:1px solid rgba(204,0,0,.08)}
+          .jl{font-family:var(--imono);font-size:9px;letter-spacing:1.5px;color:var(--itextd)}
+          .jn{font-family:var(--imono);font-size:10px;color:var(--itext);flex:1;
+            overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+            letter-spacing:.5px}
+          .er{padding:6px 14px;background:rgba(204,0,0,.1);
+            border-top:1px solid rgba(204,0,0,.5);
+            font-family:var(--imono);font-size:9px;letter-spacing:2px;
+            color:var(--ir);display:flex;align-items:center;gap:6px;
+            position:relative;z-index:1;animation:pulse 1.2s ease-in-out infinite}
+        </style>
+        <div class="card">${PHTML}<div class="sl"></div>
+          <div class="hd">
+            <div class="dot"></div>
+            <div class="pn">${displayName}</div>
+            <div class="sb">${statusLabel}</div>
+          </div>
+          <div class="pb" style="position:relative">
+            <div class="pf"></div>
+            ${pct>0?`<div class="pct">${Math.round(pct)}%</div>`:''}
+          </div>
+          <div class="st">
+            <div class="sc"><div class="sl2">Nozzle</div><div class="sv">${nozzStr}</div></div>
+            <div class="sc"><div class="sl2">Bed</div><div class="sv">${bedStr}</div></div>
+            <div class="sc"><div class="sl2">Layers</div><div class="sv">${layerStr}</div></div>
+            <div class="sc"><div class="sl2">Remain</div><div class="sv">${remStr}</div></div>
+          </div>
+          ${taskStr?`<div class="jb"><span class="jl">JOB //</span>
+            <span class="jn">${taskStr.toUpperCase()}</span></div>`:''}
+          ${hasError?`<div class="er">
+            <ha-icon icon="mdi:alert-circle" style="--mdc-icon-size:14px"></ha-icon>
+            PRINT ERROR DETECTED — INTERVENTION REQUIRED</div>`:''}
+        </div>`;
+    }
+    getCardSize() { return 3; }
+    static getStubConfig() {
+      return { prefix: 'p1p_01s00c431300106', name: 'BAMBU P1P — UNIT ALPHA' };
+    }
+  }
+
   // ── Register cards ─────────────────────────────────────────────────────────
   [
-    ['imperial-header',  ImperialHeader],
-    ['imperial-panel',   ImperialPanel],
-    ['imperial-readout', ImperialReadout],
-    ['imperial-button',  ImperialButton],
+    ['imperial-header',          ImperialHeader],
+    ['imperial-panel',           ImperialPanel],
+    ['imperial-readout',         ImperialReadout],
+    ['imperial-button',          ImperialButton],
+    ['imperial-printer-status',  ImperialPrinterStatus],
   ].forEach(([tag, cls]) => {
     if (!customElements.get(tag)) customElements.define(tag, cls);
   });
 
   window.customCards = window.customCards || [];
   window.customCards.push(
-    { type: 'imperial-header',  name: 'Imperial Header',  description: 'Imperial section divider' },
-    { type: 'imperial-panel',   name: 'Imperial Panel',   description: 'Imperial entity list' },
-    { type: 'imperial-readout', name: 'Imperial Readout', description: 'Phosphor sensor display' },
-    { type: 'imperial-button',  name: 'Imperial Button',  description: 'Imperial command button' },
+    { type: 'imperial-header',         name: 'Imperial Header',         description: 'Imperial section divider' },
+    { type: 'imperial-panel',          name: 'Imperial Panel',          description: 'Imperial entity list' },
+    { type: 'imperial-readout',        name: 'Imperial Readout',        description: 'Phosphor sensor display' },
+    { type: 'imperial-button',         name: 'Imperial Button',         description: 'Imperial command button' },
+    { type: 'imperial-printer-status', name: 'Imperial Printer Status', description: 'Printer fleet status block' },
   );
 
   console.info(

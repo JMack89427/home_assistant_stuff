@@ -1,6 +1,6 @@
 title: Imperial Command Center
 resources:
-  - url: /local/imperial-cards.js?v=2
+  - url: /local/imperial-cards.js?v=3
     type: module
 views:
 
@@ -197,7 +197,24 @@ views:
             icon: mdi:ip-network
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 5: IMPERIAL MANUFACTURING FACILITY
+  # VIEW 5: FABRICATION FLEET COMMAND
+  # ═══════════════════════════════════════════════════════════════════════════
+  - title: Fleet
+    path: fleet
+    icon: local:galactic-republic
+    badges: []
+    cards:
+      - type: custom:imperial-header
+        title: Fabrication Fleet Command
+        subtitle: Replicator status — all units reporting
+        icon: local:galactic-republic
+
+      - type: custom:imperial-printer-status
+        prefix: p1p_01s00c431300106
+        name: Bambu P1P — Unit Alpha
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # VIEW 6: IMPERIAL MANUFACTURING FACILITY
   # ═══════════════════════════════════════════════════════════════════════════
   - title: Manufacturing
     path: manufacturing
