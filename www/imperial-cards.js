@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '1.4.0';
+  const VERSION = '1.5.0';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -67,6 +67,74 @@
     if (!hass || !str) return;
     const [d, s] = str.split('.');
     hass.callService(d, s, data);
+  }
+
+  // Shared printer data extractor — supports Bambu and Moonraker naming
+  function getPrinterInfo(h, prefix) {
+    const eid = (...sfx) => {
+      for (const s of sfx) {
+        const key = `${prefix}_${s}`;
+        const e = Object.values(h?.states || {}).find(x => x.entity_id.endsWith('.' + key));
+        if (e) return e;
+      }
+      return null;
+    };
+    const onlineEnt       = eid('online');
+    const printerStateEnt = eid('printer_state');
+    const statusEnt       = eid('current_print_state', 'print_status');
+    const progressEnt     = eid('progress', 'print_progress');
+    const taskEnt         = eid('filename', 'task_name');
+    const remainEnt       = eid('print_time_left', 'remaining_time');
+    const curLayEnt       = eid('current_layer');
+    const totLayEnt       = eid('total_layer', 'total_layer_count');
+    const nozzEnt         = eid('extruder_temperature', 'nozzle_temperature');
+    const bedEnt          = eid('bed_temperature');
+    const errEnt          = eid('print_error');
+    const nameEnt         = eid('printer_name');
+
+    const isOnline = onlineEnt
+      ? onlineEnt.state === 'on'
+      : (printerStateEnt ? !['shutdown','startup','unavailable'].includes(printerStateEnt.state) : false);
+
+    const sv       = statusEnt?.state || 'unavailable';
+    const pct      = Math.min(100, Math.max(0, parseFloat(progressEnt?.state) || 0));
+    const hasError = errEnt?.state === 'on' || sv === 'error' || printerStateEnt?.state === 'error';
+
+    const PRINTING   = new Set(['running','prepare','slicing','printing']);
+    const isPrinting = PRINTING.has(sv);
+    const isPaused   = sv === 'pause'  || sv === 'paused';
+    const isDone     = sv === 'finish' || sv === 'complete';
+    const isFailed   = sv === 'failed' || sv === 'error';
+    const isCancelled= sv === 'cancelled';
+    const isOffline  = sv === 'unavailable' || sv === 'offline' || sv === 'shutdown' || !isOnline;
+    const isActive   = isPrinting || isPaused || hasError;
+
+    let statusColor, statusLabel;
+    if (hasError || isFailed)  { statusColor = 'var(--ir)'; statusLabel = 'ERROR'; }
+    else if (isPrinting)       { statusColor = 'var(--ia)'; statusLabel = 'PRINTING'; }
+    else if (isPaused)         { statusColor = 'var(--ia)'; statusLabel = 'PAUSED'; }
+    else if (isDone)           { statusColor = 'var(--ig)'; statusLabel = 'COMPLETE'; }
+    else if (isCancelled)      { statusColor = 'var(--igreyl)'; statusLabel = 'CANCELLED'; }
+    else if (isOffline)        { statusColor = 'var(--igrey)'; statusLabel = 'OFFLINE'; }
+    else                       { statusColor = 'var(--igreyl)'; statusLabel = 'IDLE'; }
+
+    const clean  = e => (!e || ['unavailable','unknown','none',''].includes(e.state)) ? null : e.state;
+    const remVal = clean(remainEnt);
+    return {
+      isActive, isPrinting, isPaused, isDone, isFailed, isCancelled, isOffline, hasError,
+      statusColor, statusLabel, pct,
+      taskStr:  clean(taskEnt),
+      remStr:   remVal ? (parseFloat(remVal) < 1
+        ? `${Math.round(parseFloat(remVal) * 60)}M`
+        : `${parseFloat(remVal).toFixed(1)}H`) : '---',
+      layerStr: (clean(curLayEnt) && clean(totLayEnt))
+        ? `${curLayEnt.state}/${totLayEnt.state}` : '---',
+      nozzStr:  clean(nozzEnt) ? `${nozzEnt.state}°` : '---',
+      bedStr:   clean(bedEnt)  ? `${bedEnt.state}°`  : '---',
+      barColor: isPrinting ? 'var(--ir)' : isDone ? 'var(--ig)' : 'var(--igreyl)',
+      barGlow:  isPrinting ? 'box-shadow:0 0 8px rgba(204,0,0,.7)' : '',
+      fallbackName: clean(nameEnt),
+    };
   }
 
   // ============================================================================
@@ -336,69 +404,11 @@
       if (!this.shadowRoot || !this._c) return;
       const { prefix, name } = this._c;
       const h   = this._h;
-      // Try multiple suffixes — supports both Bambu and Moonraker naming
-      const eid = (...suffixes) => {
-        for (const suffix of suffixes) {
-          const target = `${prefix}_${suffix}`;
-          const found = Object.values(h?.states || {}).find(s => s.entity_id.endsWith('.' + target));
-          if (found) return found;
-        }
-        return null;
-      };
-
-      const onlineEnt      = eid('online');
-      const printerStateEnt= eid('printer_state');
-      const statusEnt      = eid('current_print_state', 'print_status');
-      const progressEnt    = eid('progress', 'print_progress');
-      const taskEnt        = eid('filename', 'task_name');
-      const remainEnt      = eid('print_time_left', 'remaining_time');
-      const curLayEnt      = eid('current_layer');
-      const totLayEnt      = eid('total_layer', 'total_layer_count');
-      const nozzEnt        = eid('extruder_temperature', 'nozzle_temperature');
-      const bedEnt         = eid('bed_temperature');
-      const errEnt         = eid('print_error');
-      const nameEnt        = eid('printer_name');
-
-      // Bambu: binary_sensor online; Moonraker: derive from printer_state
-      const isOnline = onlineEnt
-        ? onlineEnt.state === 'on'
-        : (printerStateEnt ? !['shutdown','startup','unavailable'].includes(printerStateEnt.state) : false);
-
-      const sv       = statusEnt?.state || 'unavailable';
-      const pct      = Math.min(100, Math.max(0, parseFloat(progressEnt?.state) || 0));
-      const hasError = errEnt?.state === 'on' || sv === 'error' || printerStateEnt?.state === 'error';
-
-      const PRINTING  = new Set(['running','prepare','slicing','printing']);
-      const isPrinting = PRINTING.has(sv);
-      const isPaused   = sv === 'pause' || sv === 'paused';
-      const isDone     = sv === 'finish' || sv === 'complete';
-      const isFailed   = sv === 'failed' || sv === 'error';
-      const isCancelled= sv === 'cancelled';
-      const isOffline  = sv === 'unavailable' || sv === 'offline' || sv === 'shutdown' || !isOnline;
-
-      let statusColor, statusLabel;
-      if (hasError || isFailed)  { statusColor = 'var(--ir)'; statusLabel = 'ERROR'; }
-      else if (isPrinting)       { statusColor = 'var(--ia)'; statusLabel = 'PRINTING'; }
-      else if (isPaused)         { statusColor = 'var(--ia)'; statusLabel = 'PAUSED'; }
-      else if (isDone)           { statusColor = 'var(--ig)'; statusLabel = 'COMPLETE'; }
-      else if (isCancelled)      { statusColor = 'var(--igreyl)'; statusLabel = 'CANCELLED'; }
-      else if (isOffline)        { statusColor = 'var(--igrey)'; statusLabel = 'OFFLINE'; }
-      else                       { statusColor = 'var(--igreyl)'; statusLabel = 'IDLE'; }
-
-      const displayName = name || nameEnt?.state || prefix;
-
-      const clean = (ent) => (!ent || ['unavailable','unknown','none',''].includes(ent.state)) ? null : ent.state;
-      const taskStr  = clean(taskEnt);
-      const remVal   = clean(remainEnt);
-      const remStr   = remVal ? (parseFloat(remVal) < 1
-        ? `${Math.round(parseFloat(remVal)*60)}M`
-        : `${parseFloat(remVal).toFixed(1)}H`) : '---';
-      const layerStr = (clean(curLayEnt) && clean(totLayEnt))
-        ? `${curLayEnt.state}/${totLayEnt.state}` : '---';
-      const nozzStr  = clean(nozzEnt) ? `${nozzEnt.state}°` : '---';
-      const bedStr   = clean(bedEnt)  ? `${bedEnt.state}°`  : '---';
-      const barColor = isPrinting ? 'var(--ir)' : isDone ? 'var(--ig)' : 'var(--igreyl)';
-      const barGlow  = isPrinting ? 'box-shadow:0 0 8px rgba(204,0,0,.7)' : '';
+      const { isActive, isPrinting, isDone, hasError, isOffline,
+              statusColor, statusLabel, pct,
+              taskStr, remStr, layerStr, nozzStr, bedStr, barColor, barGlow,
+              fallbackName } = getPrinterInfo(h, prefix);
+      const displayName = name || fallbackName || prefix;
 
       this.shadowRoot.innerHTML = `
         <style>
@@ -471,6 +481,121 @@
     }
   }
 
+  // ============================================================================
+  // imperial-fleet-grid  (2-col active/standby grouped printer overview)
+  // ============================================================================
+  class ImperialFleetGrid extends HTMLElement {
+    setConfig(c) {
+      if (!c.printers?.length) throw new Error('imperial-fleet-grid: printers required');
+      this._c = c;
+      if (!this.shadowRoot) this.attachShadow({ mode: 'open' });
+    }
+    set hass(h) { this._h = h; this._r(); }
+    _r() {
+      if (!this.shadowRoot || !this._c) return;
+      const h = this._h;
+      const items = this._c.printers.map(p => ({
+        name: p.name || p.prefix,
+        info: getPrinterInfo(h, p.prefix),
+      }));
+      const active  = items.filter(i => i.info.isActive);
+      const standby = items.filter(i => !i.info.isActive);
+
+      const block = (displayName, info) => {
+        const { statusColor, statusLabel, pct, taskStr,
+                remStr, layerStr, nozzStr, bedStr, barColor, barGlow,
+                isPrinting, hasError } = info;
+        return `
+          <div class="pb-wrap">
+            ${PHTML}
+            <div class="phd">
+              <div class="dot" style="background:${statusColor};${isPrinting?`box-shadow:0 0 6px ${statusColor};animation:pulse 1.8s ease-in-out infinite`:''}"></div>
+              <div class="pname">${displayName}</div>
+              <div class="sbadge" style="border-color:${statusColor};color:${statusColor};background:${statusColor}1a">${statusLabel}</div>
+            </div>
+            <div class="pbar"><div class="pfill" style="width:${pct}%;background:${barColor};${barGlow}"></div>${pct>0?`<span class="ppct">${Math.round(pct)}%</span>`:''}</div>
+            <div class="stats">
+              <div class="stat"><div class="slabel">Nozzle</div><div class="sval">${nozzStr}</div></div>
+              <div class="stat"><div class="slabel">Bed</div><div class="sval">${bedStr}</div></div>
+              <div class="stat"><div class="slabel">Layers</div><div class="sval">${layerStr}</div></div>
+              <div class="stat"><div class="slabel">Remain</div><div class="sval">${remStr}</div></div>
+            </div>
+            ${taskStr ? `<div class="job"><span class="jlabel">JOB //</span><span class="jname">${taskStr.toUpperCase()}</span></div>` : ''}
+            ${hasError ? `<div class="err"><ha-icon icon="mdi:alert-circle" style="--mdc-icon-size:13px"></ha-icon>PRINT ERROR</div>` : ''}
+          </div>`;
+      };
+
+      const section = (title, list, accentColor) => {
+        if (!list.length) return '';
+        return `
+          <div class="sh">
+            <div class="shbar" style="background:${accentColor}"></div>
+            <span class="shtitle" style="color:${accentColor}">${title}</span>
+            <span class="shcount">${list.length}</span>
+          </div>
+          <div class="grid">${list.map(i => block(i.name, i.info)).join('')}</div>`;
+      };
+
+      this.shadowRoot.innerHTML = `
+        <style>
+          :host{display:block}
+          .wrap{${V}}
+          @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+          /* section header */
+          .sh{display:flex;align-items:center;gap:8px;padding:8px 2px;margin-top:10px}
+          .sh:first-child{margin-top:0}
+          .shbar{width:3px;height:14px;flex-shrink:0}
+          .shtitle{font-family:var(--iui);font-size:10px;font-weight:700;
+            letter-spacing:3px;text-transform:uppercase;flex:1}
+          .shcount{font-family:var(--imono);font-size:11px;color:var(--itextd)}
+          /* 2-col grid */
+          .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+          /* printer block */
+          .pb-wrap{${V} background:var(--ipanel);border:1px solid rgba(204,0,0,.28);
+            position:relative;overflow:hidden}
+          ${PIPS} ${SCAN}
+          .phd{display:flex;align-items:center;gap:8px;padding:9px 12px;
+            border-bottom:1px solid rgba(204,0,0,.1);position:relative;z-index:1}
+          .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+          .pname{flex:1;font-family:var(--iui);font-size:10px;font-weight:700;
+            letter-spacing:2px;text-transform:uppercase;color:#fff;
+            overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+          .sbadge{font-family:var(--imono);font-size:8px;letter-spacing:1.5px;
+            padding:2px 6px;border:1px solid;flex-shrink:0}
+          .pbar{height:3px;background:var(--igrey);position:relative;z-index:1}
+          .pfill{height:100%;transition:width .6s}
+          .ppct{position:absolute;right:4px;top:50%;transform:translateY(-50%);
+            font-family:var(--imono);font-size:7px;color:var(--itext);opacity:.6;z-index:2}
+          .stats{display:grid;grid-template-columns:repeat(4,1fr);
+            border-bottom:1px solid rgba(204,0,0,.07);position:relative;z-index:1}
+          .stat{padding:6px 4px;text-align:center;border-right:1px solid rgba(204,0,0,.07)}
+          .stat:last-child{border-right:none}
+          .slabel{font-family:var(--imono);font-size:7px;letter-spacing:1px;
+            color:var(--itextd);text-transform:uppercase}
+          .sval{font-family:var(--imono);font-size:11px;color:var(--itext);margin-top:2px}
+          .job{padding:5px 12px;display:flex;align-items:center;gap:6px;
+            position:relative;z-index:1}
+          .jlabel{font-family:var(--imono);font-size:8px;letter-spacing:1px;
+            color:var(--itextd);flex-shrink:0}
+          .jname{font-family:var(--imono);font-size:9px;color:var(--itext);
+            overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+          .err{padding:5px 12px;background:rgba(204,0,0,.1);
+            border-top:1px solid rgba(204,0,0,.5);
+            font-family:var(--imono);font-size:8px;letter-spacing:2px;
+            color:var(--ir);display:flex;align-items:center;gap:5px;
+            position:relative;z-index:1;animation:pulse 1.2s ease-in-out infinite}
+        </style>
+        <div class="wrap">
+          ${section('Active Units', active, 'var(--ia)')}
+          ${section('Standby', standby, 'var(--igreyl)')}
+        </div>`;
+    }
+    getCardSize() { return Math.ceil((this._c?.printers?.length || 0) / 2) * 3 + 2; }
+    static getStubConfig() {
+      return { printers: [{ prefix: 'p1p_01s00c431300106', name: 'BAMBU P1P' }] };
+    }
+  }
+
   // ── Register cards ─────────────────────────────────────────────────────────
   [
     ['imperial-header',          ImperialHeader],
@@ -478,6 +603,7 @@
     ['imperial-readout',         ImperialReadout],
     ['imperial-button',          ImperialButton],
     ['imperial-printer-status',  ImperialPrinterStatus],
+    ['imperial-fleet-grid',      ImperialFleetGrid],
   ].forEach(([tag, cls]) => {
     if (!customElements.get(tag)) customElements.define(tag, cls);
   });
@@ -489,6 +615,7 @@
     { type: 'imperial-readout',        name: 'Imperial Readout',        description: 'Phosphor sensor display' },
     { type: 'imperial-button',         name: 'Imperial Button',         description: 'Imperial command button' },
     { type: 'imperial-printer-status', name: 'Imperial Printer Status', description: 'Printer fleet status block' },
+    { type: 'imperial-fleet-grid',     name: 'Imperial Fleet Grid',     description: '2-col active/standby printer grid' },
   );
 
   console.info(

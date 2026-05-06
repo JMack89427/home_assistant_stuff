@@ -1,6 +1,6 @@
 title: Imperial Manufacturing Facility
 resources:
-  - url: /local/imperial-cards.js?v=6
+  - url: /local/imperial-cards.js?v=7
     type: module
 views:
 
@@ -17,21 +17,16 @@ views:
         subtitle: Replicator status — all units reporting
         icon: local:galactic-republic
 
-      - type: custom:imperial-printer-status
-        prefix: p1p_01s00c431300106
-        name: Bambu P1P — Unit Alpha
-
-      - type: custom:imperial-printer-status
-        prefix: flsuns1pro
-        name: Flsun S1 Pro
-
-      - type: custom:imperial-printer-status
-        prefix: printz
-        name: Printz
-
-      - type: custom:imperial-printer-status
-        prefix: ratrig
-        name: RatRig
+      - type: custom:imperial-fleet-grid
+        printers:
+          - prefix: p1p_01s00c431300106
+            name: Bambu P1P
+          - prefix: flsuns1pro
+            name: Flsun S1 Pro
+          - prefix: printz
+            name: Printz
+          - prefix: ratrig
+            name: RatRig
 
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 2: IMPERIAL MANUFACTURING FACILITY — P1P UNIT ALPHA
