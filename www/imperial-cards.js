@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.1.3';
+  const VERSION = '2.1.4';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -635,7 +635,7 @@
         <style>
           :host { display: block; }
           .cols { display: grid; grid-template-columns: minmax(0,2fr) minmax(0,3fr); gap: 8px; align-items: start; }
-          @media (max-width: 768px) { .cols { grid-template-columns: 1fr; } }
+          @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } }
           .col { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
         </style>
         <div class="cols">
