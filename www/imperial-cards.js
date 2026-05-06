@@ -5,16 +5,16 @@
 (function () {
   'use strict';
 
-  const VERSION = '1.2.0';
+  const VERSION = '1.3.0';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
     --ir: #CC0000; --ir-dim: rgba(204,0,0,0.25); --ir-glow: rgba(204,0,0,0.15);
     --ig: #00C853; --ig-glow: rgba(0,200,83,0.5);
     --ia: #FFB300; --ia-glow: rgba(255,179,0,0.5);
-    --ibg: #0A0A0A; --ipanel: #131313;
-    --igrey: #3A3A3A; --igreyl: #5C5C5C;
-    --itext: #DEDEDE; --itextd: #6A6A6A;
+    --ibg: #0A0A0A; --ipanel: #1A1A1A;
+    --igrey: #444444; --igreyl: #909090;
+    --itext: #E8E8E8; --itextd: #909090;
     --imono: 'Courier New', Courier, monospace;
     --iui:   'Arial Narrow', Arial, sans-serif;
   `;
@@ -336,7 +336,10 @@
       if (!this.shadowRoot || !this._c) return;
       const { prefix, name } = this._c;
       const h   = this._h;
-      const eid = id => h?.states[`${prefix}_${id}`];
+      const eid = (suffix) => {
+        const target = `${prefix}_${suffix}`;
+        return Object.values(h?.states || {}).find(s => s.entity_id.endsWith('.' + target)) || null;
+      };
 
       const online      = eid('online');
       const statusEnt   = eid('print_status');
