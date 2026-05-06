@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.1.2';
+  const VERSION = '2.1.3';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -251,8 +251,8 @@
           .row.tog:active{background:rgba(204,0,0,.12)}
           ha-icon{--mdc-icon-size:24px;flex-shrink:0}
           .nm{flex:1;font-family:var(--iui);font-size:15px;letter-spacing:2px;color:var(--itext)}
-          .vl{font-family:var(--imono);font-size:15px;letter-spacing:.5px}
-          .dt{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+          .vl{font-family:var(--imono);font-size:15px;letter-spacing:.5px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+          .dt{width:8px;height:8px;border-radius:50%;flex-shrink:0;align-self:center}
         </style>
         <div class="card">${PHTML}<div class="sl"></div>
           ${title ? `<div class="hd">${title}</div>` : ''}
@@ -376,15 +376,10 @@
           .lb{font-family:var(--iui);font-size:13px;font-weight:700;
             letter-spacing:3.5px;text-transform:uppercase;
             color:var(--itext);position:relative;z-index:1}
-          .rk{display:flex;gap:4px;position:relative;z-index:1}
-          .rp{width:20px;height:6px;background:${c2}}
-          .rp:nth-child(-n+4){opacity:${active?1:.3}}
-          .rp:nth-child(n+5){opacity:.15}
         </style>
         <div class="b">${PHTML}<div class="sl"></div>
           <ha-icon icon="${ic}"></ha-icon>
           <div class="lb">${name}</div>
-          <div class="rk">${[1,2,3,4,5,6].map(()=>'<div class="rp"></div>').join('')}</div>
         </div>`;
       this.shadowRoot.querySelector('.b').addEventListener('click', () => {
         if (sv) svc(this._h, sv, sd || {});
