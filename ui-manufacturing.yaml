@@ -1,6 +1,6 @@
 title: Imperial Manufacturing Facility
 resources:
-  - url: /local/imperial-cards.js?v=8
+  - url: /local/imperial-cards.js?v=9
     type: module
 views:
 
@@ -29,7 +29,7 @@ views:
             name: RatRig
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 2: IMPERIAL MANUFACTURING FACILITY — P1P UNIT ALPHA
+  # VIEW 2: BAMBU P1P — UNIT ALPHA
   # ═══════════════════════════════════════════════════════════════════════════
   - title: P1P Alpha
     path: p1p-alpha
@@ -37,8 +37,8 @@ views:
     badges: []
     cards:
       - type: custom:imperial-header
-        title: Imperial Manufacturing Facility
-        subtitle: Fabrication systems online — awaiting replication orders
+        title: Bambu P1P — Unit Alpha
+        subtitle: Bambu Lab fabrication unit — Crafting Room
         icon: local:old-republic
 
       - type: horizontal-stack
@@ -98,10 +98,10 @@ views:
         title: Thermal Systems
         entities:
           - entity: sensor.p1p_01s00c431300106_nozzle_temperature
-            name: Nozzle Temp
+            name: Extruder Temp
             icon: mdi:printer-3d-nozzle-heat
           - entity: sensor.p1p_01s00c431300106_nozzle_target_temperature
-            name: Nozzle Target
+            name: Extruder Target
             icon: mdi:thermometer-chevron-up
           - entity: sensor.p1p_01s00c431300106_bed_temperature
             name: Bed Temp
@@ -216,6 +216,9 @@ views:
           - entity: sensor.flsuns1pro_print_time_left
             name: Time Remaining
             icon: mdi:timer-outline
+          - entity: sensor.flsuns1pro_print_eta
+            name: Est. Completion
+            icon: mdi:clock-end
 
       - type: custom:imperial-panel
         title: Thermal Systems
@@ -223,9 +226,15 @@ views:
           - entity: sensor.flsuns1pro_extruder_temperature
             name: Extruder Temp
             icon: mdi:printer-3d-nozzle-heat
+          - entity: sensor.flsuns1pro_extruder_target
+            name: Extruder Target
+            icon: mdi:thermometer-chevron-up
           - entity: sensor.flsuns1pro_bed_temperature
             name: Bed Temp
             icon: mdi:radiator
+          - entity: sensor.flsuns1pro_bed_target
+            name: Bed Target
+            icon: mdi:thermometer-chevron-up
 
       - type: grid
         columns: 4
@@ -314,6 +323,9 @@ views:
           - entity: sensor.printz_print_time_left
             name: Time Remaining
             icon: mdi:timer-outline
+          - entity: sensor.printz_print_eta
+            name: Est. Completion
+            icon: mdi:clock-end
 
       - type: custom:imperial-panel
         title: Thermal Systems
@@ -321,9 +333,15 @@ views:
           - entity: sensor.printz_extruder_temperature
             name: Extruder Temp
             icon: mdi:printer-3d-nozzle-heat
+          - entity: sensor.printz_extruder_target
+            name: Extruder Target
+            icon: mdi:thermometer-chevron-up
           - entity: sensor.printz_bed_temperature
             name: Bed Temp
             icon: mdi:radiator
+          - entity: sensor.printz_bed_target
+            name: Bed Target
+            icon: mdi:thermometer-chevron-up
 
       - type: grid
         columns: 4
@@ -424,9 +442,15 @@ views:
           - entity: sensor.ratrig_extruder_temperature
             name: Extruder Temp
             icon: mdi:printer-3d-nozzle-heat
+          - entity: sensor.ratrig_extruder_target
+            name: Extruder Target
+            icon: mdi:thermometer-chevron-up
           - entity: sensor.ratrig_bed_temperature
             name: Bed Temp
             icon: mdi:radiator
+          - entity: sensor.ratrig_bed_target
+            name: Bed Target
+            icon: mdi:thermometer-chevron-up
 
       - type: grid
         columns: 4
