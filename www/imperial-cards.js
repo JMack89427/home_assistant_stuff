@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.0.1';
+  const VERSION = '2.0.2';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -162,7 +162,7 @@
           .ti{font-family:var(--iui);font-size:18px;font-weight:700;
             letter-spacing:5px;text-transform:uppercase;color:#fff}
           .su{font-family:var(--imono);font-size:13px;letter-spacing:3px;
-            color:var(--itextd);margin-top:3px}
+            color:#fff;margin-top:3px}
           .di{width:14px;height:14px;flex-shrink:0;background:var(--ir);
             clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%)}
           ${PIPS}
