@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.0.2';
+  const VERSION = '2.1.0';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -604,6 +604,59 @@
     }
   }
 
+  // ============================================================================
+  // imperial-responsive-columns  (2-col on wide, 1-col on narrow/mobile)
+  // ============================================================================
+  class ImperialResponsiveColumns extends HTMLElement {
+    setConfig(c) {
+      if (!c.left || !c.right) throw new Error('imperial-responsive-columns: left and right required');
+      this._c = c;
+      this._hass = null;
+      this._leftEls = [];
+      this._rightEls = [];
+      if (!this.shadowRoot) this.attachShadow({ mode: 'open' });
+      this._setup();
+    }
+
+    async _setup() {
+      const helpers = await window.loadCardHelpers();
+      this._leftEls  = (this._c.left  || []).map(cfg => helpers.createCardElement(cfg));
+      this._rightEls = (this._c.right || []).map(cfg => helpers.createCardElement(cfg));
+      this._render();
+      if (this._hass) this._passHass();
+    }
+
+    _passHass() {
+      [...this._leftEls, ...this._rightEls].forEach(el => { el.hass = this._hass; });
+    }
+
+    set hass(h) {
+      this._hass = h;
+      this._passHass();
+    }
+
+    _render() {
+      this.shadowRoot.innerHTML = `
+        <style>
+          :host { display: block; container-type: inline-size; }
+          .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
+          @container (max-width: 600px) { .cols { grid-template-columns: 1fr; } }
+          .col { display: flex; flex-direction: column; gap: 8px; }
+        </style>
+        <div class="cols">
+          <div class="left col"></div>
+          <div class="right col"></div>
+        </div>`;
+      const leftEl  = this.shadowRoot.querySelector('.left');
+      const rightEl = this.shadowRoot.querySelector('.right');
+      this._leftEls.forEach(el  => leftEl.appendChild(el));
+      this._rightEls.forEach(el => rightEl.appendChild(el));
+    }
+
+    getCardSize() { return 6; }
+    static getStubConfig() { return { left: [], right: [] }; }
+  }
+
   // ── Register cards ─────────────────────────────────────────────────────────
   [
     ['imperial-header',          ImperialHeader],
@@ -611,7 +664,8 @@
     ['imperial-readout',         ImperialReadout],
     ['imperial-button',          ImperialButton],
     ['imperial-printer-status',  ImperialPrinterStatus],
-    ['imperial-fleet-grid',      ImperialFleetGrid],
+    ['imperial-fleet-grid',         ImperialFleetGrid],
+    ['imperial-responsive-columns', ImperialResponsiveColumns],
   ].forEach(([tag, cls]) => {
     if (!customElements.get(tag)) customElements.define(tag, cls);
   });
@@ -623,7 +677,8 @@
     { type: 'imperial-readout',        name: 'Imperial Readout',        description: 'Phosphor sensor display' },
     { type: 'imperial-button',         name: 'Imperial Button',         description: 'Imperial command button' },
     { type: 'imperial-printer-status', name: 'Imperial Printer Status', description: 'Printer fleet status block' },
-    { type: 'imperial-fleet-grid',     name: 'Imperial Fleet Grid',     description: '2-col active/standby printer grid' },
+    { type: 'imperial-fleet-grid',         name: 'Imperial Fleet Grid',         description: '2-col active/standby printer grid' },
+    { type: 'imperial-responsive-columns', name: 'Imperial Responsive Columns', description: 'Responsive 2-col layout, stacks on mobile' },
   );
 
   console.info(
