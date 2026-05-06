@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '1.8.0';
+  const VERSION = '1.9.0';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -27,7 +27,7 @@
   `;
 
   const PIPS = `
-    .p { position:absolute; width:6px; height:6px; background:var(--ir); z-index:3; }
+    .p { position:absolute; width:8px; height:8px; background:var(--ir); z-index:3; }
     .p.tl { top:0;    left:0;  } .p.tr { top:0;    right:0; }
     .p.bl { bottom:0; left:0;  } .p.br { bottom:0; right:0; }
   `;
@@ -155,15 +155,15 @@
           :host{display:block}
           .w{${V} position:relative}
           .b{background:linear-gradient(90deg,var(--ir) 0%,rgba(204,0,0,.2) 45%,transparent 100%);
-            border:1px solid rgba(204,0,0,.45);padding:10px 16px;
-            display:flex;align-items:center;gap:10px}
-          ha-icon{color:var(--ir);--mdc-icon-size:20px;flex-shrink:0}
+            border:1px solid rgba(204,0,0,.45);padding:14px 22px;
+            display:flex;align-items:center;gap:14px}
+          ha-icon{color:var(--ir);--mdc-icon-size:28px;flex-shrink:0}
           .t{flex:1}
-          .ti{font-family:var(--iui);font-size:12px;font-weight:700;
-            letter-spacing:3.5px;text-transform:uppercase;color:#fff}
-          .su{font-family:var(--imono);font-size:9px;letter-spacing:2px;
-            color:var(--itextd);margin-top:2px}
-          .di{width:8px;height:8px;flex-shrink:0;background:var(--ir);
+          .ti{font-family:var(--iui);font-size:17px;font-weight:700;
+            letter-spacing:5px;text-transform:uppercase;color:#fff}
+          .su{font-family:var(--imono);font-size:13px;letter-spacing:3px;
+            color:var(--itextd);margin-top:3px}
+          .di{width:11px;height:11px;flex-shrink:0;background:var(--ir);
             clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%)}
           ${PIPS}
         </style>
@@ -239,20 +239,20 @@
           .card{${V} background:var(--ipanel);border:1px solid rgba(204,0,0,.3);position:relative}
           ${PIPS} ${SCAN}
           .hd{background:linear-gradient(90deg,rgba(204,0,0,.5),rgba(204,0,0,.1) 55%,transparent);
-            border-bottom:1px solid rgba(204,0,0,.25);padding:7px 14px;
-            font-family:var(--iui);font-size:10px;font-weight:700;
-            letter-spacing:3px;text-transform:uppercase;color:#fff;position:relative;z-index:1}
-          .row{display:flex;align-items:center;gap:10px;padding:9px 14px;
+            border-bottom:1px solid rgba(204,0,0,.25);padding:10px 20px;
+            font-family:var(--iui);font-size:14px;font-weight:700;
+            letter-spacing:4px;text-transform:uppercase;color:#fff;position:relative;z-index:1}
+          .row{display:flex;align-items:center;gap:14px;padding:13px 20px;
             border-bottom:1px solid rgba(204,0,0,.07);position:relative;z-index:1;
             transition:background .12s}
           .row:last-child{border-bottom:none}
           .row.tog{cursor:pointer}
           .row.tog:hover{background:rgba(204,0,0,.06)}
           .row.tog:active{background:rgba(204,0,0,.12)}
-          ha-icon{--mdc-icon-size:17px;flex-shrink:0}
-          .nm{flex:1;font-family:var(--iui);font-size:11px;letter-spacing:1.5px;color:var(--itext)}
-          .vl{font-family:var(--imono);font-size:11px;letter-spacing:.5px}
-          .dt{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+          ha-icon{--mdc-icon-size:24px;flex-shrink:0}
+          .nm{flex:1;font-family:var(--iui);font-size:15px;letter-spacing:2px;color:var(--itext)}
+          .vl{font-family:var(--imono);font-size:15px;letter-spacing:.5px}
+          .dt{width:8px;height:8px;border-radius:50%;flex-shrink:0}
         </style>
         <div class="card">${PHTML}<div class="sl"></div>
           ${title ? `<div class="hd">${title}</div>` : ''}
@@ -301,21 +301,21 @@
         <style>
           :host{display:block}
           .card{${V} background:var(--ipanel);border:1px solid ${dead?'rgba(100,100,100,.25)':dim};
-            padding:14px 16px 12px;position:relative;overflow:hidden}
-          .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+            padding:20px 22px 17px;position:relative;overflow:hidden}
+          .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
             background:${dead?'var(--igrey)':c2}}
           ${SCAN} ${PIPS}
           .p{background:${dead?'var(--igrey)':c2}}
-          .lb{font-family:var(--imono);font-size:9px;letter-spacing:3px;text-transform:uppercase;
-            color:${c2};opacity:${dead?.3:.7};margin-bottom:6px;position:relative;z-index:1}
-          .rv{display:flex;align-items:baseline;gap:5px;position:relative;z-index:1}
-          .vl{font-family:var(--imono);font-size:46px;font-weight:700;line-height:1;
-            letter-spacing:-2px;color:${dead?'var(--igrey)':c2};
+          .lb{font-family:var(--imono);font-size:13px;letter-spacing:4px;text-transform:uppercase;
+            color:${c2};opacity:${dead?.3:.7};margin-bottom:8px;position:relative;z-index:1}
+          .rv{display:flex;align-items:baseline;gap:7px;position:relative;z-index:1}
+          .vl{font-family:var(--imono);font-size:64px;font-weight:700;line-height:1;
+            letter-spacing:-3px;color:${dead?'var(--igrey)':c2};
             text-shadow:${dead?'none':`0 0 12px ${glow},0 0 28px ${dim}`}}
-          .un{font-family:var(--imono);font-size:16px;color:${c2};opacity:.5}
+          .un{font-family:var(--imono);font-size:22px;color:${c2};opacity:.5}
           .dv{height:1px;background:linear-gradient(90deg,${c2},transparent);
-            margin:9px 0 5px;opacity:.3;position:relative;z-index:1}
-          .ft{font-family:var(--imono);font-size:9px;letter-spacing:2px;
+            margin:13px 0 7px;opacity:.3;position:relative;z-index:1}
+          .ft{font-family:var(--imono);font-size:13px;letter-spacing:3px;
             color:${c2};opacity:.35;text-transform:uppercase;position:relative;z-index:1}
         </style>
         <div class="card">${PHTML}<div class="sl"></div>
@@ -361,23 +361,23 @@
           :host{display:block;cursor:pointer}
           .b{${V} background:${active?dm:'var(--ipanel)'};
             border:1px solid ${active?c2:'rgba(204,0,0,.3)'};
-            padding:16px 12px 12px;display:flex;flex-direction:column;
-            align-items:center;gap:8px;text-align:center;
-            position:relative;overflow:hidden;min-height:100px;
+            padding:22px 17px 17px;display:flex;flex-direction:column;
+            align-items:center;gap:11px;text-align:center;
+            position:relative;overflow:hidden;min-height:140px;
             box-shadow:${active?`0 0 18px ${gl}`:'none'};
             transition:background .15s,box-shadow .15s,border-color .15s}
           .b:hover{background:${dm};border-color:${c2};box-shadow:0 0 22px ${gl}}
           .b:active{opacity:.7}
           ${PIPS} .p{background:${c2}}
           ${SCAN}
-          ha-icon{color:${active?c2:'var(--igreyl)'};--mdc-icon-size:30px;
+          ha-icon{color:${active?c2:'var(--igreyl)'};--mdc-icon-size:42px;
             transition:color .15s;position:relative;z-index:1}
           .b:hover ha-icon{color:${c2}}
-          .lb{font-family:var(--iui);font-size:9px;font-weight:700;
-            letter-spacing:2.5px;text-transform:uppercase;
+          .lb{font-family:var(--iui);font-size:13px;font-weight:700;
+            letter-spacing:3.5px;text-transform:uppercase;
             color:var(--itext);position:relative;z-index:1}
-          .rk{display:flex;gap:3px;position:relative;z-index:1}
-          .rp{width:14px;height:4px;background:${c2}}
+          .rk{display:flex;gap:4px;position:relative;z-index:1}
+          .rp{width:20px;height:6px;background:${c2}}
           .rp:nth-child(-n+4){opacity:${active?1:.3}}
           .rp:nth-child(n+5){opacity:.15}
         </style>
