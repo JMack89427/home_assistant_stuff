@@ -34,6 +34,13 @@ lovelace:
       icon: mdi:space-station
       show_in_sidebar: true
       require_admin: false
+    imperial-manufacturing:
+      mode: yaml
+      filename: ui-manufacturing.yaml
+      title: Imperial Manufacturing Facility
+      icon: mdi:printer-3d-nozzle
+      show_in_sidebar: true
+      require_admin: false
 
 
 # ── HTTP ──────────────────────────────────────────────────────────────────────

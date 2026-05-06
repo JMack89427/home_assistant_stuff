@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '1.1.0';
+  const VERSION = '1.2.0';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -130,26 +130,34 @@
       const h = this._h;
       const TOGGLE_DOMAINS = new Set(['light','switch','input_boolean','fan','automation','script']);
       const rows = entities.map(e => {
-        const id  = typeof e === 'string' ? e : e.entity;
-        const nm  = e.name  || h?.states[id]?.attributes?.friendly_name || id;
-        const ic  = e.icon  || h?.states[id]?.attributes?.icon || icon(id);
-        const so  = st(h, id);
-        const tog = TOGGLE_DOMAINS.has(id.split('.')[0]) && !e.attribute;
-        let c2, tx;
+        const id     = typeof e === 'string' ? e : e.entity;
+        const nm     = e.name  || h?.states[id]?.attributes?.friendly_name || id;
+        const ic     = e.icon  || h?.states[id]?.attributes?.icon || icon(id);
+        const so     = st(h, id);
+        const tog    = TOGGLE_DOMAINS.has(id.split('.')[0]) && !e.attribute;
+        const unavail = !so || so.state === 'unavailable';
+        let dotColor, txtColor, tx;
         if (e.attribute) {
           const val = so?.attributes?.[e.attribute];
           const u   = e.unit ?? so?.attributes?.[`${e.attribute}_unit`] ?? '';
-          tx = val !== undefined ? `${val}${u ? ' ' + u : ''}`.toUpperCase() : 'N/A';
-          c2 = 'var(--itextd)';
+          tx        = val !== undefined ? `${val}${u ? ' ' + u : ''}`.toUpperCase() : 'N/A';
+          dotColor  = unavail ? 'var(--igrey)' : 'var(--itextd)';
+          txtColor  = unavail ? 'var(--igrey)' : 'var(--itext)';
+        } else if (tog) {
+          dotColor = col(so);
+          txtColor = col(so);
+          tx       = txt(so);
         } else {
-          c2 = col(so);
-          tx = txt(so);
+          // pure sensor — keep dot color-coded, make value text readable
+          dotColor = col(so);
+          txtColor = unavail ? 'var(--igrey)' : 'var(--itext)';
+          tx       = txt(so);
         }
         return `<div class="row${tog?' tog':''}" data-id="${id}">
-          <ha-icon icon="${ic}" style="color:${c2}"></ha-icon>
+          <ha-icon icon="${ic}" style="color:${dotColor}"></ha-icon>
           <span class="nm">${nm.toUpperCase()}</span>
-          <span class="vl" style="color:${c2}">${tx}</span>
-          <span class="dt" style="background:${c2};box-shadow:0 0 5px ${c2}"></span>
+          <span class="vl" style="color:${txtColor}">${tx}</span>
+          <span class="dt" style="background:${dotColor};box-shadow:0 0 5px ${dotColor}"></span>
         </div>`;
       }).join('');
       this.shadowRoot.innerHTML = `
