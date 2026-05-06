@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '1.3.0';
+  const VERSION = '1.4.0';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -336,40 +336,52 @@
       if (!this.shadowRoot || !this._c) return;
       const { prefix, name } = this._c;
       const h   = this._h;
-      const eid = (suffix) => {
-        const target = `${prefix}_${suffix}`;
-        return Object.values(h?.states || {}).find(s => s.entity_id.endsWith('.' + target)) || null;
+      // Try multiple suffixes — supports both Bambu and Moonraker naming
+      const eid = (...suffixes) => {
+        for (const suffix of suffixes) {
+          const target = `${prefix}_${suffix}`;
+          const found = Object.values(h?.states || {}).find(s => s.entity_id.endsWith('.' + target));
+          if (found) return found;
+        }
+        return null;
       };
 
-      const online      = eid('online');
-      const statusEnt   = eid('print_status');
-      const progressEnt = eid('print_progress');
-      const taskEnt     = eid('task_name');
-      const remainEnt   = eid('remaining_time');
-      const curLayEnt   = eid('current_layer');
-      const totLayEnt   = eid('total_layer_count');
-      const nozzEnt     = eid('nozzle_temperature');
-      const bedEnt      = eid('bed_temperature');
-      const errEnt      = eid('print_error');
-      const nameEnt     = eid('printer_name');
+      const onlineEnt      = eid('online');
+      const printerStateEnt= eid('printer_state');
+      const statusEnt      = eid('current_print_state', 'print_status');
+      const progressEnt    = eid('progress', 'print_progress');
+      const taskEnt        = eid('filename', 'task_name');
+      const remainEnt      = eid('print_time_left', 'remaining_time');
+      const curLayEnt      = eid('current_layer');
+      const totLayEnt      = eid('total_layer', 'total_layer_count');
+      const nozzEnt        = eid('extruder_temperature', 'nozzle_temperature');
+      const bedEnt         = eid('bed_temperature');
+      const errEnt         = eid('print_error');
+      const nameEnt        = eid('printer_name');
 
-      const isOnline  = online?.state === 'on';
-      const sv        = statusEnt?.state || 'unavailable';
-      const pct       = Math.min(100, Math.max(0, parseFloat(progressEnt?.state) || 0));
-      const hasError  = errEnt?.state === 'on';
+      // Bambu: binary_sensor online; Moonraker: derive from printer_state
+      const isOnline = onlineEnt
+        ? onlineEnt.state === 'on'
+        : (printerStateEnt ? !['shutdown','startup','unavailable'].includes(printerStateEnt.state) : false);
 
-      const PRINTING  = new Set(['running','prepare','slicing']);
+      const sv       = statusEnt?.state || 'unavailable';
+      const pct      = Math.min(100, Math.max(0, parseFloat(progressEnt?.state) || 0));
+      const hasError = errEnt?.state === 'on' || sv === 'error' || printerStateEnt?.state === 'error';
+
+      const PRINTING  = new Set(['running','prepare','slicing','printing']);
       const isPrinting = PRINTING.has(sv);
-      const isPaused   = sv === 'pause';
-      const isDone     = sv === 'finish';
-      const isFailed   = sv === 'failed';
-      const isOffline  = sv === 'unavailable' || sv === 'offline' || !isOnline;
+      const isPaused   = sv === 'pause' || sv === 'paused';
+      const isDone     = sv === 'finish' || sv === 'complete';
+      const isFailed   = sv === 'failed' || sv === 'error';
+      const isCancelled= sv === 'cancelled';
+      const isOffline  = sv === 'unavailable' || sv === 'offline' || sv === 'shutdown' || !isOnline;
 
       let statusColor, statusLabel;
       if (hasError || isFailed)  { statusColor = 'var(--ir)'; statusLabel = 'ERROR'; }
       else if (isPrinting)       { statusColor = 'var(--ia)'; statusLabel = 'PRINTING'; }
       else if (isPaused)         { statusColor = 'var(--ia)'; statusLabel = 'PAUSED'; }
       else if (isDone)           { statusColor = 'var(--ig)'; statusLabel = 'COMPLETE'; }
+      else if (isCancelled)      { statusColor = 'var(--igreyl)'; statusLabel = 'CANCELLED'; }
       else if (isOffline)        { statusColor = 'var(--igrey)'; statusLabel = 'OFFLINE'; }
       else                       { statusColor = 'var(--igreyl)'; statusLabel = 'IDLE'; }
 
