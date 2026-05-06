@@ -1,6 +1,6 @@
 title: Imperial Manufacturing Facility
 resources:
-  - url: /local/imperial-cards.js?v=11
+  - url: /local/imperial-cards.js?v=12
     type: module
 views:
 
@@ -43,24 +43,23 @@ views:
 
       - type: horizontal-stack
         cards:
-          - type: custom:imperial-readout
-            entity: sensor.p1p_01s00c431300106_print_progress
-            name: Print Progress
-            color: green
-            unit: "%"
-          - type: custom:imperial-readout
-            entity: sensor.p1p_01s00c431300106_current_layer
-            name: Current Layer
-            color: amber
-          - type: custom:imperial-readout
-            entity: sensor.p1p_01s00c431300106_total_layer_count
-            name: Total Layers
-            color: red
-
-      - type: horizontal-stack
-        cards:
           - type: vertical-stack
             cards:
+              - type: horizontal-stack
+                cards:
+                  - type: custom:imperial-readout
+                    entity: sensor.p1p_01s00c431300106_print_progress
+                    name: Print Progress
+                    color: green
+                    unit: "%"
+                  - type: custom:imperial-readout
+                    entity: sensor.p1p_01s00c431300106_current_layer
+                    name: Current Layer
+                    color: amber
+                  - type: custom:imperial-readout
+                    entity: sensor.p1p_01s00c431300106_total_layer_count
+                    name: Total Layers
+                    color: red
               - type: picture-glance
                 title: Fabrication Bay
                 camera_image: camera.p1p_01s00c431300106_camera
@@ -72,6 +71,34 @@ views:
                     icon: mdi:network
                   - entity: light.p1p_01s00c431300106_chamber_light
                     icon: mdi:lightbulb
+              - type: grid
+                columns: 3
+                square: false
+                cards:
+                  - type: custom:imperial-button
+                    name: Pause
+                    icon: mdi:pause-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.p1p_01s00c431300106_pause_printing
+                    entity: button.p1p_01s00c431300106_pause_printing
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Resume
+                    icon: mdi:play-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.p1p_01s00c431300106_resume_printing
+                    entity: button.p1p_01s00c431300106_resume_printing
+                    color: green
+                  - type: custom:imperial-button
+                    name: Stop Print
+                    icon: mdi:stop-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.p1p_01s00c431300106_stop_printing
+                    entity: button.p1p_01s00c431300106_stop_printing
+                    color: red
           - type: vertical-stack
             cards:
               - type: custom:imperial-panel
@@ -108,35 +135,6 @@ views:
                     name: Bed Temp
                     icon: mdi:radiator
 
-      - type: grid
-        columns: 3
-        square: false
-        cards:
-          - type: custom:imperial-button
-            name: Pause
-            icon: mdi:pause-circle
-            service: button.press
-            service_data:
-              entity_id: button.p1p_01s00c431300106_pause_printing
-            entity: button.p1p_01s00c431300106_pause_printing
-            color: amber
-          - type: custom:imperial-button
-            name: Resume
-            icon: mdi:play-circle
-            service: button.press
-            service_data:
-              entity_id: button.p1p_01s00c431300106_resume_printing
-            entity: button.p1p_01s00c431300106_resume_printing
-            color: green
-          - type: custom:imperial-button
-            name: Stop Print
-            icon: mdi:stop-circle
-            service: button.press
-            service_data:
-              entity_id: button.p1p_01s00c431300106_stop_printing
-            entity: button.p1p_01s00c431300106_stop_printing
-            color: red
-
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 3: FLSUN S1 PRO
   # ═══════════════════════════════════════════════════════════════════════════
@@ -152,25 +150,24 @@ views:
 
       - type: horizontal-stack
         cards:
-          - type: custom:imperial-readout
-            entity: sensor.flsuns1pro_progress
-            name: Print Progress
-            color: green
-            unit: "%"
-            round: true
-          - type: custom:imperial-readout
-            entity: sensor.flsuns1pro_current_layer
-            name: Current Layer
-            color: amber
-          - type: custom:imperial-readout
-            entity: sensor.flsuns1pro_total_layer
-            name: Total Layers
-            color: red
-
-      - type: horizontal-stack
-        cards:
           - type: vertical-stack
             cards:
+              - type: horizontal-stack
+                cards:
+                  - type: custom:imperial-readout
+                    entity: sensor.flsuns1pro_progress
+                    name: Print Progress
+                    color: green
+                    unit: "%"
+                    round: true
+                  - type: custom:imperial-readout
+                    entity: sensor.flsuns1pro_current_layer
+                    name: Current Layer
+                    color: amber
+                  - type: custom:imperial-readout
+                    entity: sensor.flsuns1pro_total_layer
+                    name: Total Layers
+                    color: red
               - type: picture-glance
                 title: Fabrication Bay
                 camera_image: camera.flsuns1pro_camera
@@ -178,6 +175,42 @@ views:
                 entities:
                   - entity: binary_sensor.flsuns1pro_filament_sensor
                     icon: mdi:alert-circle
+              - type: grid
+                columns: 4
+                square: false
+                cards:
+                  - type: custom:imperial-button
+                    name: Pause
+                    icon: mdi:pause-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.flsuns1pro_pause_print
+                    entity: button.flsuns1pro_pause_print
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Resume
+                    icon: mdi:play-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.flsuns1pro_resume_print
+                    entity: button.flsuns1pro_resume_print
+                    color: green
+                  - type: custom:imperial-button
+                    name: Cancel
+                    icon: mdi:stop-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.flsuns1pro_cancel_print
+                    entity: button.flsuns1pro_cancel_print
+                    color: red
+                  - type: custom:imperial-button
+                    name: E-Stop
+                    icon: mdi:alert-octagon
+                    service: button.press
+                    service_data:
+                      entity_id: button.flsuns1pro_emergency_stop
+                    entity: button.flsuns1pro_emergency_stop
+                    color: red
           - type: vertical-stack
             cards:
               - type: custom:imperial-panel
@@ -210,43 +243,6 @@ views:
                     icon: mdi:radiator
                     round: true
 
-      - type: grid
-        columns: 4
-        square: false
-        cards:
-          - type: custom:imperial-button
-            name: Pause
-            icon: mdi:pause-circle
-            service: button.press
-            service_data:
-              entity_id: button.flsuns1pro_pause_print
-            entity: button.flsuns1pro_pause_print
-            color: amber
-          - type: custom:imperial-button
-            name: Resume
-            icon: mdi:play-circle
-            service: button.press
-            service_data:
-              entity_id: button.flsuns1pro_resume_print
-            entity: button.flsuns1pro_resume_print
-            color: green
-          - type: custom:imperial-button
-            name: Cancel
-            icon: mdi:stop-circle
-            service: button.press
-            service_data:
-              entity_id: button.flsuns1pro_cancel_print
-            entity: button.flsuns1pro_cancel_print
-            color: red
-          - type: custom:imperial-button
-            name: E-Stop
-            icon: mdi:alert-octagon
-            service: button.press
-            service_data:
-              entity_id: button.flsuns1pro_emergency_stop
-            entity: button.flsuns1pro_emergency_stop
-            color: red
-
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 4: PRINTZ
   # ═══════════════════════════════════════════════════════════════════════════
@@ -262,30 +258,65 @@ views:
 
       - type: horizontal-stack
         cards:
-          - type: custom:imperial-readout
-            entity: sensor.printz_progress
-            name: Print Progress
-            color: green
-            unit: "%"
-            round: true
-          - type: custom:imperial-readout
-            entity: sensor.printz_current_layer
-            name: Current Layer
-            color: amber
-          - type: custom:imperial-readout
-            entity: sensor.printz_total_layer
-            name: Total Layers
-            color: red
-
-      - type: horizontal-stack
-        cards:
           - type: vertical-stack
             cards:
+              - type: horizontal-stack
+                cards:
+                  - type: custom:imperial-readout
+                    entity: sensor.printz_progress
+                    name: Print Progress
+                    color: green
+                    unit: "%"
+                    round: true
+                  - type: custom:imperial-readout
+                    entity: sensor.printz_current_layer
+                    name: Current Layer
+                    color: amber
+                  - type: custom:imperial-readout
+                    entity: sensor.printz_total_layer
+                    name: Total Layers
+                    color: red
               - type: picture-glance
                 title: Fabrication Bay
                 camera_image: camera.printz_webcam
                 camera_view: auto
                 entities: []
+              - type: grid
+                columns: 4
+                square: false
+                cards:
+                  - type: custom:imperial-button
+                    name: Pause
+                    icon: mdi:pause-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.printz_pause_print
+                    entity: button.printz_pause_print
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Resume
+                    icon: mdi:play-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.printz_resume_print
+                    entity: button.printz_resume_print
+                    color: green
+                  - type: custom:imperial-button
+                    name: Cancel
+                    icon: mdi:stop-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.printz_cancel_print
+                    entity: button.printz_cancel_print
+                    color: red
+                  - type: custom:imperial-button
+                    name: E-Stop
+                    icon: mdi:alert-octagon
+                    service: button.press
+                    service_data:
+                      entity_id: button.printz_emergency_stop
+                    entity: button.printz_emergency_stop
+                    color: red
           - type: vertical-stack
             cards:
               - type: custom:imperial-panel
@@ -318,43 +349,6 @@ views:
                     icon: mdi:radiator
                     round: true
 
-      - type: grid
-        columns: 4
-        square: false
-        cards:
-          - type: custom:imperial-button
-            name: Pause
-            icon: mdi:pause-circle
-            service: button.press
-            service_data:
-              entity_id: button.printz_pause_print
-            entity: button.printz_pause_print
-            color: amber
-          - type: custom:imperial-button
-            name: Resume
-            icon: mdi:play-circle
-            service: button.press
-            service_data:
-              entity_id: button.printz_resume_print
-            entity: button.printz_resume_print
-            color: green
-          - type: custom:imperial-button
-            name: Cancel
-            icon: mdi:stop-circle
-            service: button.press
-            service_data:
-              entity_id: button.printz_cancel_print
-            entity: button.printz_cancel_print
-            color: red
-          - type: custom:imperial-button
-            name: E-Stop
-            icon: mdi:alert-octagon
-            service: button.press
-            service_data:
-              entity_id: button.printz_emergency_stop
-            entity: button.printz_emergency_stop
-            color: red
-
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 5: RATRIG
   # ═══════════════════════════════════════════════════════════════════════════
@@ -370,25 +364,24 @@ views:
 
       - type: horizontal-stack
         cards:
-          - type: custom:imperial-readout
-            entity: sensor.ratrig_progress
-            name: Print Progress
-            color: green
-            unit: "%"
-            round: true
-          - type: custom:imperial-readout
-            entity: sensor.ratrig_current_layer
-            name: Current Layer
-            color: amber
-          - type: custom:imperial-readout
-            entity: sensor.ratrig_total_layer
-            name: Total Layers
-            color: red
-
-      - type: horizontal-stack
-        cards:
           - type: vertical-stack
             cards:
+              - type: horizontal-stack
+                cards:
+                  - type: custom:imperial-readout
+                    entity: sensor.ratrig_progress
+                    name: Print Progress
+                    color: green
+                    unit: "%"
+                    round: true
+                  - type: custom:imperial-readout
+                    entity: sensor.ratrig_current_layer
+                    name: Current Layer
+                    color: amber
+                  - type: custom:imperial-readout
+                    entity: sensor.ratrig_total_layer
+                    name: Total Layers
+                    color: red
               - type: picture-glance
                 title: Fabrication Bay
                 camera_image: camera.ratrig_enclosure_cam
@@ -396,6 +389,42 @@ views:
                 entities:
                   - entity: binary_sensor.ratrig_toolhead_filament_sensor_t0
                     icon: mdi:alert-circle
+              - type: grid
+                columns: 4
+                square: false
+                cards:
+                  - type: custom:imperial-button
+                    name: Pause
+                    icon: mdi:pause-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.ratrig_pause_print
+                    entity: button.ratrig_pause_print
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Resume
+                    icon: mdi:play-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.ratrig_resume_print
+                    entity: button.ratrig_resume_print
+                    color: green
+                  - type: custom:imperial-button
+                    name: Cancel
+                    icon: mdi:stop-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.ratrig_cancel_print
+                    entity: button.ratrig_cancel_print
+                    color: red
+                  - type: custom:imperial-button
+                    name: E-Stop
+                    icon: mdi:alert-octagon
+                    service: button.press
+                    service_data:
+                      entity_id: button.ratrig_emergency_stop
+                    entity: button.ratrig_emergency_stop
+                    color: red
           - type: vertical-stack
             cards:
               - type: custom:imperial-panel
@@ -431,40 +460,3 @@ views:
                     name: Chamber Temp
                     icon: mdi:thermometer
                     round: true
-
-      - type: grid
-        columns: 4
-        square: false
-        cards:
-          - type: custom:imperial-button
-            name: Pause
-            icon: mdi:pause-circle
-            service: button.press
-            service_data:
-              entity_id: button.ratrig_pause_print
-            entity: button.ratrig_pause_print
-            color: amber
-          - type: custom:imperial-button
-            name: Resume
-            icon: mdi:play-circle
-            service: button.press
-            service_data:
-              entity_id: button.ratrig_resume_print
-            entity: button.ratrig_resume_print
-            color: green
-          - type: custom:imperial-button
-            name: Cancel
-            icon: mdi:stop-circle
-            service: button.press
-            service_data:
-              entity_id: button.ratrig_cancel_print
-            entity: button.ratrig_cancel_print
-            color: red
-          - type: custom:imperial-button
-            name: E-Stop
-            icon: mdi:alert-octagon
-            service: button.press
-            service_data:
-              entity_id: button.ratrig_emergency_stop
-            entity: button.ratrig_emergency_stop
-            color: red

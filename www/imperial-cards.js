@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '1.9.0';
+  const VERSION = '2.0.0';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -155,15 +155,15 @@
           :host{display:block}
           .w{${V} position:relative}
           .b{background:linear-gradient(90deg,var(--ir) 0%,rgba(204,0,0,.2) 45%,transparent 100%);
-            border:1px solid rgba(204,0,0,.45);padding:14px 22px;
-            display:flex;align-items:center;gap:14px}
-          ha-icon{color:var(--ir);--mdc-icon-size:28px;flex-shrink:0}
+            border:1px solid rgba(204,0,0,.45);padding:18px 29px;
+            display:flex;align-items:center;gap:18px}
+          ha-icon{color:var(--ir);--mdc-icon-size:36px;flex-shrink:0}
           .t{flex:1}
-          .ti{font-family:var(--iui);font-size:17px;font-weight:700;
-            letter-spacing:5px;text-transform:uppercase;color:#fff}
-          .su{font-family:var(--imono);font-size:13px;letter-spacing:3px;
-            color:var(--itextd);margin-top:3px}
-          .di{width:11px;height:11px;flex-shrink:0;background:var(--ir);
+          .ti{font-family:var(--iui);font-size:22px;font-weight:700;
+            letter-spacing:7px;text-transform:uppercase;color:#fff}
+          .su{font-family:var(--imono);font-size:17px;letter-spacing:4px;
+            color:var(--itextd);margin-top:4px}
+          .di{width:14px;height:14px;flex-shrink:0;background:var(--ir);
             clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%)}
           ${PIPS}
         </style>
