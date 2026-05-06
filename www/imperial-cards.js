@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '1.5.0';
+  const VERSION = '1.6.0';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -521,7 +521,7 @@
               <div class="stat"><div class="slabel">Remain</div><div class="sval">${remStr}</div></div>
             </div>
             ${taskStr ? `<div class="job"><span class="jlabel">JOB //</span><span class="jname">${taskStr.toUpperCase()}</span></div>` : ''}
-            ${hasError ? `<div class="err"><ha-icon icon="mdi:alert-circle" style="--mdc-icon-size:13px"></ha-icon>PRINT ERROR</div>` : ''}
+            ${hasError ? `<div class="err"><ha-icon icon="mdi:alert-circle" style="--mdc-icon-size:16px"></ha-icon>PRINT ERROR</div>` : ''}
           </div>`;
       };
 
@@ -542,47 +542,47 @@
           .wrap{${V}}
           @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
           /* section header */
-          .sh{display:flex;align-items:center;gap:8px;padding:8px 2px;margin-top:10px}
+          .sh{display:flex;align-items:center;gap:10px;padding:10px 2px;margin-top:12px}
           .sh:first-child{margin-top:0}
-          .shbar{width:3px;height:14px;flex-shrink:0}
-          .shtitle{font-family:var(--iui);font-size:10px;font-weight:700;
-            letter-spacing:3px;text-transform:uppercase;flex:1}
-          .shcount{font-family:var(--imono);font-size:11px;color:var(--itextd)}
+          .shbar{width:4px;height:17px;flex-shrink:0}
+          .shtitle{font-family:var(--iui);font-size:12px;font-weight:700;
+            letter-spacing:3.5px;text-transform:uppercase;flex:1}
+          .shcount{font-family:var(--imono);font-size:13px;color:var(--itextd)}
           /* 2-col grid */
-          .grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+          .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
           /* printer block */
           .pb-wrap{${V} background:var(--ipanel);border:1px solid rgba(204,0,0,.28);
             position:relative;overflow:hidden}
           ${PIPS} ${SCAN}
-          .phd{display:flex;align-items:center;gap:8px;padding:9px 12px;
+          .phd{display:flex;align-items:center;gap:10px;padding:11px 14px;
             border-bottom:1px solid rgba(204,0,0,.1);position:relative;z-index:1}
-          .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-          .pname{flex:1;font-family:var(--iui);font-size:10px;font-weight:700;
-            letter-spacing:2px;text-transform:uppercase;color:#fff;
+          .dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+          .pname{flex:1;font-family:var(--iui);font-size:12px;font-weight:700;
+            letter-spacing:2.5px;text-transform:uppercase;color:#fff;
             overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-          .sbadge{font-family:var(--imono);font-size:8px;letter-spacing:1.5px;
-            padding:2px 6px;border:1px solid;flex-shrink:0}
-          .pbar{height:3px;background:var(--igrey);position:relative;z-index:1}
+          .sbadge{font-family:var(--imono);font-size:10px;letter-spacing:2px;
+            padding:3px 7px;border:1px solid;flex-shrink:0}
+          .pbar{height:4px;background:var(--igrey);position:relative;z-index:1}
           .pfill{height:100%;transition:width .6s}
-          .ppct{position:absolute;right:4px;top:50%;transform:translateY(-50%);
-            font-family:var(--imono);font-size:7px;color:var(--itext);opacity:.6;z-index:2}
+          .ppct{position:absolute;right:5px;top:50%;transform:translateY(-50%);
+            font-family:var(--imono);font-size:8px;color:var(--itext);opacity:.6;z-index:2}
           .stats{display:grid;grid-template-columns:repeat(4,1fr);
             border-bottom:1px solid rgba(204,0,0,.07);position:relative;z-index:1}
-          .stat{padding:6px 4px;text-align:center;border-right:1px solid rgba(204,0,0,.07)}
+          .stat{padding:7px 5px;text-align:center;border-right:1px solid rgba(204,0,0,.07)}
           .stat:last-child{border-right:none}
-          .slabel{font-family:var(--imono);font-size:7px;letter-spacing:1px;
+          .slabel{font-family:var(--imono);font-size:9px;letter-spacing:1px;
             color:var(--itextd);text-transform:uppercase}
-          .sval{font-family:var(--imono);font-size:11px;color:var(--itext);margin-top:2px}
-          .job{padding:5px 12px;display:flex;align-items:center;gap:6px;
+          .sval{font-family:var(--imono);font-size:13px;color:var(--itext);margin-top:3px}
+          .job{padding:6px 14px;display:flex;align-items:center;gap:7px;
             position:relative;z-index:1}
-          .jlabel{font-family:var(--imono);font-size:8px;letter-spacing:1px;
+          .jlabel{font-family:var(--imono);font-size:10px;letter-spacing:1px;
             color:var(--itextd);flex-shrink:0}
-          .jname{font-family:var(--imono);font-size:9px;color:var(--itext);
+          .jname{font-family:var(--imono);font-size:11px;color:var(--itext);
             overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-          .err{padding:5px 12px;background:rgba(204,0,0,.1);
+          .err{padding:6px 14px;background:rgba(204,0,0,.1);
             border-top:1px solid rgba(204,0,0,.5);
-            font-family:var(--imono);font-size:8px;letter-spacing:2px;
-            color:var(--ir);display:flex;align-items:center;gap:5px;
+            font-family:var(--imono);font-size:10px;letter-spacing:2px;
+            color:var(--ir);display:flex;align-items:center;gap:6px;
             position:relative;z-index:1;animation:pulse 1.2s ease-in-out infinite}
         </style>
         <div class="wrap">
