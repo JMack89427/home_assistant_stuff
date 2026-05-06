@@ -1,6 +1,6 @@
 title: Imperial Manufacturing Facility
 resources:
-  - url: /local/imperial-cards.js?v=9
+  - url: /local/imperial-cards.js?v=10
     type: module
 views:
 
@@ -100,40 +100,9 @@ views:
           - entity: sensor.p1p_01s00c431300106_nozzle_temperature
             name: Extruder Temp
             icon: mdi:printer-3d-nozzle-heat
-          - entity: sensor.p1p_01s00c431300106_nozzle_target_temperature
-            name: Extruder Target
-            icon: mdi:thermometer-chevron-up
           - entity: sensor.p1p_01s00c431300106_bed_temperature
             name: Bed Temp
             icon: mdi:radiator
-          - entity: sensor.p1p_01s00c431300106_bed_target_temperature
-            name: Bed Target
-            icon: mdi:thermometer-chevron-up
-
-      - type: custom:imperial-panel
-        title: Hardware Configuration
-        entities:
-          - entity: sensor.p1p_01s00c431300106_nozzle_size
-            name: Nozzle Size
-            icon: mdi:printer-3d-nozzle
-          - entity: sensor.p1p_01s00c431300106_nozzle_type
-            name: Nozzle Type
-            icon: mdi:printer-3d-nozzle-outline
-          - entity: sensor.p1p_01s00c431300106_print_bed_type
-            name: Bed Type
-            icon: mdi:table-furniture
-          - entity: sensor.p1p_01s00c431300106_speed_profile
-            name: Speed Profile
-            icon: mdi:speedometer
-          - entity: light.p1p_01s00c431300106_chamber_light
-            name: Chamber Light
-            icon: mdi:lightbulb
-          - entity: fan.p1p_01s00c431300106_cooling_fan
-            name: Cooling Fan
-            icon: mdi:fan
-          - entity: fan.p1p_01s00c431300106_aux_fan
-            name: Aux Fan
-            icon: mdi:fan-chevron-up
 
       - type: grid
         columns: 3
@@ -184,6 +153,7 @@ views:
             name: Print Progress
             color: green
             unit: "%"
+            round: true
           - type: custom:imperial-readout
             entity: sensor.flsuns1pro_current_layer
             name: Current Layer
@@ -226,15 +196,11 @@ views:
           - entity: sensor.flsuns1pro_extruder_temperature
             name: Extruder Temp
             icon: mdi:printer-3d-nozzle-heat
-          - entity: sensor.flsuns1pro_extruder_target
-            name: Extruder Target
-            icon: mdi:thermometer-chevron-up
+            round: true
           - entity: sensor.flsuns1pro_bed_temperature
             name: Bed Temp
             icon: mdi:radiator
-          - entity: sensor.flsuns1pro_bed_target
-            name: Bed Target
-            icon: mdi:thermometer-chevron-up
+            round: true
 
       - type: grid
         columns: 4
@@ -293,6 +259,7 @@ views:
             name: Print Progress
             color: green
             unit: "%"
+            round: true
           - type: custom:imperial-readout
             entity: sensor.printz_current_layer
             name: Current Layer
@@ -333,15 +300,11 @@ views:
           - entity: sensor.printz_extruder_temperature
             name: Extruder Temp
             icon: mdi:printer-3d-nozzle-heat
-          - entity: sensor.printz_extruder_target
-            name: Extruder Target
-            icon: mdi:thermometer-chevron-up
+            round: true
           - entity: sensor.printz_bed_temperature
             name: Bed Temp
             icon: mdi:radiator
-          - entity: sensor.printz_bed_target
-            name: Bed Target
-            icon: mdi:thermometer-chevron-up
+            round: true
 
       - type: grid
         columns: 4
@@ -400,6 +363,7 @@ views:
             name: Print Progress
             color: green
             unit: "%"
+            round: true
           - type: custom:imperial-readout
             entity: sensor.ratrig_current_layer
             name: Current Layer
@@ -442,15 +406,15 @@ views:
           - entity: sensor.ratrig_extruder_temperature
             name: Extruder Temp
             icon: mdi:printer-3d-nozzle-heat
-          - entity: sensor.ratrig_extruder_target
-            name: Extruder Target
-            icon: mdi:thermometer-chevron-up
+            round: true
           - entity: sensor.ratrig_bed_temperature
             name: Bed Temp
             icon: mdi:radiator
-          - entity: sensor.ratrig_bed_target
-            name: Bed Target
-            icon: mdi:thermometer-chevron-up
+            round: true
+          - entity: sensor.ratrig_chamber_temp
+            name: Chamber Temp
+            icon: mdi:thermometer
+            round: true
 
       - type: grid
         columns: 4

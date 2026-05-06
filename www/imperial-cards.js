@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '1.7.0';
+  const VERSION = '1.8.0';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -219,7 +219,12 @@
           // pure sensor — keep dot color-coded, make value text readable
           dotColor = col(so);
           txtColor = unavail ? 'var(--igrey)' : 'var(--itext)';
-          tx       = txt(so);
+          if (e.round && !unavail && !isNaN(parseFloat(so.state))) {
+            const u = so.attributes?.unit_of_measurement || '';
+            tx = (String(Math.round(parseFloat(so.state))) + (u ? ' ' + u : '')).toUpperCase();
+          } else {
+            tx = txt(so);
+          }
         }
         return `<div class="row${tog?' tog':''}" data-id="${id}">
           <ha-icon icon="${ic}" style="color:${dotColor}"></ha-icon>
@@ -274,11 +279,14 @@
     set hass(h) { this._h = h; this._r(); }
     _r() {
       if (!this.shadowRoot || !this._c) return;
-      const { entity, name, color = 'green', attribute, unit: unitOverride } = this._c;
-      const so    = st(this._h, entity);
-      const state = attribute
+      const { entity, name, color = 'green', attribute, unit: unitOverride, round: doRound } = this._c;
+      const so  = st(this._h, entity);
+      let state = attribute
         ? String(so?.attributes?.[attribute] ?? '---')
         : (so?.state || '---');
+      if (doRound && !isNaN(parseFloat(state)) && state !== '---') {
+        state = String(Math.round(parseFloat(state)));
+      }
       const unit  = unitOverride
         ?? (attribute ? (so?.attributes?.[`${attribute}_unit`] ?? '') : (so?.attributes?.unit_of_measurement ?? ''));
       const label = name || so?.attributes?.friendly_name || entity;
