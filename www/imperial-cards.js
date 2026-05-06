@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.1.1';
+  const VERSION = '2.1.2';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -638,10 +638,10 @@
     _render() {
       this.shadowRoot.innerHTML = `
         <style>
-          :host { display: block; container-type: inline-size; }
-          .cols { display: grid; grid-template-columns: 2fr 3fr; gap: 8px; align-items: start; }
-          @container (max-width: 600px) { .cols { grid-template-columns: 1fr; } }
-          .col { display: flex; flex-direction: column; gap: 8px; }
+          :host { display: block; }
+          .cols { display: grid; grid-template-columns: minmax(0,2fr) minmax(0,3fr); gap: 8px; align-items: start; }
+          @media (max-width: 768px) { .cols { grid-template-columns: 1fr; } }
+          .col { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
         </style>
         <div class="cols">
           <div class="left col"></div>
