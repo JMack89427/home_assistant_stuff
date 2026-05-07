@@ -1,6 +1,6 @@
 title: Imperial Manufacturing Facility
 resources:
-  - url: /local/imperial-cards.js?v=20
+  - url: /local/imperial-cards.js?v=21
     type: module
 views:
 
@@ -30,6 +30,8 @@ views:
                 name: Printz
               - prefix: ratrig
                 name: RatRig
+              - prefix: magneto_x
+                name: Magneto X
 
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 2: BAMBU P1P — UNIT ALPHA
@@ -462,4 +464,114 @@ views:
                   - entity: sensor.ratrig_chamber_temp
                     name: Chamber Temp
                     icon: mdi:thermometer
+                    round: true
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # VIEW 6: MAGNETO X
+  # ═══════════════════════════════════════════════════════════════════════════
+  - title: Magneto X
+    path: magneto-x
+    panel: true
+    icon: mdi:printer-3d-nozzle
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:imperial-header
+            title: Magneto X
+            subtitle: Klipper fabrication unit — Crafting Room
+            icon: local:old-republic
+
+          - type: custom:imperial-responsive-columns
+            left:
+              - type: horizontal-stack
+                cards:
+                  - type: custom:imperial-readout
+                    entity: sensor.magneto_x_progress
+                    name: Print Progress
+                    color: green
+                    unit: "%"
+                    round: true
+                  - type: custom:imperial-readout
+                    entity: sensor.magneto_x_current_layer
+                    name: Current Layer
+                    color: amber
+                  - type: custom:imperial-readout
+                    entity: sensor.magneto_x_total_layer
+                    name: Total Layers
+                    color: red
+              - type: picture-glance
+                title: Fabrication Bay
+                camera_image: camera.magneto_x_camera
+                camera_view: auto
+                entities: []
+              - type: grid
+                columns: 4
+                square: false
+                cards:
+                  - type: custom:imperial-button
+                    name: Pause
+                    icon: mdi:pause-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.magneto_x_pause_print
+                    entity: button.magneto_x_pause_print
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Resume
+                    icon: mdi:play-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.magneto_x_resume_print
+                    entity: button.magneto_x_resume_print
+                    color: green
+                  - type: custom:imperial-button
+                    name: Cancel
+                    icon: mdi:stop-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.magneto_x_cancel_print
+                    entity: button.magneto_x_cancel_print
+                    color: red
+                  - type: custom:imperial-button
+                    name: E-Stop
+                    icon: mdi:alert-octagon
+                    service: button.press
+                    service_data:
+                      entity_id: button.magneto_x_emergency_stop
+                    entity: button.magneto_x_emergency_stop
+                    color: red
+            right:
+              - type: custom:imperial-panel
+                title: Fabrication Status
+                entities:
+                  - entity: sensor.magneto_x_filename
+                    name: Job Name
+                    icon: mdi:file-document-outline
+                  - entity: sensor.magneto_x_current_print_state
+                    name: Print Status
+                    icon: mdi:printer-3d
+                  - entity: sensor.magneto_x_printer_state
+                    name: System State
+                    icon: mdi:state-machine
+                  - entity: sensor.magneto_x_print_time_left
+                    name: Time Remaining
+                    icon: mdi:timer-outline
+                  - entity: sensor.magneto_x_print_eta
+                    name: Est. Completion
+                    icon: mdi:clock-end
+              - type: custom:imperial-panel
+                title: Thermal Systems
+                entities:
+                  - entity: sensor.magneto_x_extruder_temperature
+                    name: Extruder Temp
+                    icon: mdi:printer-3d-nozzle-heat
+                    round: true
+                  - entity: sensor.magneto_x_bed_temperature
+                    name: Bed Temp
+                    icon: mdi:radiator
+                    round: true
+                  - entity: sensor.magneto_x_beacon_coil_temp
+                    name: Beacon Coil Temp
+                    icon: mdi:radar
                     round: true
