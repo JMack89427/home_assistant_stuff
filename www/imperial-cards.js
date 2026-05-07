@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.1.4';
+  const VERSION = '2.1.5';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -501,8 +501,9 @@
         name: p.name || p.prefix,
         info: getPrinterInfo(h, p.prefix),
       }));
-      const active  = items.filter(i => i.info.isActive);
-      const standby = items.filter(i => !i.info.isActive);
+      const active   = items.filter(i => i.info.isActive);
+      const standby  = items.filter(i => !i.info.isActive && !i.info.isOffline);
+      const offline  = items.filter(i => i.info.isOffline);
 
       const block = (displayName, info) => {
         const { statusColor, statusLabel, pct, taskStr,
@@ -591,6 +592,7 @@
         <div class="wrap">
           ${section('Active Units', active, 'var(--ia)')}
           ${section('Standby', standby, 'var(--igreyl)')}
+          ${section('Offline', offline, 'var(--igrey)')}
         </div>`;
     }
     getCardSize() { return Math.ceil((this._c?.printers?.length || 0) / 2) * 3 + 2; }
