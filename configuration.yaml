@@ -62,7 +62,6 @@ sensor:
       - time
       - date
       - date_time
-      - day
 
 # ── Automations, Scripts, Scenes ─────────────────────────────────────────────
 automation: !include automations.yaml
