@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.1.5';
+  const VERSION = '2.3.0';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -149,7 +149,7 @@
     }
     set hass(_) {}
     _r() {
-      const { title, subtitle, icon: ic } = this._c;
+      const { title, subtitle, icon: ic, lock } = this._c;
       this.shadowRoot.innerHTML = `
         <style>
           :host{display:block}
@@ -157,7 +157,7 @@
           .b{background:linear-gradient(90deg,var(--ir) 0%,rgba(204,0,0,.2) 45%,transparent 100%);
             border:1px solid rgba(204,0,0,.45);padding:18px 29px;
             display:flex;align-items:center;gap:18px}
-          ha-icon{color:#000;--mdc-icon-size:36px;flex-shrink:0}
+          .b > ha-icon{color:#000;--mdc-icon-size:36px;flex-shrink:0}
           .t{flex:1}
           .ti{font-family:var(--iui);font-size:18px;font-weight:700;
             letter-spacing:5px;text-transform:uppercase;color:#fff}
@@ -165,6 +165,10 @@
             color:#fff;margin-top:3px}
           .di{width:14px;height:14px;flex-shrink:0;background:var(--ir);
             clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%)}
+          .lk{cursor:pointer;display:flex;align-items:center;padding:4px;
+            color:rgba(255,255,255,.45);transition:color .15s;flex-shrink:0}
+          .lk:hover{color:rgba(255,255,255,.9)}
+          .lk ha-icon{--mdc-icon-size:24px;color:inherit}
           ${PIPS}
         </style>
         <div class="w">${PHTML}
@@ -174,7 +178,7 @@
               <div class="ti">${title}</div>
               ${subtitle ? `<div class="su">${subtitle}</div>` : ''}
             </div>
-            <div class="di"></div>
+            ${lock ? `<div class="lk"><ha-icon icon="mdi:lock-outline"></ha-icon></div>` : '<div class="di"></div>'}
           </div>
         </div>`;
     }
@@ -654,6 +658,80 @@
     static getStubConfig() { return { left: [], right: [] }; }
   }
 
+  // ============================================================================
+  // imperial-clock  (self-updating time/date display — no sensor needed)
+  // ============================================================================
+  class ImperialClock extends HTMLElement {
+    setConfig(c) {
+      this._c = c || {};
+      if (!this.shadowRoot) this.attachShadow({ mode: 'open' });
+      this._render();
+    }
+    connectedCallback() {
+      if (!this._timer) this._timer = setInterval(() => this._tick(), 1000);
+    }
+    disconnectedCallback() {
+      clearInterval(this._timer);
+      this._timer = null;
+    }
+    set hass(_) {}
+    _render() {
+      this.shadowRoot.innerHTML = `
+        <style>
+          :host{display:block}
+          .card{${V} background:var(--ipanel);border:1px solid rgba(204,0,0,.3);
+            position:relative;overflow:hidden;padding:32px 24px;text-align:center}
+          ${PIPS} ${SCAN}
+          .day{font-family:var(--iui);font-size:13px;font-weight:700;
+            letter-spacing:6px;text-transform:uppercase;color:var(--ia);
+            opacity:.85;position:relative;z-index:1;margin-bottom:12px}
+          .tc{position:relative;z-index:1;display:flex;align-items:baseline;
+            justify-content:center;gap:6px;margin-bottom:4px}
+          .tm{font-family:var(--imono);font-size:80px;font-weight:700;
+            letter-spacing:-3px;line-height:1;color:var(--ir);
+            text-shadow:0 0 20px rgba(204,0,0,.55),0 0 50px rgba(204,0,0,.2)}
+          .ap{font-family:var(--imono);font-size:22px;letter-spacing:2px;
+            color:var(--ir);opacity:.5;align-self:flex-end;padding-bottom:10px}
+          .dv{height:1px;background:linear-gradient(90deg,transparent,var(--ir),transparent);
+            margin:18px 0 15px;opacity:.25;position:relative;z-index:1}
+          .dt{font-family:var(--iui);font-size:13px;letter-spacing:5px;
+            text-transform:uppercase;color:var(--igreyl);position:relative;z-index:1}
+        </style>
+        <div class="card">${PHTML}<div class="sl"></div>
+          <div class="day" id="cl-d">---</div>
+          <div class="tc">
+            <span class="tm" id="cl-t">--:--</span>
+            <span class="ap" id="cl-ap">--</span>
+          </div>
+          <div class="dv"></div>
+          <div class="dt" id="cl-dt">--- --, ----</div>
+        </div>`;
+      this._tick();
+    }
+    _tick() {
+      const sr = this.shadowRoot;
+      if (!sr) return;
+      const now = new Date();
+      const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+      const MONTHS = ['January','February','March','April','May','June',
+                      'July','August','September','October','November','December'];
+      let h = now.getHours();
+      const ap = h >= 12 ? 'PM' : 'AM';
+      h = h % 12 || 12;
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const dEl  = sr.getElementById('cl-d');
+      const tEl  = sr.getElementById('cl-t');
+      const apEl = sr.getElementById('cl-ap');
+      const dtEl = sr.getElementById('cl-dt');
+      if (dEl)  dEl.textContent  = DAYS[now.getDay()];
+      if (tEl)  tEl.textContent  = `${h}:${m}`;
+      if (apEl) apEl.textContent = ap;
+      if (dtEl) dtEl.textContent = `${MONTHS[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
+    }
+    getCardSize() { return 4; }
+    static getStubConfig() { return {}; }
+  }
+
   // ── Register cards ─────────────────────────────────────────────────────────
   [
     ['imperial-header',          ImperialHeader],
@@ -663,6 +741,7 @@
     ['imperial-printer-status',  ImperialPrinterStatus],
     ['imperial-fleet-grid',         ImperialFleetGrid],
     ['imperial-responsive-columns', ImperialResponsiveColumns],
+    ['imperial-clock',              ImperialClock],
   ].forEach(([tag, cls]) => {
     if (!customElements.get(tag)) customElements.define(tag, cls);
   });
@@ -676,6 +755,7 @@
     { type: 'imperial-printer-status', name: 'Imperial Printer Status', description: 'Printer fleet status block' },
     { type: 'imperial-fleet-grid',         name: 'Imperial Fleet Grid',         description: '2-col active/standby printer grid' },
     { type: 'imperial-responsive-columns', name: 'Imperial Responsive Columns', description: 'Responsive 2-col layout, stacks on mobile' },
+    { type: 'imperial-clock',              name: 'Imperial Clock',              description: 'Self-updating time and date display' },
   );
 
   console.info(

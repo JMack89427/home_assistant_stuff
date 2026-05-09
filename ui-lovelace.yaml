@@ -1,6 +1,8 @@
 title: Imperial Command Center
 resources:
-  - url: /local/imperial-cards.js?v=22
+  - url: /local/imperial-cards.js?v=23
+    type: module
+  - url: /hacsfiles/calendar-card-pro/calendar-card-pro.js
     type: module
 views:
 
@@ -195,4 +197,67 @@ views:
           - entity: sensor.eero_external_ip
             name: Holonet Uplink IP
             icon: mdi:ip-network
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # VIEW 5: KIOSK OVERVIEW
+  # ═══════════════════════════════════════════════════════════════════════════
+  - title: Kiosk
+    path: kiosk
+    icon: mdi:shield-lock-outline
+    panel: true
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:imperial-header
+            title: Imperial Command Center
+            icon: local:empire
+            lock: true
+
+          - type: horizontal-stack
+            cards:
+              - type: custom:imperial-clock
+
+              - type: custom:imperial-panel
+                title: Atmospheric Conditions
+                entities:
+                  - entity: weather.forecast_home_3
+                    name: Conditions
+                    icon: mdi:weather-cloudy
+                  - entity: weather.forecast_home_3
+                    name: Temperature
+                    icon: mdi:thermometer
+                    attribute: temperature
+                    unit: "°F"
+                  - entity: weather.forecast_home_3
+                    name: Humidity
+                    icon: mdi:water-percent
+                    attribute: humidity
+                    unit: "%"
+                  - entity: weather.forecast_home_3
+                    name: Wind Speed
+                    icon: mdi:weather-windy
+                    attribute: wind_speed
+                  - entity: weather.forecast_home_3
+                    name: Pressure
+                    icon: mdi:gauge
+                    attribute: pressure
+                  - entity: weather.forecast_home_3
+                    name: UV Index
+                    icon: mdi:sun-wireless
+                    attribute: uv_index
+                  - entity: weather.forecast_home_3
+                    name: Cloud Cover
+                    icon: mdi:cloud-percent
+                    attribute: cloud_coverage
+                    unit: "%"
+
+              - type: custom:calendar-card-pro
+                entities:
+                  - calendar.jmack89427_gmail_com
+                  - calendar.jcummings522_gmail_com
+                  - calendar.catriona_cummings
+                  - calendar.catriona_l_cummings_gmail_com
+                  - calendar.chores
+                days_to_show: 7
 
