@@ -55,6 +55,15 @@ http:
 shell_command:
   git_pull_config: "cd /config && git fetch --all && git reset --hard origin/main"
 
+# ── Sensors ──────────────────────────────────────────────────────────────────
+sensor:
+  - platform: time_date
+    display_options:
+      - time
+      - date
+      - date_time
+      - day
+
 # ── Automations, Scripts, Scenes ─────────────────────────────────────────────
 automation: !include automations.yaml
 script:      !include scripts.yaml
