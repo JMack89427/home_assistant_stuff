@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.4.0';
+  const VERSION = '2.4.1';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -746,30 +746,32 @@
       const {
         title = 'System Alerts',
         battery_threshold = 20,
-        exclude_domains: userExDomains = [],
         exclude_entities: userExEntities = [],
         max_rows = 8,
       } = this._c;
       const h = this._h;
       if (!h) return;
 
-      const DEFAULT_EXCL = ['update','button','event','scene','sun','zone',
-                            'persistent_notification','input_text','input_number',
-                            'input_boolean','input_select','input_datetime','timer','script'];
-      const exDomains  = new Set([...DEFAULT_EXCL, ...userExDomains]);
       const exEntities = new Set(userExEntities);
+
+      // Domains and device classes considered security/alarm-relevant
+      const ALARM_DOMAINS  = new Set(['alarm_control_panel', 'lock', 'camera']);
+      const ALARM_CLASSES  = new Set(['motion','door','window','garage_door','lock',
+                                      'smoke','carbon_monoxide','moisture','occupancy',
+                                      'safety','tamper','sound','vibration']);
 
       const lowBat = [], offline = [];
 
       Object.values(h.states).forEach(s => {
         const id     = s.entity_id;
         const domain = id.split('.')[0];
-        if (exDomains.has(domain) || exEntities.has(id)) return;
+        if (exEntities.has(id)) return;
         const a  = s.attributes || {};
         const nm = a.friendly_name || id;
+        const dc = a.device_class;
 
         // Battery: device_class=battery sensor or battery_level attribute
-        if (a.device_class === 'battery' && !isNaN(parseFloat(s.state))) {
+        if (dc === 'battery' && !isNaN(parseFloat(s.state))) {
           const pct = parseFloat(s.state);
           if (pct < battery_threshold) lowBat.push({ nm, pct: Math.round(pct) });
         } else if (a.battery_level !== undefined && !isNaN(parseFloat(a.battery_level))) {
@@ -777,8 +779,12 @@
           if (pct < battery_threshold) lowBat.push({ nm, pct: Math.round(pct) });
         }
 
-        // Unavailable
-        if (s.state === 'unavailable') offline.push({ nm });
+        // Offline: alarm/security-relevant entities only
+        if (s.state === 'unavailable') {
+          const isAlarmDomain  = ALARM_DOMAINS.has(domain);
+          const isAlarmSensor  = domain === 'binary_sensor' && ALARM_CLASSES.has(dc);
+          if (isAlarmDomain || isAlarmSensor) offline.push({ nm });
+        }
       });
 
       lowBat.sort((a, b) => a.pct - b.pct);
@@ -858,7 +864,7 @@
                 <span>All Systems Nominal</span>
                </div>`
             : section('Low Battery', 'var(--ia)', 'mdi:battery-alert', lowBat, batPct)
-              + section('Offline / Unavailable', 'var(--igrey)', 'mdi:wifi-off', offline, offRow)
+              + section('Alarm / Security Offline', 'var(--igrey)', 'mdi:shield-off-outline', offline, offRow)
           }
         </div>`;
     }
