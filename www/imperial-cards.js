@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.3.0';
+  const VERSION = '2.4.0';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -732,6 +732,140 @@
     static getStubConfig() { return {}; }
   }
 
+  // ============================================================================
+  // imperial-alert-panel  (low battery + unavailable entity scanner)
+  // ============================================================================
+  class ImperialAlertPanel extends HTMLElement {
+    setConfig(c) {
+      this._c = c || {};
+      if (!this.shadowRoot) this.attachShadow({ mode: 'open' });
+    }
+    set hass(h) { this._h = h; this._r(); }
+    _r() {
+      if (!this.shadowRoot || !this._c) return;
+      const {
+        title = 'System Alerts',
+        battery_threshold = 20,
+        exclude_domains: userExDomains = [],
+        exclude_entities: userExEntities = [],
+        max_rows = 8,
+      } = this._c;
+      const h = this._h;
+      if (!h) return;
+
+      const DEFAULT_EXCL = ['update','button','event','scene','sun','zone',
+                            'persistent_notification','input_text','input_number',
+                            'input_boolean','input_select','input_datetime','timer','script'];
+      const exDomains  = new Set([...DEFAULT_EXCL, ...userExDomains]);
+      const exEntities = new Set(userExEntities);
+
+      const lowBat = [], offline = [];
+
+      Object.values(h.states).forEach(s => {
+        const id     = s.entity_id;
+        const domain = id.split('.')[0];
+        if (exDomains.has(domain) || exEntities.has(id)) return;
+        const a  = s.attributes || {};
+        const nm = a.friendly_name || id;
+
+        // Battery: device_class=battery sensor or battery_level attribute
+        if (a.device_class === 'battery' && !isNaN(parseFloat(s.state))) {
+          const pct = parseFloat(s.state);
+          if (pct < battery_threshold) lowBat.push({ nm, pct: Math.round(pct) });
+        } else if (a.battery_level !== undefined && !isNaN(parseFloat(a.battery_level))) {
+          const pct = parseFloat(a.battery_level);
+          if (pct < battery_threshold) lowBat.push({ nm, pct: Math.round(pct) });
+        }
+
+        // Unavailable
+        if (s.state === 'unavailable') offline.push({ nm });
+      });
+
+      lowBat.sort((a, b) => a.pct - b.pct);
+      offline.sort((a, b) => a.nm.localeCompare(b.nm));
+
+      const allClear = lowBat.length === 0 && offline.length === 0;
+
+      const batPct = b => {
+        const c2 = b.pct < 10 ? 'var(--ir)' : 'var(--ia)';
+        return `<div class="row">
+          <ha-icon icon="mdi:battery-alert" style="color:${c2}"></ha-icon>
+          <span class="nm">${b.nm}</span>
+          <span class="vl" style="color:${c2}">${b.pct}%</span>
+        </div>`;
+      };
+      const offRow = o => `<div class="row">
+        <ha-icon icon="mdi:wifi-off" style="color:var(--igrey)"></ha-icon>
+        <span class="nm">${o.nm}</span>
+        <span class="vl" style="color:var(--igrey)">UNAVAILABLE</span>
+      </div>`;
+      const overflow = (n, color) =>
+        n > 0 ? `<div class="more" style="color:${color}">+ ${n} more</div>` : '';
+
+      const section = (label, color, icon2, rows, fn) => {
+        if (!rows.length) return '';
+        const shown = rows.slice(0, max_rows);
+        const extra = rows.length - shown.length;
+        return `
+          <div class="sh">
+            <div class="shbar" style="background:${color}"></div>
+            <ha-icon icon="${icon2}" style="color:${color};--mdc-icon-size:16px"></ha-icon>
+            <span class="shtitle" style="color:${color}">${label}</span>
+            <span class="shcount" style="color:${color}">${rows.length}</span>
+          </div>
+          ${shown.map(fn).join('')}
+          ${overflow(extra, color)}`;
+      };
+
+      this.shadowRoot.innerHTML = `
+        <style>
+          :host{display:block}
+          .card{${V} background:var(--ipanel);border:1px solid rgba(204,0,0,.3);
+            position:relative;overflow:hidden}
+          ${PIPS} ${SCAN}
+          .hd{background:linear-gradient(90deg,rgba(204,0,0,.5),rgba(204,0,0,.1) 55%,transparent);
+            border-bottom:1px solid rgba(204,0,0,.25);padding:10px 20px;
+            font-family:var(--iui);font-size:14px;font-weight:700;
+            letter-spacing:4px;text-transform:uppercase;color:#fff;
+            position:relative;z-index:1}
+          .sh{display:flex;align-items:center;gap:10px;
+            padding:10px 20px 6px;position:relative;z-index:1}
+          .shbar{width:4px;height:16px;flex-shrink:0}
+          .shtitle{flex:1;font-family:var(--iui);font-size:12px;font-weight:700;
+            letter-spacing:3px;text-transform:uppercase}
+          .shcount{font-family:var(--imono);font-size:14px}
+          .row{display:flex;align-items:center;gap:14px;padding:9px 20px;
+            border-bottom:1px solid rgba(204,0,0,.06);position:relative;z-index:1}
+          .row:last-of-type{border-bottom:none}
+          ha-icon{--mdc-icon-size:20px;flex-shrink:0}
+          .nm{flex:1;font-family:var(--iui);font-size:13px;letter-spacing:1.5px;
+            color:var(--itext);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+          .vl{font-family:var(--imono);font-size:13px;flex-shrink:0}
+          .more{padding:6px 20px 10px;font-family:var(--imono);font-size:11px;
+            letter-spacing:2px;opacity:.6;position:relative;z-index:1}
+          .ok{display:flex;align-items:center;gap:14px;padding:20px;
+            position:relative;z-index:1}
+          .ok ha-icon{color:var(--ig);--mdc-icon-size:28px}
+          .ok span{font-family:var(--iui);font-size:14px;font-weight:700;
+            letter-spacing:4px;text-transform:uppercase;
+            color:var(--ig);text-shadow:0 0 10px rgba(0,200,83,.4)}
+        </style>
+        <div class="card">${PHTML}<div class="sl"></div>
+          <div class="hd">${title.toUpperCase()}</div>
+          ${allClear
+            ? `<div class="ok">
+                <ha-icon icon="mdi:shield-check"></ha-icon>
+                <span>All Systems Nominal</span>
+               </div>`
+            : section('Low Battery', 'var(--ia)', 'mdi:battery-alert', lowBat, batPct)
+              + section('Offline / Unavailable', 'var(--igrey)', 'mdi:wifi-off', offline, offRow)
+          }
+        </div>`;
+    }
+    getCardSize() { return 3; }
+    static getStubConfig() { return { battery_threshold: 20 }; }
+  }
+
   // ── Register cards ─────────────────────────────────────────────────────────
   [
     ['imperial-header',          ImperialHeader],
@@ -742,6 +876,7 @@
     ['imperial-fleet-grid',         ImperialFleetGrid],
     ['imperial-responsive-columns', ImperialResponsiveColumns],
     ['imperial-clock',              ImperialClock],
+    ['imperial-alert-panel',        ImperialAlertPanel],
   ].forEach(([tag, cls]) => {
     if (!customElements.get(tag)) customElements.define(tag, cls);
   });
@@ -756,6 +891,7 @@
     { type: 'imperial-fleet-grid',         name: 'Imperial Fleet Grid',         description: '2-col active/standby printer grid' },
     { type: 'imperial-responsive-columns', name: 'Imperial Responsive Columns', description: 'Responsive 2-col layout, stacks on mobile' },
     { type: 'imperial-clock',              name: 'Imperial Clock',              description: 'Self-updating time and date display' },
+    { type: 'imperial-alert-panel',        name: 'Imperial Alert Panel',        description: 'Low battery and unavailable entity scanner' },
   );
 
   console.info(

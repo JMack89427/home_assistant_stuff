@@ -1,6 +1,6 @@
 title: Imperial Command Center
 resources:
-  - url: /local/imperial-cards.js?v=23
+  - url: /local/imperial-cards.js?v=24
     type: module
   - url: /hacsfiles/calendar-card-pro/calendar-card-pro.js
     type: module
@@ -260,4 +260,8 @@ views:
                   - calendar.catriona_l_cummings_gmail_com
                   - calendar.chores
                 days_to_show: 7
+
+          - type: custom:imperial-alert-panel
+            title: System Alerts
+            battery_threshold: 20
 
