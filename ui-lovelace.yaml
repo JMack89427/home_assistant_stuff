@@ -324,10 +324,8 @@ views:
             layout: vertical
 
           - type: custom:grocy-chores-card
-            title: Station Maintenance Duties
             url: http://homeassistant.local:9192
             api_key: !secret grocy_api_key
-            show_quantity: 8
 
       - type: horizontal-stack
         cards:
