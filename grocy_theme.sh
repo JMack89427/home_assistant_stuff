@@ -4,28 +4,32 @@
 
 CSS_SRC="/homeassistant/themes/grocy-imperial.css"
 SLUG="a0d7b954_grocy"
+TMP="/share/grocy_css_tmp.css"
 
 echo "=== Imperial Grocy Theme Installer ==="
 
-# Find where Grocy's data path is configured
-echo "--- Locating Grocy data path ---"
-ha addons exec "$SLUG" -- sh -c "grep -r 'GROCY_DATAPATH\|data_path\|custom_css' /var/www/grocy/config.php /app/config.php /data/config.php 2>/dev/null | head -10"
+# Stage CSS to /share which is mounted in both terminal and Grocy containers
+echo "Staging CSS to /share..."
+cp "$CSS_SRC" "$TMP" && echo "OK" || { echo "FAIL: cannot write to /share/"; exit 1; }
 
-echo "--- Contents of /data/ ---"
-ha addons exec "$SLUG" -- ls /data/ 2>/dev/null
+# Find Grocy's actual data path
+echo ""
+echo "--- Grocy container filesystem ---"
+ha addons exec "$SLUG" -- sh -c "grep -i datapath /app/config.php /var/www/grocy/config.php 2>/dev/null | head -5; echo '-- /app/ --'; ls /app/ 2>/dev/null; echo '-- /data/ --'; ls /data/ 2>/dev/null; echo '-- /var/www/grocy/ --'; ls /var/www/grocy/ 2>/dev/null"
 
-echo "--- Searching for custom_css references in Grocy PHP ---"
-ha addons exec "$SLUG" -- sh -c "grep -r 'custom_css' /var/www/ /app/ 2>/dev/null | head -10"
-
-echo "--- Writing CSS to all likely locations ---"
-for PATH_ in \
-  "/data/custom_css" \
-  "/data/grocy/custom_css" \
-  "/var/www/grocy/data/custom_css" \
-  "/app/data/custom_css"; do
-  ha addons exec "$SLUG" -- sh -c "mkdir -p '$PATH_'" 2>/dev/null && \
-    ha addons exec -i "$SLUG" -- sh -c "cat > '$PATH_/custom.css'" < "$CSS_SRC" && \
-    echo "  Written: $PATH_/custom.css" || echo "  Skipped: $PATH_"
+# Write CSS from /share to all likely locations inside the container
+echo ""
+echo "--- Writing CSS ---"
+for DEST in \
+  "/app/data/custom_css/custom.css" \
+  "/var/www/grocy/data/custom_css/custom.css" \
+  "/data/custom_css/custom.css" \
+  "/app/public/custom_js_css/custom.css"; do
+  DIR=$(dirname "$DEST")
+  ha addons exec "$SLUG" -- sh -c "mkdir -p $DIR && cp /share/grocy_css_tmp.css $DEST && echo 'WRITTEN: $DEST'" 2>/dev/null
 done
 
-echo "=== Done — reload Grocy in browser ==="
+# Cleanup
+rm -f "$TMP"
+echo ""
+echo "=== Done - reload Grocy in browser ==="
