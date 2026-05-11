@@ -7,28 +7,25 @@ SLUG="a0d7b954_grocy"
 
 echo "=== Imperial Grocy Theme Installer ==="
 
-# Try ha CLI exec
-if command -v ha &>/dev/null; then
-  echo "Trying ha CLI..."
-  ha addons exec "$SLUG" -- sh -c "mkdir -p /data/custom_css && cat > /data/custom_css/custom.css" < "$CSS_SRC" && \
-    echo "SUCCESS: CSS written via ha CLI" && exit 0
-  echo "ha CLI exec failed, trying filesystem..."
-fi
+# Find where Grocy's data path is configured
+echo "--- Locating Grocy data path ---"
+ha addons exec "$SLUG" -- sh -c "grep -r 'GROCY_DATAPATH\|data_path\|custom_css' /var/www/grocy/config.php /app/config.php /data/config.php 2>/dev/null | head -10"
 
-# Try addon_configs path
-for DIR in \
-  "/addon_configs/${SLUG}" \
-  "/share/grocy" \
-  "/data/addon_configs/${SLUG}"; do
-  if [ -d "$DIR" ]; then
-    echo "Found addon data at: $DIR"
-    mkdir -p "$DIR/data/custom_css"
-    cp "$CSS_SRC" "$DIR/data/custom_css/custom.css" && \
-      echo "SUCCESS: CSS written to $DIR/data/custom_css/custom.css" && exit 0
-  fi
+echo "--- Contents of /data/ ---"
+ha addons exec "$SLUG" -- ls /data/ 2>/dev/null
+
+echo "--- Searching for custom_css references in Grocy PHP ---"
+ha addons exec "$SLUG" -- sh -c "grep -r 'custom_css' /var/www/ /app/ 2>/dev/null | head -10"
+
+echo "--- Writing CSS to all likely locations ---"
+for PATH_ in \
+  "/data/custom_css" \
+  "/data/grocy/custom_css" \
+  "/var/www/grocy/data/custom_css" \
+  "/app/data/custom_css"; do
+  ha addons exec "$SLUG" -- sh -c "mkdir -p '$PATH_'" 2>/dev/null && \
+    ha addons exec -i "$SLUG" -- sh -c "cat > '$PATH_/custom.css'" < "$CSS_SRC" && \
+    echo "  Written: $PATH_/custom.css" || echo "  Skipped: $PATH_"
 done
 
-echo "FAILED: Could not find Grocy data directory."
-echo "Directories checked:"
-ls /addon_configs/ 2>/dev/null && echo "(listed /addon_configs/)" || echo "/addon_configs/ not accessible"
-ls /share/ 2>/dev/null && echo "(listed /share/)" || echo "/share/ not accessible"
+echo "=== Done — reload Grocy in browser ==="
