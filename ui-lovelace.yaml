@@ -325,7 +325,7 @@ views:
 
           - type: custom:grocy-chores-card
             url: http://homeassistant.local:9192
-            api_key: !secret grocy_api_key
+            api_key: Ms8Qc2nwTTxeWLe8S6KzTLQCOglZ1rlDHdKEiMVigmKCQTZjF9
 
       - type: horizontal-stack
         cards:
