@@ -4,7 +4,7 @@ resources:
     type: module
   - url: /hacsfiles/calendar-card-pro/calendar-card-pro.js
     type: module
-  - url: /hacsfiles/mealie-mealplan-card/mealie-mealplan-card.js
+  - url: /hacsfiles/mealie-card/mealie-card.js
     type: module
   - url: /hacsfiles/lovelace-grocy-chores-card/grocy-chores-card.js
     type: module
