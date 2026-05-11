@@ -55,7 +55,7 @@ http:
 shell_command:
   git_pull_config: "cd /config && git fetch --all && git reset --hard origin/main"
   apply_grocy_theme: "mkdir -p /share/grocy/data/custom_css && cp /config/themes/grocy-imperial.css /share/grocy/data/custom_css/custom.css"
-  find_grocy_data: "ls /share/ > /config/www/grocy_paths.txt 2>&1 && find /share -maxdepth 5 -iname '*grocy*' >> /config/www/grocy_paths.txt 2>&1"
+  find_grocy_data: "ls / > /config/www/grocy_paths.txt 2>&1 ; ls /share/ >> /config/www/grocy_paths.txt 2>&1 ; ls /addon_configs/ >> /config/www/grocy_paths.txt 2>&1"
 
 # ── Sensors ──────────────────────────────────────────────────────────────────
 sensor:
