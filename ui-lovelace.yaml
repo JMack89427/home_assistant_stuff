@@ -267,7 +267,7 @@ views:
 
           - type: custom:mealie-mealplan-card
             title: "Tonight's Rations"
-            config_entry_id: c1d22f40cd76f5095dbbe37cd0e0fc8b
+            config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
             day_offset: 0
             show_image: true
             show_description: true
@@ -299,7 +299,7 @@ views:
         cards:
           - type: custom:mealie-mealplan-card
             title: "Today's Rations"
-            config_entry_id: c1d22f40cd76f5095dbbe37cd0e0fc8b
+            config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
             day_offset: 0
             show_image: true
             show_description: true
@@ -312,7 +312,7 @@ views:
 
           - type: custom:mealie-mealplan-card
             title: "Tomorrow's Rations"
-            config_entry_id: c1d22f40cd76f5095dbbe37cd0e0fc8b
+            config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
             day_offset: 1
             show_image: true
             show_description: false
@@ -333,7 +333,7 @@ views:
         cards:
           - type: custom:mealie-mealplan-card
             title: "Day +2"
-            config_entry_id: c1d22f40cd76f5095dbbe37cd0e0fc8b
+            config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
             day_offset: 2
             show_image: true
             show_description: false
@@ -346,7 +346,7 @@ views:
 
           - type: custom:mealie-mealplan-card
             title: "Day +3"
-            config_entry_id: c1d22f40cd76f5095dbbe37cd0e0fc8b
+            config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
             day_offset: 3
             show_image: true
             show_description: false
@@ -359,7 +359,7 @@ views:
 
           - type: custom:mealie-mealplan-card
             title: "Day +4"
-            config_entry_id: c1d22f40cd76f5095dbbe37cd0e0fc8b
+            config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
             day_offset: 4
             show_image: true
             show_description: false
