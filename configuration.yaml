@@ -54,6 +54,7 @@ http:
 # ── Shell Commands ────────────────────────────────────────────────────────────
 shell_command:
   git_pull_config: "cd /config && git fetch --all && git reset --hard origin/main"
+  apply_grocy_theme: "mkdir -p /share/grocy/data/custom_css && cp /config/themes/grocy-imperial.css /share/grocy/data/custom_css/custom.css"
 
 # ── Sensors ──────────────────────────────────────────────────────────────────
 sensor:
