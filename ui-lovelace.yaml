@@ -6,8 +6,6 @@ resources:
     type: module
   - url: /hacsfiles/mealie-card/mealie-card.js
     type: module
-  - url: /hacsfiles/lovelace-grocy-chores-card/grocy-chores-card.js
-    type: module
 views:
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -323,9 +321,9 @@ views:
             show_servings: true
             layout: vertical
 
-          - type: custom:grocy-chores-card
+          - type: iframe
             url: http://homeassistant.local:9192
-            api_key: Ms8Qc2nwTTxeWLe8S6KzTLQCOglZ1rlDHdKEiMVigmKCQTZjF9
+            aspect_ratio: 75%
 
       - type: horizontal-stack
         cards:
