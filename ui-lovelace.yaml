@@ -4,6 +4,10 @@ resources:
     type: module
   - url: /hacsfiles/calendar-card-pro/calendar-card-pro.js
     type: module
+  - url: /hacsfiles/mealie-mealplan-card/mealie-mealplan-card.js
+    type: module
+  - url: /hacsfiles/lovelace-grocy-chores-card/grocy-chores-card.js
+    type: module
 views:
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -261,7 +265,108 @@ views:
                   - calendar.chores
                 days_to_show: 7
 
+          - type: custom:mealie-mealplan-card
+            title: "Tonight's Rations"
+            config_entry_id: c1d22f40cd76f5095dbbe37cd0e0fc8b
+            day_offset: 0
+            show_image: true
+            show_description: true
+            show_prep_time: false
+            show_perform_time: false
+            show_total_time: false
+            show_rating: false
+            show_servings: true
+            layout: horizontal
+
           - type: custom:imperial-alert-panel
             title: System Alerts
             battery_threshold: 20
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # VIEW 6: IMPERIAL GALLEY
+  # ═══════════════════════════════════════════════════════════════════════════
+  - title: Imperial Galley
+    path: galley
+    icon: mdi:silverware-fork-knife
+    badges: []
+    cards:
+      - type: custom:imperial-header
+        title: Imperial Galley
+        subtitle: Ration distribution and supply requisitions — all personnel report
+        icon: mdi:silverware-fork-knife
+
+      - type: horizontal-stack
+        cards:
+          - type: custom:mealie-mealplan-card
+            title: "Today's Rations"
+            config_entry_id: c1d22f40cd76f5095dbbe37cd0e0fc8b
+            day_offset: 0
+            show_image: true
+            show_description: true
+            show_prep_time: true
+            show_perform_time: false
+            show_total_time: true
+            show_rating: true
+            show_servings: true
+            layout: vertical
+
+          - type: custom:mealie-mealplan-card
+            title: "Tomorrow's Rations"
+            config_entry_id: c1d22f40cd76f5095dbbe37cd0e0fc8b
+            day_offset: 1
+            show_image: true
+            show_description: false
+            show_prep_time: false
+            show_perform_time: false
+            show_total_time: false
+            show_rating: false
+            show_servings: true
+            layout: vertical
+
+          - type: custom:grocy-chores-card
+            title: Station Maintenance Duties
+            url: http://homeassistant.local:9192
+            api_key: !secret grocy_api_key
+            show_quantity: 8
+
+      - type: horizontal-stack
+        cards:
+          - type: custom:mealie-mealplan-card
+            title: "Day +2"
+            config_entry_id: c1d22f40cd76f5095dbbe37cd0e0fc8b
+            day_offset: 2
+            show_image: true
+            show_description: false
+            show_prep_time: false
+            show_perform_time: false
+            show_total_time: false
+            show_rating: false
+            show_servings: false
+            layout: vertical
+
+          - type: custom:mealie-mealplan-card
+            title: "Day +3"
+            config_entry_id: c1d22f40cd76f5095dbbe37cd0e0fc8b
+            day_offset: 3
+            show_image: true
+            show_description: false
+            show_prep_time: false
+            show_perform_time: false
+            show_total_time: false
+            show_rating: false
+            show_servings: false
+            layout: vertical
+
+          - type: custom:mealie-mealplan-card
+            title: "Day +4"
+            config_entry_id: c1d22f40cd76f5095dbbe37cd0e0fc8b
+            day_offset: 4
+            show_image: true
+            show_description: false
+            show_prep_time: false
+            show_perform_time: false
+            show_total_time: false
+            show_rating: false
+            show_servings: false
+            layout: vertical
 
