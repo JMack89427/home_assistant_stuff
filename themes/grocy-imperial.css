@@ -1,0 +1,219 @@
+/* =============================================================================
+   IMPERIAL COMMAND INTERFACE — Grocy Theme
+   Paste this into Grocy: Admin Panel → Appearance → Custom CSS
+   ============================================================================= */
+
+:root {
+  --ir: #CC0000;
+  --ibg: #0A0A0A;
+  --ipanel: #1A1A1A;
+  --igrey: #444444;
+  --igreyl: #909090;
+  --itext: #E8E8E8;
+  --imono: 'Courier New', Courier, monospace;
+  --iui: 'Arial Narrow', Arial, sans-serif;
+}
+
+/* ── Base ──────────────────────────────────────────────────────────────────── */
+body {
+  background-color: var(--ibg) !important;
+  color: var(--itext) !important;
+  font-family: var(--iui) !important;
+}
+
+/* ── Navbar ────────────────────────────────────────────────────────────────── */
+.navbar {
+  background: linear-gradient(90deg, var(--ir) 0%, rgba(204,0,0,0.3) 40%, #111 100%) !important;
+  border-bottom: 1px solid rgba(204,0,0,0.4) !important;
+}
+.navbar-brand, .nav-link, .navbar-text {
+  color: #fff !important;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: var(--iui) !important;
+}
+.nav-link:hover { color: rgba(255,255,255,0.7) !important; }
+
+/* ── Cards ─────────────────────────────────────────────────────────────────── */
+.card {
+  background-color: var(--ipanel) !important;
+  border: 1px solid rgba(204,0,0,0.3) !important;
+  color: var(--itext) !important;
+}
+.card-header {
+  background: linear-gradient(90deg, rgba(204,0,0,0.4), rgba(204,0,0,0.1) 60%, transparent) !important;
+  border-bottom: 1px solid rgba(204,0,0,0.25) !important;
+  color: #fff !important;
+  font-family: var(--iui) !important;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.card-footer {
+  background-color: rgba(0,0,0,0.2) !important;
+  border-top: 1px solid rgba(204,0,0,0.15) !important;
+}
+
+/* ── Tables ────────────────────────────────────────────────────────────────── */
+.table { color: var(--itext) !important; font-family: var(--imono) !important; font-size: 14px; }
+.table thead th {
+  background-color: rgba(204,0,0,0.12) !important;
+  border-bottom: 2px solid rgba(204,0,0,0.4) !important;
+  color: var(--ir) !important;
+  font-family: var(--iui) !important;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+.table td, .table th { border-color: rgba(204,0,0,0.1) !important; }
+.table-striped tbody tr:nth-of-type(odd) { background-color: rgba(255,255,255,0.02) !important; }
+.table-hover tbody tr:hover {
+  background-color: rgba(204,0,0,0.06) !important;
+  color: var(--itext) !important;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────────── */
+.btn {
+  font-family: var(--iui) !important;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.btn-primary {
+  background-color: var(--ir) !important;
+  border-color: var(--ir) !important;
+  color: #fff !important;
+}
+.btn-primary:hover {
+  background-color: #aa0000 !important;
+  border-color: #aa0000 !important;
+  box-shadow: 0 0 12px rgba(204,0,0,0.5) !important;
+}
+.btn-success  { background-color: #00C853 !important; border-color: #00C853 !important; }
+.btn-warning  { background-color: #FFB300 !important; border-color: #FFB300 !important; color: #000 !important; }
+.btn-danger   { background-color: #880000 !important; border-color: #880000 !important; }
+.btn-secondary, .btn-light, .btn-outline-secondary {
+  background-color: var(--ipanel) !important;
+  border-color: var(--igrey) !important;
+  color: var(--itext) !important;
+}
+
+/* ── Forms ─────────────────────────────────────────────────────────────────── */
+.form-control, .custom-select {
+  background-color: #111 !important;
+  border: 1px solid var(--igrey) !important;
+  color: var(--itext) !important;
+  font-family: var(--imono) !important;
+}
+.form-control:focus, .custom-select:focus {
+  background-color: #111 !important;
+  border-color: var(--ir) !important;
+  box-shadow: 0 0 0 0.2rem rgba(204,0,0,0.25) !important;
+  color: var(--itext) !important;
+}
+label, .col-form-label {
+  color: var(--igreyl) !important;
+  font-family: var(--iui) !important;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* ── List groups ───────────────────────────────────────────────────────────── */
+.list-group-item {
+  background-color: var(--ipanel) !important;
+  border-color: rgba(204,0,0,0.15) !important;
+  color: var(--itext) !important;
+}
+.list-group-item.active {
+  background-color: rgba(204,0,0,0.2) !important;
+  border-color: var(--ir) !important;
+  color: #fff !important;
+}
+.list-group-item:hover { background-color: rgba(204,0,0,0.08) !important; }
+
+/* ── Badges ────────────────────────────────────────────────────────────────── */
+.badge-primary, .badge-info { background-color: var(--ir) !important; }
+.badge-success { background-color: #00C853 !important; }
+.badge-warning { background-color: #FFB300 !important; color: #000 !important; }
+.badge-danger  { background-color: #880000 !important; }
+
+/* ── Modals ────────────────────────────────────────────────────────────────── */
+.modal-content {
+  background-color: var(--ipanel) !important;
+  border: 1px solid rgba(204,0,0,0.4) !important;
+  color: var(--itext) !important;
+}
+.modal-header {
+  background: linear-gradient(90deg, rgba(204,0,0,0.4), transparent) !important;
+  border-bottom: 1px solid rgba(204,0,0,0.25) !important;
+}
+.modal-footer { border-top: 1px solid rgba(204,0,0,0.15) !important; }
+.modal-title {
+  font-family: var(--iui) !important;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+/* ── Dropdowns ─────────────────────────────────────────────────────────────── */
+.dropdown-menu {
+  background-color: var(--ipanel) !important;
+  border: 1px solid rgba(204,0,0,0.3) !important;
+}
+.dropdown-item { color: var(--itext) !important; font-family: var(--imono) !important; font-size: 13px; }
+.dropdown-item:hover { background-color: rgba(204,0,0,0.1) !important; color: #fff !important; }
+.dropdown-divider { border-color: rgba(204,0,0,0.15) !important; }
+.dropdown-header {
+  color: var(--ir) !important;
+  font-family: var(--iui) !important;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* ── Progress bars ─────────────────────────────────────────────────────────── */
+.progress { background-color: var(--igrey) !important; height: 6px; }
+.progress-bar { background-color: var(--ir) !important; }
+.bg-success { background-color: #00C853 !important; }
+.bg-warning { background-color: #FFB300 !important; }
+.bg-danger  { background-color: #880000 !important; }
+
+/* ── Pagination ────────────────────────────────────────────────────────────── */
+.page-link {
+  background-color: var(--ipanel) !important;
+  border-color: rgba(204,0,0,0.2) !important;
+  color: var(--ir) !important;
+  font-family: var(--imono) !important;
+}
+.page-item.active .page-link {
+  background-color: var(--ir) !important;
+  border-color: var(--ir) !important;
+  color: #fff !important;
+}
+.page-item.disabled .page-link { color: var(--igrey) !important; }
+
+/* ── Alerts ────────────────────────────────────────────────────────────────── */
+.alert {
+  border-left: 4px solid var(--ir);
+  background-color: rgba(204,0,0,0.08) !important;
+  color: var(--itext) !important;
+  font-family: var(--imono) !important;
+}
+.alert-success { border-color: #00C853; background-color: rgba(0,200,83,0.08) !important; }
+.alert-warning { border-color: #FFB300; background-color: rgba(255,179,0,0.08) !important; }
+.alert-danger  { border-color: #880000; background-color: rgba(136,0,0,0.12) !important; }
+
+/* ── Misc ──────────────────────────────────────────────────────────────────── */
+.text-muted   { color: var(--igreyl) !important; }
+.text-primary { color: var(--ir) !important; }
+hr { border-color: rgba(204,0,0,0.2) !important; }
+.border { border-color: rgba(204,0,0,0.2) !important; }
+a { color: var(--ir); }
+a:hover { color: #ff3333; }
+
+/* ── Scrollbar ─────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--ibg); }
+::-webkit-scrollbar-thumb { background: rgba(204,0,0,0.4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ir); }

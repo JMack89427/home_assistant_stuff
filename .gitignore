@@ -15,6 +15,9 @@ home-assistant.log.fault
 .HA_VERSION
 .uuid
 
+# Script secrets
+scripts/.env
+
 # Python / dependencies
 __pycache__/
 *.pyc

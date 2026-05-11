@@ -1,0 +1,163 @@
+/* =============================================================================
+   IMPERIAL COMMAND INTERFACE — Mealie Theme
+   Step 1: In Mealie Admin → Site Settings → Appearance, enable Dark Mode
+           and set Primary Color to #CC0000
+   Step 2: Paste this into the Custom CSS field in the same panel
+   ============================================================================= */
+
+/* ── Vuetify token overrides ───────────────────────────────────────────────── */
+:root {
+  --v-theme-primary: 204, 0, 0 !important;
+  --v-theme-on-primary: 255, 255, 255 !important;
+  --v-theme-surface: 26, 26, 26 !important;
+  --v-theme-background: 10, 10, 10 !important;
+  --v-theme-on-background: 232, 232, 232 !important;
+  --v-theme-on-surface: 232, 232, 232 !important;
+}
+
+/* ── Base ──────────────────────────────────────────────────────────────────── */
+body, .v-application {
+  background-color: #0A0A0A !important;
+  font-family: 'Arial Narrow', Arial, sans-serif !important;
+}
+
+/* ── App bar / toolbar ─────────────────────────────────────────────────────── */
+.v-toolbar, .v-app-bar {
+  background: linear-gradient(90deg, #CC0000 0%, rgba(204,0,0,0.35) 40%, #111 100%) !important;
+  border-bottom: 1px solid rgba(204,0,0,0.4) !important;
+}
+.v-toolbar-title, .v-toolbar-title__placeholder {
+  font-family: 'Arial Narrow', Arial, sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 4px !important;
+  text-transform: uppercase !important;
+}
+
+/* ── Navigation drawer ─────────────────────────────────────────────────────── */
+.v-navigation-drawer {
+  background-color: #111 !important;
+  border-right: 1px solid rgba(204,0,0,0.2) !important;
+}
+.v-list-item--active {
+  background-color: rgba(204,0,0,0.15) !important;
+  border-left: 3px solid #CC0000 !important;
+}
+.v-list-item:hover { background-color: rgba(204,0,0,0.07) !important; }
+.v-list-item-title {
+  font-family: 'Arial Narrow', Arial, sans-serif !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase !important;
+}
+
+/* ── Cards ─────────────────────────────────────────────────────────────────── */
+.v-card {
+  background-color: #1A1A1A !important;
+  border: 1px solid rgba(204,0,0,0.28) !important;
+}
+.v-card-title {
+  font-family: 'Arial Narrow', Arial, sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 3px !important;
+  text-transform: uppercase !important;
+}
+.v-card-subtitle {
+  font-family: 'Courier New', Courier, monospace !important;
+  font-size: 12px !important;
+  letter-spacing: 2px !important;
+  opacity: 0.6 !important;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────────── */
+.v-btn {
+  font-family: 'Arial Narrow', Arial, sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+}
+.v-btn--variant-elevated.bg-primary,
+.v-btn.bg-primary {
+  background-color: #CC0000 !important;
+  box-shadow: 0 0 12px rgba(204,0,0,0.35) !important;
+}
+.v-btn--variant-elevated.bg-primary:hover { box-shadow: 0 0 20px rgba(204,0,0,0.6) !important; }
+
+/* ── Text fields / inputs ──────────────────────────────────────────────────── */
+.v-field {
+  background-color: #111 !important;
+  border-color: #444 !important;
+  font-family: 'Courier New', Courier, monospace !important;
+}
+.v-field--focused { border-color: #CC0000 !important; }
+.v-label {
+  font-family: 'Arial Narrow', Arial, sans-serif !important;
+  font-size: 12px !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase !important;
+}
+
+/* ── Tables ────────────────────────────────────────────────────────────────── */
+.v-table {
+  background-color: #1A1A1A !important;
+  font-family: 'Courier New', Courier, monospace !important;
+}
+.v-table thead tr {
+  background-color: rgba(204,0,0,0.1) !important;
+}
+.v-table thead th {
+  color: #CC0000 !important;
+  font-family: 'Arial Narrow', Arial, sans-serif !important;
+  font-size: 12px !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+  border-bottom: 2px solid rgba(204,0,0,0.35) !important;
+}
+.v-table tbody tr:hover { background-color: rgba(204,0,0,0.05) !important; }
+.v-table tbody td { border-bottom: 1px solid rgba(204,0,0,0.07) !important; }
+
+/* ── Chips ─────────────────────────────────────────────────────────────────── */
+.v-chip {
+  font-family: 'Courier New', Courier, monospace !important;
+  font-size: 11px !important;
+  letter-spacing: 1px !important;
+}
+.v-chip.bg-primary { background-color: rgba(204,0,0,0.25) !important; border: 1px solid #CC0000 !important; }
+
+/* ── Dialogs / modals ──────────────────────────────────────────────────────── */
+.v-dialog .v-card {
+  background-color: #1A1A1A !important;
+  border: 1px solid rgba(204,0,0,0.4) !important;
+}
+.v-dialog .v-card-title {
+  background: linear-gradient(90deg, rgba(204,0,0,0.4), transparent) !important;
+  border-bottom: 1px solid rgba(204,0,0,0.25) !important;
+}
+
+/* ── Menu / dropdowns ──────────────────────────────────────────────────────── */
+.v-menu > .v-overlay__content > .v-list,
+.v-overlay__content .v-list {
+  background-color: #1A1A1A !important;
+  border: 1px solid rgba(204,0,0,0.3) !important;
+}
+.v-list-item__title { font-family: 'Courier New', Courier, monospace !important; font-size: 13px !important; }
+
+/* ── Dividers ──────────────────────────────────────────────────────────────── */
+.v-divider { border-color: rgba(204,0,0,0.15) !important; }
+
+/* ── Recipe cards (Mealie-specific) ────────────────────────────────────────── */
+.recipe-card-image { filter: brightness(0.85) contrast(1.05); }
+.recipe-title {
+  font-family: 'Arial Narrow', Arial, sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+}
+
+/* ── Links ─────────────────────────────────────────────────────────────────── */
+a { color: #CC0000 !important; }
+a:hover { color: #ff3333 !important; }
+
+/* ── Scrollbar ─────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0A0A0A; }
+::-webkit-scrollbar-thumb { background: rgba(204,0,0,0.4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #CC0000; }
