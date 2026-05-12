@@ -89,20 +89,18 @@ views:
                       - entity: light.side_light
                         name: Starboard Array
                         icon: mdi:wall-sconce-flat
-
-              - type: vertical-stack
-                cards:
-                  - type: custom:calendar-card-pro
-                    entities:
-                      - calendar.jmack89427_gmail_com
-                      - calendar.jcummings522_gmail_com
-                      - calendar.catriona_cummings
-                      - calendar.catriona_l_cummings_gmail_com
-                      - calendar.chores
-                    days_to_show: 7
                   - type: custom:imperial-alert-panel
                     title: System Alerts
                     battery_threshold: 20
+
+              - type: custom:calendar-card-pro
+                entities:
+                  - calendar.jmack89427_gmail_com
+                  - calendar.jcummings522_gmail_com
+                  - calendar.catriona_cummings
+                  - calendar.catriona_l_cummings_gmail_com
+                  - calendar.chores
+                days_to_show: 7
 
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 2: DETENTION BLOCK
