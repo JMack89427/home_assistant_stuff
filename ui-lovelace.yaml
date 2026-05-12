@@ -26,72 +26,20 @@ views:
 
           - type: horizontal-stack
             cards:
-              - type: vertical-stack
-                cards:
-                  - type: custom:imperial-clock
-                  - type: custom:imperial-panel
-                    title: Perimeter Illumination Grid
-                    entities:
-                      - entity: light.garage_light
-                        name: Hangar Alpha
-                        icon: mdi:light-flood-down
-                      - entity: light.front_light
-                        name: Forward Array
-                        icon: mdi:outdoor-lamp
-                      - entity: light.side_light
-                        name: Starboard Array
-                        icon: mdi:wall-sconce-flat
-                  - type: custom:imperial-alert-panel
-                    title: System Alerts
-                    battery_threshold: 20
+              - type: custom:imperial-clock
 
-              - type: vertical-stack
-                cards:
-                  - type: custom:mealie-mealplan-card
-                    title: "Tonight's Rations"
-                    config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
-                    day_offset: 0
-                    show_image: true
-                    show_description: true
-                    show_prep_time: false
-                    show_perform_time: false
-                    show_total_time: false
-                    show_rating: false
-                    show_servings: true
-                    layout: horizontal
-                  - type: custom:imperial-panel
-                    title: Atmospheric Conditions
-                    entities:
-                      - entity: weather.forecast_home_3
-                        name: Conditions
-                        icon: mdi:weather-cloudy
-                      - entity: weather.forecast_home_3
-                        name: Temperature
-                        icon: mdi:thermometer
-                        attribute: temperature
-                        unit: "°F"
-                      - entity: weather.forecast_home_3
-                        name: Humidity
-                        icon: mdi:water-percent
-                        attribute: humidity
-                        unit: "%"
-                      - entity: weather.forecast_home_3
-                        name: Wind Speed
-                        icon: mdi:weather-windy
-                        attribute: wind_speed
-                      - entity: weather.forecast_home_3
-                        name: Pressure
-                        icon: mdi:gauge
-                        attribute: pressure
-                      - entity: weather.forecast_home_3
-                        name: UV Index
-                        icon: mdi:sun-wireless
-                        attribute: uv_index
-                      - entity: weather.forecast_home_3
-                        name: Cloud Cover
-                        icon: mdi:cloud-percent
-                        attribute: cloud_coverage
-                        unit: "%"
+              - type: custom:mealie-mealplan-card
+                title: "Tonight's Rations"
+                config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
+                day_offset: 0
+                show_image: true
+                show_description: true
+                show_prep_time: false
+                show_perform_time: false
+                show_total_time: false
+                show_rating: false
+                show_servings: true
+                layout: horizontal
 
               - type: custom:calendar-card-pro
                 entities:
@@ -101,6 +49,59 @@ views:
                   - calendar.catriona_l_cummings_gmail_com
                   - calendar.chores
                 days_to_show: 7
+
+          - type: horizontal-stack
+            cards:
+              - type: custom:imperial-panel
+                title: Atmospheric Conditions
+                entities:
+                  - entity: weather.forecast_home_3
+                    name: Conditions
+                    icon: mdi:weather-cloudy
+                  - entity: weather.forecast_home_3
+                    name: Temperature
+                    icon: mdi:thermometer
+                    attribute: temperature
+                    unit: "°F"
+                  - entity: weather.forecast_home_3
+                    name: Humidity
+                    icon: mdi:water-percent
+                    attribute: humidity
+                    unit: "%"
+                  - entity: weather.forecast_home_3
+                    name: Wind Speed
+                    icon: mdi:weather-windy
+                    attribute: wind_speed
+                  - entity: weather.forecast_home_3
+                    name: Pressure
+                    icon: mdi:gauge
+                    attribute: pressure
+                  - entity: weather.forecast_home_3
+                    name: UV Index
+                    icon: mdi:sun-wireless
+                    attribute: uv_index
+                  - entity: weather.forecast_home_3
+                    name: Cloud Cover
+                    icon: mdi:cloud-percent
+                    attribute: cloud_coverage
+                    unit: "%"
+
+              - type: custom:imperial-panel
+                title: Perimeter Illumination Grid
+                entities:
+                  - entity: light.garage_light
+                    name: Hangar Alpha
+                    icon: mdi:light-flood-down
+                  - entity: light.front_light
+                    name: Forward Array
+                    icon: mdi:outdoor-lamp
+                  - entity: light.side_light
+                    name: Starboard Array
+                    icon: mdi:wall-sconce-flat
+
+          - type: custom:imperial-alert-panel
+            title: System Alerts
+            battery_threshold: 20
 
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 2: DETENTION BLOCK
