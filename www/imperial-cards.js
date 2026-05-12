@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.5.1';
+  const VERSION = '2.5.2';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -700,8 +700,8 @@
           .ap{font-family:var(--imono);font-size:20px;letter-spacing:2px;
             color:var(--ir);opacity:.5;align-self:flex-end;padding-bottom:8px}
           .wx{display:flex;align-items:center;gap:12px}
-          .wx-img{width:48px;height:48px;object-fit:contain;
-            filter:drop-shadow(0 0 8px rgba(204,0,0,.45))}
+          ha-icon{color:var(--ir);--mdi-icon-size:52px;width:52px;height:52px;
+            filter:drop-shadow(0 0 8px rgba(204,0,0,.45));flex-shrink:0}
           .wx-rows{text-align:left}
           .wx-row{font-family:var(--iui);font-size:11px;letter-spacing:3px;
             text-transform:uppercase;color:var(--igreyl);line-height:2}
@@ -719,7 +719,7 @@
               <span class="ap" id="cl-ap">--</span>
             </div>
             ${wx ? `<div class="wx">
-              <img class="wx-img" id="cl-img" src="" alt="" onerror="this.style.display='none'"/>
+              <ha-icon id="cl-icon" icon="mdi:weather-cloudy"></ha-icon>
               <div class="wx-rows">
                 <div class="wx-row">H <span class="wx-val" id="cl-hi">--</span> &nbsp; L <span class="wx-val" id="cl-lo">--</span></div>
                 <div class="wx-row">Feels <span class="wx-val" id="cl-fl">--</span></div>
@@ -751,6 +751,16 @@
       if (dtEl) dtEl.textContent = `${MONTHS[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
     }
     _wupdate() {
+      const WX_ICONS = {
+        'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
+        'partlycloudy':'mdi:weather-partly-cloudy','cloudy':'mdi:weather-cloudy',
+        'fog':'mdi:weather-fog','rainy':'mdi:weather-rainy',
+        'pouring':'mdi:weather-pouring','snowy':'mdi:weather-snowy',
+        'snowy-rainy':'mdi:weather-snowy-rainy','windy':'mdi:weather-windy',
+        'windy-variant':'mdi:weather-windy-variant','hail':'mdi:weather-hail',
+        'lightning':'mdi:weather-lightning','lightning-rainy':'mdi:weather-lightning-rainy',
+        'exceptional':'mdi:alert-circle-outline',
+      };
       const sr = this.shadowRoot;
       if (!sr || !this._h || !this._c.weather) return;
       const st = this._h.states[this._c.weather];
@@ -758,18 +768,28 @@
       const attr = st.attributes;
       const unit = attr.temperature_unit || '°F';
       const fc   = attr.forecast;
-      const hi   = fc && fc[0] && fc[0].temperature   != null ? Math.round(fc[0].temperature) : null;
-      const lo   = fc && fc[0] && fc[0].templow       != null ? Math.round(fc[0].templow)     : null;
-      const fl   = attr.apparent_temperature           != null ? Math.round(attr.apparent_temperature) : null;
-      const pic  = st.attributes.entity_picture;
-      const hiEl  = sr.getElementById('cl-hi');
-      const loEl  = sr.getElementById('cl-lo');
-      const flEl  = sr.getElementById('cl-fl');
-      const imgEl = sr.getElementById('cl-img');
-      if (hiEl)  hiEl.textContent  = hi != null ? `${hi}${unit}` : '--';
-      if (loEl)  loEl.textContent  = lo != null ? `${lo}${unit}` : '--';
-      if (flEl)  flEl.textContent  = fl != null ? `${fl}${unit}` : '--';
-      if (imgEl && pic) imgEl.src  = pic;
+      const hi   = fc && fc[0] && fc[0].temperature != null ? Math.round(fc[0].temperature) : null;
+      const lo   = fc && fc[0] && fc[0].templow     != null ? Math.round(fc[0].templow)     : null;
+      // Feels like: use explicit attribute, else calculate wind chill / heat index
+      let fl = attr.apparent_temperature != null ? Math.round(attr.apparent_temperature) : null;
+      if (fl == null && attr.temperature != null) {
+        const t = attr.temperature, w = attr.wind_speed || 0, h = attr.humidity || 0;
+        if (t <= 50 && w > 3)
+          fl = Math.round(35.74 + 0.6215*t - 35.75*Math.pow(w,0.16) + 0.4275*t*Math.pow(w,0.16));
+        else if (t >= 80 && h >= 40)
+          fl = Math.round(-42.379 + 2.04901523*t + 10.14333127*h - 0.22475541*t*h
+            - 0.00683783*t*t - 0.05481717*h*h + 0.00122874*t*t*h
+            + 0.00085282*t*h*h - 0.00000199*t*t*h*h);
+        else fl = Math.round(t);
+      }
+      const iconEl = sr.getElementById('cl-icon');
+      const hiEl   = sr.getElementById('cl-hi');
+      const loEl   = sr.getElementById('cl-lo');
+      const flEl   = sr.getElementById('cl-fl');
+      if (iconEl) iconEl.setAttribute('icon', WX_ICONS[st.state] || 'mdi:weather-cloudy');
+      if (hiEl)   hiEl.textContent = hi != null ? `${hi}${unit}` : '--';
+      if (loEl)   loEl.textContent = lo != null ? `${lo}${unit}` : '--';
+      if (flEl)   flEl.textContent = fl != null ? `${fl}${unit}` : '--';
     }
     getCardSize() { return 4; }
     static getStubConfig() { return { weather: 'weather.forecast_home' }; }
