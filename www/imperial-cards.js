@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.5.0';
+  const VERSION = '2.5.1';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -681,25 +681,26 @@
         <style>
           :host{display:block}
           .card{${V} background:var(--ipanel);border:1px solid rgba(204,0,0,.3);
-            position:relative;overflow:hidden;padding:32px 24px;text-align:center}
+            position:relative;overflow:hidden;padding:28px 24px;}
           ${PIPS} ${SCAN}
+          .top{position:relative;z-index:1;display:flex;align-items:baseline;
+            justify-content:space-between;margin-bottom:10px}
           .day{font-family:var(--iui);font-size:13px;font-weight:700;
-            letter-spacing:6px;text-transform:uppercase;color:var(--ia);
-            opacity:.85;position:relative;z-index:1;margin-bottom:12px}
-          .tc{position:relative;z-index:1;display:flex;align-items:baseline;
-            justify-content:center;gap:6px;margin-bottom:4px}
-          .tm{font-family:var(--imono);font-size:80px;font-weight:700;
+            letter-spacing:6px;text-transform:uppercase;color:var(--ia);opacity:.85}
+          .dt{font-family:var(--iui);font-size:12px;letter-spacing:4px;
+            text-transform:uppercase;color:var(--igreyl)}
+          .dv{height:1px;background:linear-gradient(90deg,transparent,var(--ir),transparent);
+            margin:0 0 14px;opacity:.25;position:relative;z-index:1}
+          .main{position:relative;z-index:1;display:flex;align-items:center;
+            justify-content:space-between;gap:12px}
+          .tc{display:flex;align-items:baseline;gap:6px}
+          .tm{font-family:var(--imono);font-size:72px;font-weight:700;
             letter-spacing:-3px;line-height:1;color:var(--ir);
             text-shadow:0 0 20px rgba(204,0,0,.55),0 0 50px rgba(204,0,0,.2)}
-          .ap{font-family:var(--imono);font-size:22px;letter-spacing:2px;
-            color:var(--ir);opacity:.5;align-self:flex-end;padding-bottom:10px}
-          .dv{height:1px;background:linear-gradient(90deg,transparent,var(--ir),transparent);
-            margin:18px 0 15px;opacity:.25;position:relative;z-index:1}
-          .dt{font-family:var(--iui);font-size:13px;letter-spacing:5px;
-            text-transform:uppercase;color:var(--igreyl);position:relative;z-index:1}
-          .wx{position:relative;z-index:1;display:flex;align-items:center;
-            justify-content:center;gap:16px;margin-top:4px}
-          .wx-img{width:52px;height:52px;object-fit:contain;
+          .ap{font-family:var(--imono);font-size:20px;letter-spacing:2px;
+            color:var(--ir);opacity:.5;align-self:flex-end;padding-bottom:8px}
+          .wx{display:flex;align-items:center;gap:12px}
+          .wx-img{width:48px;height:48px;object-fit:contain;
             filter:drop-shadow(0 0 8px rgba(204,0,0,.45))}
           .wx-rows{text-align:left}
           .wx-row{font-family:var(--iui);font-size:11px;letter-spacing:3px;
@@ -707,21 +708,24 @@
           .wx-val{color:var(--ia);font-weight:700}
         </style>
         <div class="card">${PHTML}<div class="sl"></div>
-          <div class="day" id="cl-d">---</div>
-          <div class="tc">
-            <span class="tm" id="cl-t">--:--</span>
-            <span class="ap" id="cl-ap">--</span>
+          <div class="top">
+            <span class="day" id="cl-d">---</span>
+            <span class="dt" id="cl-dt">--- --, ----</span>
           </div>
           <div class="dv"></div>
-          <div class="dt" id="cl-dt">--- --, ----</div>
-          ${wx ? `<div class="dv"></div>
-          <div class="wx">
-            <img class="wx-img" id="cl-img" src="" alt="" onerror="this.style.display='none'"/>
-            <div class="wx-rows">
-              <div class="wx-row">H <span class="wx-val" id="cl-hi">--</span> &nbsp; L <span class="wx-val" id="cl-lo">--</span></div>
-              <div class="wx-row">Feels <span class="wx-val" id="cl-fl">--</span></div>
+          <div class="main">
+            <div class="tc">
+              <span class="tm" id="cl-t">--:--</span>
+              <span class="ap" id="cl-ap">--</span>
             </div>
-          </div>` : ''}
+            ${wx ? `<div class="wx">
+              <img class="wx-img" id="cl-img" src="" alt="" onerror="this.style.display='none'"/>
+              <div class="wx-rows">
+                <div class="wx-row">H <span class="wx-val" id="cl-hi">--</span> &nbsp; L <span class="wx-val" id="cl-lo">--</span></div>
+                <div class="wx-row">Feels <span class="wx-val" id="cl-fl">--</span></div>
+              </div>
+            </div>` : ''}
+          </div>
         </div>`;
       this._tick();
       if (this._h) this._wupdate();
