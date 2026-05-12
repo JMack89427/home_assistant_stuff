@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.4.1';
+  const VERSION = '2.5.0';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -674,8 +674,9 @@
       clearInterval(this._timer);
       this._timer = null;
     }
-    set hass(_) {}
+    set hass(h) { this._h = h; this._wupdate(); }
     _render() {
+      const wx = !!this._c.weather;
       this.shadowRoot.innerHTML = `
         <style>
           :host{display:block}
@@ -696,6 +697,14 @@
             margin:18px 0 15px;opacity:.25;position:relative;z-index:1}
           .dt{font-family:var(--iui);font-size:13px;letter-spacing:5px;
             text-transform:uppercase;color:var(--igreyl);position:relative;z-index:1}
+          .wx{position:relative;z-index:1;display:flex;align-items:center;
+            justify-content:center;gap:16px;margin-top:4px}
+          .wx-img{width:52px;height:52px;object-fit:contain;
+            filter:drop-shadow(0 0 8px rgba(204,0,0,.45))}
+          .wx-rows{text-align:left}
+          .wx-row{font-family:var(--iui);font-size:11px;letter-spacing:3px;
+            text-transform:uppercase;color:var(--igreyl);line-height:2}
+          .wx-val{color:var(--ia);font-weight:700}
         </style>
         <div class="card">${PHTML}<div class="sl"></div>
           <div class="day" id="cl-d">---</div>
@@ -705,8 +714,17 @@
           </div>
           <div class="dv"></div>
           <div class="dt" id="cl-dt">--- --, ----</div>
+          ${wx ? `<div class="dv"></div>
+          <div class="wx">
+            <img class="wx-img" id="cl-img" src="" alt="" onerror="this.style.display='none'"/>
+            <div class="wx-rows">
+              <div class="wx-row">H <span class="wx-val" id="cl-hi">--</span> &nbsp; L <span class="wx-val" id="cl-lo">--</span></div>
+              <div class="wx-row">Feels <span class="wx-val" id="cl-fl">--</span></div>
+            </div>
+          </div>` : ''}
         </div>`;
       this._tick();
+      if (this._h) this._wupdate();
     }
     _tick() {
       const sr = this.shadowRoot;
@@ -728,8 +746,29 @@
       if (apEl) apEl.textContent = ap;
       if (dtEl) dtEl.textContent = `${MONTHS[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
     }
+    _wupdate() {
+      const sr = this.shadowRoot;
+      if (!sr || !this._h || !this._c.weather) return;
+      const st = this._h.states[this._c.weather];
+      if (!st) return;
+      const attr = st.attributes;
+      const unit = attr.temperature_unit || '°F';
+      const fc   = attr.forecast;
+      const hi   = fc && fc[0] && fc[0].temperature   != null ? Math.round(fc[0].temperature) : null;
+      const lo   = fc && fc[0] && fc[0].templow       != null ? Math.round(fc[0].templow)     : null;
+      const fl   = attr.apparent_temperature           != null ? Math.round(attr.apparent_temperature) : null;
+      const pic  = st.attributes.entity_picture;
+      const hiEl  = sr.getElementById('cl-hi');
+      const loEl  = sr.getElementById('cl-lo');
+      const flEl  = sr.getElementById('cl-fl');
+      const imgEl = sr.getElementById('cl-img');
+      if (hiEl)  hiEl.textContent  = hi != null ? `${hi}${unit}` : '--';
+      if (loEl)  loEl.textContent  = lo != null ? `${lo}${unit}` : '--';
+      if (flEl)  flEl.textContent  = fl != null ? `${fl}${unit}` : '--';
+      if (imgEl && pic) imgEl.src  = pic;
+    }
     getCardSize() { return 4; }
-    static getStubConfig() { return {}; }
+    static getStubConfig() { return { weather: 'weather.forecast_home' }; }
   }
 
   // ============================================================================

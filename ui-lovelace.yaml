@@ -1,6 +1,6 @@
 title: Imperial Command Center
 resources:
-  - url: /local/imperial-cards.js?v=25
+  - url: /local/imperial-cards.js?v=26
     type: module
   - url: /hacsfiles/calendar-card-pro/calendar-card-pro.js
     type: module
@@ -29,6 +29,7 @@ views:
               - type: vertical-stack
                 cards:
                   - type: custom:imperial-clock
+                    weather: weather.forecast_home_3
                   - type: custom:imperial-panel
                     title: Atmospheric Conditions
                     entities:
