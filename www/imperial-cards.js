@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.6.2';
+  const VERSION = '2.6.3';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -714,7 +714,7 @@
           .ap{font-family:var(--imono);font-size:20px;letter-spacing:2px;
             color:var(--ir);opacity:.5;align-self:flex-end;padding-bottom:8px}
           .wx{display:flex;align-items:center;gap:12px}
-          ha-icon{flex-shrink:0}
+          ha-icon{flex-shrink:0;--mdc-icon-size:72px;width:72px;height:72px;color:var(--ir);filter:drop-shadow(0 0 8px rgba(204,0,0,.45))}
           .wx-rows{text-align:left}
           .wx-row{font-family:var(--iui);font-size:11px;letter-spacing:3px;
             text-transform:uppercase;color:var(--igreyl);line-height:2}
@@ -732,7 +732,7 @@
               <span class="ap" id="cl-ap">--</span>
             </div>
             ${wx ? `<div class="wx">
-              <ha-icon id="cl-icon" icon="mdi:weather-cloudy" style="--mdi-icon-size:72px;width:72px;height:72px;color:var(--ir);filter:drop-shadow(0 0 8px rgba(204,0,0,.45))"></ha-icon>
+              <ha-icon id="cl-icon" icon="mdi:weather-cloudy"></ha-icon>
               <div class="wx-rows">
                 <div class="wx-row">H <span class="wx-val" id="cl-hi">--</span> &nbsp; L <span class="wx-val" id="cl-lo">--</span></div>
                 <div class="wx-row">Feels <span class="wx-val" id="cl-fl">--</span></div>
