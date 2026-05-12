@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.6.0';
+  const VERSION = '2.6.1';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -714,7 +714,7 @@
           .ap{font-family:var(--imono);font-size:20px;letter-spacing:2px;
             color:var(--ir);opacity:.5;align-self:flex-end;padding-bottom:8px}
           .wx{display:flex;align-items:center;gap:12px}
-          ha-icon{color:var(--ir);--mdi-icon-size:52px;width:52px;height:52px;
+          ha-icon{color:var(--ir);--mdi-icon-size:72px;width:72px;height:72px;
             filter:drop-shadow(0 0 8px rgba(204,0,0,.45));flex-shrink:0}
           .wx-rows{text-align:left}
           .wx-row{font-family:var(--iui);font-size:11px;letter-spacing:3px;
