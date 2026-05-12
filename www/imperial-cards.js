@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.5.2';
+  const VERSION = '2.6.0';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -673,8 +673,22 @@
     disconnectedCallback() {
       clearInterval(this._timer);
       this._timer = null;
+      if (this._fUnsub) { this._fUnsub(); this._fUnsub = null; }
     }
-    set hass(h) { this._h = h; this._wupdate(); }
+    set hass(h) {
+      this._h = h;
+      this._subscribeForecast();
+      this._wupdate();
+    }
+    async _subscribeForecast() {
+      if (this._fUnsub || !this._h || !this._c.weather) return;
+      try {
+        this._fUnsub = await this._h.connection.subscribeMessage(
+          (msg) => { this._fData = msg.forecast?.[0] ?? null; this._wupdate(); },
+          { type: 'weather/subscribe_forecast', forecast_type: 'daily', entity_id: this._c.weather }
+        );
+      } catch (_) {}
+    }
     _render() {
       const wx = !!this._c.weather;
       this.shadowRoot.innerHTML = `
@@ -767,9 +781,8 @@
       if (!st) return;
       const attr = st.attributes;
       const unit = attr.temperature_unit || '°F';
-      const fc   = attr.forecast;
-      const hi   = fc && fc[0] && fc[0].temperature != null ? Math.round(fc[0].temperature) : null;
-      const lo   = fc && fc[0] && fc[0].templow     != null ? Math.round(fc[0].templow)     : null;
+      const hi = this._fData?.temperature != null ? Math.round(this._fData.temperature) : null;
+      const lo = this._fData?.templow     != null ? Math.round(this._fData.templow)     : null;
       // Feels like: use explicit attribute, else calculate wind chill / heat index
       let fl = attr.apparent_temperature != null ? Math.round(attr.apparent_temperature) : null;
       if (fl == null && attr.temperature != null) {
