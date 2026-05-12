@@ -26,7 +26,21 @@ views:
 
           - type: horizontal-stack
             cards:
-              - type: custom:imperial-clock
+              - type: vertical-stack
+                cards:
+                  - type: custom:imperial-clock
+                  - type: custom:imperial-panel
+                    title: Perimeter Illumination Grid
+                    entities:
+                      - entity: light.garage_light
+                        name: Hangar Alpha
+                        icon: mdi:light-flood-down
+                      - entity: light.front_light
+                        name: Forward Array
+                        icon: mdi:outdoor-lamp
+                      - entity: light.side_light
+                        name: Starboard Array
+                        icon: mdi:wall-sconce-flat
 
               - type: custom:imperial-panel
                 title: Atmospheric Conditions
@@ -61,19 +75,6 @@ views:
                     icon: mdi:cloud-percent
                     attribute: cloud_coverage
                     unit: "%"
-
-              - type: custom:imperial-panel
-                title: Perimeter Illumination Grid
-                entities:
-                  - entity: light.garage_light
-                    name: Hangar Alpha
-                    icon: mdi:light-flood-down
-                  - entity: light.front_light
-                    name: Forward Array
-                    icon: mdi:outdoor-lamp
-                  - entity: light.side_light
-                    name: Starboard Array
-                    icon: mdi:wall-sconce-flat
 
               - type: custom:calendar-card-pro
                 entities:
