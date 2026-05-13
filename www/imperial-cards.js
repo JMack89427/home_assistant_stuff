@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.6.4';
+  const VERSION = '2.6.5';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -732,7 +732,7 @@
               <span class="ap" id="cl-ap">--</span>
             </div>
             ${wx ? `<div class="wx">
-              <ha-icon id="cl-icon" icon="mdi:weather-cloudy"></ha-icon>
+              <ha-icon id="cl-icon" icon="mdi:weather-cloudy" size="72"></ha-icon>
               <div class="wx-rows">
                 <div class="wx-row">H <span class="wx-val" id="cl-hi">--</span> &nbsp; L <span class="wx-val" id="cl-lo">--</span></div>
                 <div class="wx-row">Feels <span class="wx-val" id="cl-fl">--</span></div>
@@ -742,17 +742,26 @@
         </div>`;
       this._tick();
       if (this._h) this._wupdate();
-      requestAnimationFrame(() => {
+      const _sz = () => {
         const ic = this.shadowRoot?.getElementById('cl-icon');
         if (!ic) return;
+        ic.size = 72;
         ic.style.setProperty('--mdi-icon-size', '72px');
         ic.style.setProperty('--mdc-icon-size', '72px');
         ic.style.width = '72px';
         ic.style.height = '72px';
         ic.style.color = 'var(--ir)';
         ic.style.filter = 'drop-shadow(0 0 8px rgba(204,0,0,.45))';
-        ic.style.flexShrink = '0';
-      });
+        // Drill into ha-icon → ha-svg-icon → svg
+        const inner = ic.shadowRoot?.firstElementChild;
+        if (inner) {
+          inner.style.width = '72px'; inner.style.height = '72px';
+          inner.style.setProperty('--mdi-icon-size', '72px');
+          const svg = inner.shadowRoot?.querySelector('svg');
+          if (svg) { svg.style.width = '72px'; svg.style.height = '72px'; }
+        }
+      };
+      [0, 50, 200, 600].forEach(ms => ms ? setTimeout(_sz, ms) : requestAnimationFrame(_sz));
     }
     _tick() {
       const sr = this.shadowRoot;
