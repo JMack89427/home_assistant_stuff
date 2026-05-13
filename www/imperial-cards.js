@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.6.3';
+  const VERSION = '2.6.4';
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -714,7 +714,7 @@
           .ap{font-family:var(--imono);font-size:20px;letter-spacing:2px;
             color:var(--ir);opacity:.5;align-self:flex-end;padding-bottom:8px}
           .wx{display:flex;align-items:center;gap:12px}
-          ha-icon{flex-shrink:0;--mdc-icon-size:72px;width:72px;height:72px;color:var(--ir);filter:drop-shadow(0 0 8px rgba(204,0,0,.45))}
+          ha-icon{flex-shrink:0}
           .wx-rows{text-align:left}
           .wx-row{font-family:var(--iui);font-size:11px;letter-spacing:3px;
             text-transform:uppercase;color:var(--igreyl);line-height:2}
@@ -742,6 +742,17 @@
         </div>`;
       this._tick();
       if (this._h) this._wupdate();
+      requestAnimationFrame(() => {
+        const ic = this.shadowRoot?.getElementById('cl-icon');
+        if (!ic) return;
+        ic.style.setProperty('--mdi-icon-size', '72px');
+        ic.style.setProperty('--mdc-icon-size', '72px');
+        ic.style.width = '72px';
+        ic.style.height = '72px';
+        ic.style.color = 'var(--ir)';
+        ic.style.filter = 'drop-shadow(0 0 8px rgba(204,0,0,.45))';
+        ic.style.flexShrink = '0';
+      });
     }
     _tick() {
       const sr = this.shadowRoot;
