@@ -5,7 +5,18 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.6.6';
+  const VERSION = '2.6.7';
+
+  const WX_ICONS = {
+    'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
+    'partlycloudy':'mdi:weather-partly-cloudy','cloudy':'mdi:weather-cloudy',
+    'fog':'mdi:weather-fog','rainy':'mdi:weather-rainy',
+    'pouring':'mdi:weather-pouring','snowy':'mdi:weather-snowy',
+    'snowy-rainy':'mdi:weather-snowy-rainy','windy':'mdi:weather-windy',
+    'windy-variant':'mdi:weather-windy-variant','hail':'mdi:weather-hail',
+    'lightning':'mdi:weather-lightning','lightning-rainy':'mdi:weather-lightning-rainy',
+    'exceptional':'mdi:alert-circle-outline',
+  };
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
@@ -714,8 +725,7 @@
           .ap{font-family:var(--imono);font-size:20px;letter-spacing:2px;
             color:var(--ir);opacity:.5;align-self:flex-end;padding-bottom:8px}
           .wx{display:flex;align-items:center;gap:12px}
-          .wx-ic{width:72px;height:72px;display:flex;align-items:center;justify-content:center;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(204,0,0,.45))}
-          ha-icon{transform:scale(3);transform-origin:center;color:var(--ir)}
+          .wx-svg{flex-shrink:0;fill:var(--ir);filter:drop-shadow(0 0 8px rgba(204,0,0,.45))}
           .wx-rows{text-align:left}
           .wx-row{font-family:var(--iui);font-size:11px;letter-spacing:3px;
             text-transform:uppercase;color:var(--igreyl);line-height:2}
@@ -733,7 +743,7 @@
               <span class="ap" id="cl-ap">--</span>
             </div>
             ${wx ? `<div class="wx">
-              <div class="wx-ic"><ha-icon id="cl-icon" icon="mdi:weather-cloudy"></ha-icon></div>
+              <svg class="wx-svg" id="cl-icon" viewBox="0 0 24 24" width="72" height="72"><path id="cl-icon-path" d=""/></svg>
               <div class="wx-rows">
                 <div class="wx-row">H <span class="wx-val" id="cl-hi">--</span> &nbsp; L <span class="wx-val" id="cl-lo">--</span></div>
                 <div class="wx-row">Feels <span class="wx-val" id="cl-fl">--</span></div>
@@ -765,16 +775,6 @@
       if (dtEl) dtEl.textContent = `${MONTHS[now.getMonth()]} ${now.getDate()}, ${now.getFullYear()}`;
     }
     _wupdate() {
-      const WX_ICONS = {
-        'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
-        'partlycloudy':'mdi:weather-partly-cloudy','cloudy':'mdi:weather-cloudy',
-        'fog':'mdi:weather-fog','rainy':'mdi:weather-rainy',
-        'pouring':'mdi:weather-pouring','snowy':'mdi:weather-snowy',
-        'snowy-rainy':'mdi:weather-snowy-rainy','windy':'mdi:weather-windy',
-        'windy-variant':'mdi:weather-windy-variant','hail':'mdi:weather-hail',
-        'lightning':'mdi:weather-lightning','lightning-rainy':'mdi:weather-lightning-rainy',
-        'exceptional':'mdi:alert-circle-outline',
-      };
       const sr = this.shadowRoot;
       if (!sr || !this._h || !this._c.weather) return;
       const st = this._h.states[this._c.weather];
@@ -783,7 +783,6 @@
       const unit = attr.temperature_unit || '°F';
       const hi = this._fData?.temperature != null ? Math.round(this._fData.temperature) : null;
       const lo = this._fData?.templow     != null ? Math.round(this._fData.templow)     : null;
-      // Feels like: use explicit attribute, else calculate wind chill / heat index
       let fl = attr.apparent_temperature != null ? Math.round(attr.apparent_temperature) : null;
       if (fl == null && attr.temperature != null) {
         const t = attr.temperature, w = attr.wind_speed || 0, h = attr.humidity || 0;
@@ -795,14 +794,43 @@
             + 0.00085282*t*h*h - 0.00000199*t*t*h*h);
         else fl = Math.round(t);
       }
-      const iconEl = sr.getElementById('cl-icon');
-      const hiEl   = sr.getElementById('cl-hi');
-      const loEl   = sr.getElementById('cl-lo');
-      const flEl   = sr.getElementById('cl-fl');
-      if (iconEl) iconEl.setAttribute('icon', WX_ICONS[st.state] || 'mdi:weather-cloudy');
-      if (hiEl)   hiEl.textContent = hi != null ? `${hi}${unit}` : '--';
-      if (loEl)   loEl.textContent = lo != null ? `${lo}${unit}` : '--';
-      if (flEl)   flEl.textContent = fl != null ? `${fl}${unit}` : '--';
+      const hiEl = sr.getElementById('cl-hi');
+      const loEl = sr.getElementById('cl-lo');
+      const flEl = sr.getElementById('cl-fl');
+      if (hiEl) hiEl.textContent = hi != null ? `${hi}${unit}` : '--';
+      if (loEl) loEl.textContent = lo != null ? `${lo}${unit}` : '--';
+      if (flEl) flEl.textContent = fl != null ? `${fl}${unit}` : '--';
+      this._setIconPath(WX_ICONS[st.state] || 'mdi:weather-cloudy');
+    }
+    _setIconPath(iconName) {
+      if (!this._ipc) this._ipc = {};
+      if (!this._ipl) this._ipl = new Set();
+      const pathEl = this.shadowRoot?.getElementById('cl-icon-path');
+      if (this._ipc[iconName] !== undefined) {
+        if (pathEl) pathEl.setAttribute('d', this._ipc[iconName]);
+        return;
+      }
+      if (this._ipl.has(iconName)) return;
+      this._ipl.add(iconName);
+      (async () => {
+        try {
+          const el = document.createElement('ha-icon');
+          el.setAttribute('icon', iconName);
+          el.style.cssText = 'position:fixed;top:-500px;left:-500px;visibility:hidden';
+          document.documentElement.appendChild(el);
+          if (el.updateComplete) await el.updateComplete;
+          await new Promise(r => setTimeout(r, 200));
+          const inner = el.shadowRoot?.querySelector('ha-svg-icon');
+          if (inner?.updateComplete) await inner.updateComplete;
+          const d = inner?.shadowRoot?.querySelector('path')?.getAttribute('d')
+                 || el.shadowRoot?.querySelector('path')?.getAttribute('d') || '';
+          document.documentElement.removeChild(el);
+          this._ipc[iconName] = d;
+          const p = this.shadowRoot?.getElementById('cl-icon-path');
+          if (p && d) p.setAttribute('d', d);
+        } catch (e) { this._ipc[iconName] = ''; }
+        this._ipl.delete(iconName);
+      })();
     }
     getCardSize() { return 4; }
     static getStubConfig() { return { weather: 'weather.forecast_home' }; }
