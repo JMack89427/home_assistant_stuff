@@ -394,6 +394,56 @@ views:
                     icon: mdi:water-percent
                     round: true
 
+          - type: horizontal-stack
+            cards:
+              - type: custom:imperial-panel
+                title: Cadet's Quarters
+                entities:
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_temperature_3
+                    name: Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_humidity_3
+                    name: Humidity
+                    icon: mdi:water-percent
+                    round: true
+
+              - type: custom:imperial-panel
+                title: Reserve Barracks
+                entities:
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_temperature_4
+                    name: Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_humidity_4
+                    name: Humidity
+                    icon: mdi:water-percent
+                    round: true
+
+              - type: custom:imperial-panel
+                title: Tactical Operations Center
+                entities:
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_temperature_5
+                    name: Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_humidity_5
+                    name: Humidity
+                    icon: mdi:water-percent
+                    round: true
+
+              - type: custom:imperial-panel
+                title: Fabrication Bay
+                entities:
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_temperature_6
+                    name: Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_humidity_6
+                    name: Humidity
+                    icon: mdi:water-percent
+                    round: true
+
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 7: MSE-6 DROID BAY
   # ═══════════════════════════════════════════════════════════════════════════
