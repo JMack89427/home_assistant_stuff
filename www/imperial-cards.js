@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.6.7';
+  const VERSION = '2.6.8';
 
   const WX_ICONS = {
     'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
@@ -265,8 +265,8 @@
           .row.tog:hover{background:rgba(204,0,0,.06)}
           .row.tog:active{background:rgba(204,0,0,.12)}
           ha-icon{--mdc-icon-size:24px;flex-shrink:0}
-          .nm{flex:1;font-family:var(--iui);font-size:15px;letter-spacing:2px;color:var(--itext)}
-          .vl{font-family:var(--imono);font-size:15px;letter-spacing:.5px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+          .nm{flex:1;min-width:0;font-family:var(--iui);font-size:15px;letter-spacing:2px;color:var(--itext);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+          .vl{flex-shrink:0;font-family:var(--imono);font-size:15px;letter-spacing:.5px;white-space:nowrap}
           .dt{width:8px;height:8px;border-radius:50%;flex-shrink:0;align-self:center}
         </style>
         <div class="card">${PHTML}<div class="sl"></div>
@@ -814,17 +814,19 @@
       this._ipl.add(iconName);
       (async () => {
         try {
-          const el = document.createElement('ha-icon');
+          const host = document.createElement('div');
+          const el   = document.createElement('ha-icon');
           el.setAttribute('icon', iconName);
-          el.style.cssText = 'position:fixed;top:-500px;left:-500px;visibility:hidden';
-          document.documentElement.appendChild(el);
-          if (el.updateComplete) await el.updateComplete;
-          await new Promise(r => setTimeout(r, 200));
+          host.appendChild(el);
+          // Attach to a detached shadow so Lit can render without touching live DOM
+          const detached = document.createElement('div');
+          detached.attachShadow({ mode: 'open' }).appendChild(host);
+          await new Promise(r => setTimeout(r, 300));
+          if (el.updateComplete) await el.updateComplete.catch(() => {});
           const inner = el.shadowRoot?.querySelector('ha-svg-icon');
-          if (inner?.updateComplete) await inner.updateComplete;
+          if (inner?.updateComplete) await inner.updateComplete.catch(() => {});
           const d = inner?.shadowRoot?.querySelector('path')?.getAttribute('d')
                  || el.shadowRoot?.querySelector('path')?.getAttribute('d') || '';
-          document.documentElement.removeChild(el);
           this._ipc[iconName] = d;
           const p = this.shadowRoot?.getElementById('cl-icon-path');
           if (p && d) p.setAttribute('d', d);
