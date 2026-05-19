@@ -415,6 +415,39 @@ views:
             subtitle: Primary sector patrol droid
             icon: mdi:robot-vacuum
 
+          - type: grid
+            columns: 4
+            square: false
+            cards:
+              - type: custom:imperial-button
+                name: Deploy
+                icon: mdi:play
+                service: vacuum.start
+                service_data:
+                  entity_id: vacuum.roborock_qrevo_curv_series
+                color: green
+              - type: custom:imperial-button
+                name: Halt
+                icon: mdi:pause
+                service: vacuum.pause
+                service_data:
+                  entity_id: vacuum.roborock_qrevo_curv_series
+                color: amber
+              - type: custom:imperial-button
+                name: Stand Down
+                icon: mdi:stop
+                service: vacuum.stop
+                service_data:
+                  entity_id: vacuum.roborock_qrevo_curv_series
+                color: red
+              - type: custom:imperial-button
+                name: Return to Base
+                icon: mdi:home-import-outline
+                service: vacuum.return_to_base
+                service_data:
+                  entity_id: vacuum.roborock_qrevo_curv_series
+                color: amber
+
           - type: horizontal-stack
             cards:
               - type: vertical-stack
@@ -525,6 +558,39 @@ views:
             title: Unit Beta — QR 798
             subtitle: Secondary sector patrol droid
             icon: mdi:robot-vacuum
+
+          - type: grid
+            columns: 4
+            square: false
+            cards:
+              - type: custom:imperial-button
+                name: Deploy
+                icon: mdi:play
+                service: vacuum.start
+                service_data:
+                  entity_id: vacuum.roborock_qr_798
+                color: green
+              - type: custom:imperial-button
+                name: Halt
+                icon: mdi:pause
+                service: vacuum.pause
+                service_data:
+                  entity_id: vacuum.roborock_qr_798
+                color: amber
+              - type: custom:imperial-button
+                name: Stand Down
+                icon: mdi:stop
+                service: vacuum.stop
+                service_data:
+                  entity_id: vacuum.roborock_qr_798
+                color: red
+              - type: custom:imperial-button
+                name: Return to Base
+                icon: mdi:home-import-outline
+                service: vacuum.return_to_base
+                service_data:
+                  entity_id: vacuum.roborock_qr_798
+                color: amber
 
           - type: horizontal-stack
             cards:
