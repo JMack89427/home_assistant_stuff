@@ -5,6 +5,32 @@
 # this file automatically when the file is referenced by configuration.yaml).
 # ─────────────────────────────────────────────────────────────────────────────
 
+# ── Vacuum: Qrevo Curv (main level) — daily 10am ─────────────────────────────
+- id: vacuum_curv_daily_10am
+  alias: "Vacuum: Curv Series daily 10am"
+  trigger:
+    - platform: time
+      at: "10:00:00"
+  condition: []
+  action:
+    - service: vacuum.start
+      target:
+        entity_id: vacuum.roborock_qrevo_curv_series
+  mode: single
+
+# ── Vacuum: QR 798 (basement) — daily 5pm ────────────────────────────────────
+- id: vacuum_qr798_daily_5pm
+  alias: "Vacuum: QR 798 daily 5pm"
+  trigger:
+    - platform: time
+      at: "17:00:00"
+  condition: []
+  action:
+    - service: vacuum.start
+      target:
+        entity_id: vacuum.roborock_qr_798
+  mode: single
+
 # ── Example: notify when someone arrives home ─────────────────────────────────
 - id: notify_someone_arrived_home
   alias: "Notify: Someone arrived home"
