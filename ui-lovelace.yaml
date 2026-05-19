@@ -362,11 +362,11 @@ views:
                 title: Admiral's Quarters
                 entities:
                   - entity: sensor.timmerflotte_temp_hmd_sensor_temperature_2
-                    name: Temp
+                    name: Temperature
                     icon: mdi:thermometer
                     round: true
                   - entity: sensor.timmerflotte_temp_hmd_sensor_humidity_2
-                    name: Hum
+                    name: Humidity
                     icon: mdi:water-percent
                     round: true
 
@@ -374,11 +374,11 @@ views:
                 title: Lower Deck
                 entities:
                   - entity: sensor.timmerflotte_temp_hmd_sensor_temperature
-                    name: Temp
+                    name: Temperature
                     icon: mdi:thermometer
                     round: true
                   - entity: sensor.timmerflotte_temp_hmd_sensor_humidity
-                    name: Hum
+                    name: Humidity
                     icon: mdi:water-percent
                     round: true
 
@@ -386,11 +386,11 @@ views:
                 title: Carbonite Vault
                 entities:
                   - entity: sensor.temperature_and_humidity_sensor_air_temperature
-                    name: Temp
+                    name: Temperature
                     icon: mdi:thermometer
                     round: true
                   - entity: sensor.temperature_and_humidity_sensor_humidity
-                    name: Hum
+                    name: Humidity
                     icon: mdi:water-percent
                     round: true
 
