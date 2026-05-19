@@ -346,48 +346,51 @@ views:
   - title: Life Support
     path: life-support
     icon: mdi:air-filter
+    panel: true
     badges: []
     cards:
-      - type: custom:imperial-header
-        title: Imperial Life Support Systems
-        subtitle: Atmospheric monitoring across all sectors — crew safety nominal
-        icon: mdi:air-filter
-
-      - type: horizontal-stack
+      - type: vertical-stack
         cards:
-          - type: custom:imperial-panel
-            title: Admiral's Quarters
-            entities:
-              - entity: sensor.timmerflotte_temp_hmd_sensor_temperature_2
-                name: Temp
-                icon: mdi:thermometer
-                round: true
-              - entity: sensor.timmerflotte_temp_hmd_sensor_humidity_2
-                name: Hum
-                icon: mdi:water-percent
-                round: true
+          - type: custom:imperial-header
+            title: Imperial Life Support Systems
+            subtitle: Atmospheric monitoring across all sectors — crew safety nominal
+            icon: mdi:air-filter
 
-          - type: custom:imperial-panel
-            title: Lower Deck
-            entities:
-              - entity: sensor.timmerflotte_temp_hmd_sensor_temperature
-                name: Temp
-                icon: mdi:thermometer
-                round: true
-              - entity: sensor.timmerflotte_temp_hmd_sensor_humidity
-                name: Hum
-                icon: mdi:water-percent
-                round: true
+          - type: horizontal-stack
+            cards:
+              - type: custom:imperial-panel
+                title: Admiral's Quarters
+                entities:
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_temperature_2
+                    name: Temp
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_humidity_2
+                    name: Hum
+                    icon: mdi:water-percent
+                    round: true
 
-          - type: custom:imperial-panel
-            title: Carbonite Vault
-            entities:
-              - entity: sensor.temperature_and_humidity_sensor_air_temperature
-                name: Temp
-                icon: mdi:thermometer
-                round: true
-              - entity: sensor.temperature_and_humidity_sensor_humidity
-                name: Hum
-                icon: mdi:water-percent
-                round: true
+              - type: custom:imperial-panel
+                title: Lower Deck
+                entities:
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_temperature
+                    name: Temp
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_humidity
+                    name: Hum
+                    icon: mdi:water-percent
+                    round: true
+
+              - type: custom:imperial-panel
+                title: Carbonite Vault
+                entities:
+                  - entity: sensor.temperature_and_humidity_sensor_air_temperature
+                    name: Temp
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.temperature_and_humidity_sensor_humidity
+                    name: Hum
+                    icon: mdi:water-percent
+                    round: true
 
