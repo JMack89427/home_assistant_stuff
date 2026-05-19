@@ -410,6 +410,11 @@ views:
             subtitle: Unit MSE-6-G735Y — autonomous sanitation droid — sector patrol active
             icon: mdi:robot-vacuum
 
+          - type: custom:imperial-header
+            title: Unit Alpha — Qrevo Curv Series
+            subtitle: Primary sector patrol droid
+            icon: mdi:robot-vacuum
+
           - type: horizontal-stack
             cards:
               - type: vertical-stack
@@ -513,6 +518,111 @@ views:
                         name: Total Duty Time
                         icon: mdi:timer
                       - entity: sensor.roborock_qrevo_curv_series_total_cleaning_count
+                        name: Missions Complete
+                        icon: mdi:counter
+
+          - type: custom:imperial-header
+            title: Unit Beta — QR 798
+            subtitle: Secondary sector patrol droid
+            icon: mdi:robot-vacuum
+
+          - type: horizontal-stack
+            cards:
+              - type: vertical-stack
+                cards:
+                  - type: custom:imperial-panel
+                    title: Droid Status
+                    entities:
+                      - entity: sensor.roborock_qr_798_status
+                        name: Status
+                        icon: mdi:information-outline
+                      - entity: sensor.roborock_qr_798_battery
+                        name: Power Cell
+                        icon: mdi:battery
+                      - entity: sensor.roborock_qr_798_current_room
+                        name: Current Sector
+                        icon: mdi:map-marker
+                      - entity: binary_sensor.roborock_qr_798_cleaning
+                        name: Cleaning
+                        icon: mdi:broom
+                      - entity: binary_sensor.roborock_qr_798_charging
+                        name: Charging
+                        icon: mdi:lightning-bolt
+
+                  - type: custom:imperial-panel
+                    title: Active Mission
+                    entities:
+                      - entity: sensor.roborock_qr_798_cleaning_area
+                        name: Area Covered
+                        icon: mdi:texture-box
+                      - entity: sensor.roborock_qr_798_cleaning_progress
+                        name: Progress
+                        icon: mdi:progress-check
+                      - entity: sensor.roborock_qr_798_cleaning_time
+                        name: Mission Time
+                        icon: mdi:timer
+
+              - type: vertical-stack
+                cards:
+                  - type: custom:imperial-panel
+                    title: Dock Systems
+                    entities:
+                      - entity: binary_sensor.roborock_qr_798_dock_clean_water_box
+                        name: Clean Water Supply
+                        icon: mdi:water
+                      - entity: binary_sensor.roborock_qr_798_dock_dirty_water_box
+                        name: Waste Containment
+                        icon: mdi:water-off
+                      - entity: binary_sensor.roborock_qr_798_water_shortage
+                        name: Water Shortage
+                        icon: mdi:water-alert
+                      - entity: binary_sensor.roborock_qr_798_mop_attached
+                        name: Mop Attached
+                        icon: mdi:mop
+                      - entity: binary_sensor.roborock_qr_798_dock_mop_drying
+                        name: Mop Drying
+                        icon: mdi:tumble-dryer
+                      - entity: sensor.roborock_qr_798_dock_mop_drying_remaining_time
+                        name: Drying Time Left
+                        icon: mdi:timer-sand
+
+                  - type: custom:imperial-panel
+                    title: Maintenance Schedule
+                    entities:
+                      - entity: sensor.roborock_qr_798_main_brush_time_left
+                        name: Main Brush
+                        icon: mdi:brush
+                      - entity: sensor.roborock_qr_798_side_brush_time_left
+                        name: Side Brush
+                        icon: mdi:brush-variant
+                      - entity: sensor.roborock_qr_798_filter_time_left
+                        name: Filter
+                        icon: mdi:air-filter
+                      - entity: sensor.roborock_qr_798_sensor_time_left
+                        name: Sensors
+                        icon: mdi:leak
+                      - entity: sensor.roborock_qr_798_dock_strainer_time_left
+                        name: Dock Strainer
+                        icon: mdi:filter
+
+              - type: vertical-stack
+                cards:
+                  - type: picture-entity
+                    entity: image.roborock_qr_798_map_0
+                    name: Sector Map
+                    show_name: false
+                    show_state: false
+
+                  - type: custom:imperial-panel
+                    title: Fleet Statistics
+                    entities:
+                      - entity: sensor.roborock_qr_798_total_cleaning_area
+                        name: Total Area
+                        icon: mdi:texture-box
+                      - entity: sensor.roborock_qr_798_total_cleaning_time
+                        name: Total Duty Time
+                        icon: mdi:timer
+                      - entity: sensor.roborock_qr_798_total_cleaning_count
                         name: Missions Complete
                         icon: mdi:counter
 
