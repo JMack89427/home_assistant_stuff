@@ -200,11 +200,6 @@ views:
     badges: []
     cards:
       - type: custom:imperial-header
-        title: Imperial Operations Console
-        subtitle: Execute standing orders with precision
-        icon: local:sith
-
-      - type: custom:imperial-header
         title: Forward Command Post — Climate Control
         subtitle: Atmospheric temperature regulation — Forward sector
         icon: mdi:thermostat
