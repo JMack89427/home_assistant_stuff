@@ -44,6 +44,7 @@
         - sensor.timmerflotte_temp_hmd_sensor_humidity_5
         - sensor.timmerflotte_temp_hmd_sensor_humidity_6
         - sensor.temperature_and_humidity_sensor_humidity
+        - sensor.t6_pro_z_wave_programmable_thermostat_humidity
       above: 40
   condition: []
   action:
@@ -65,6 +66,7 @@
         - sensor.timmerflotte_temp_hmd_sensor_humidity_5
         - sensor.timmerflotte_temp_hmd_sensor_humidity_6
         - sensor.temperature_and_humidity_sensor_humidity
+        - sensor.t6_pro_z_wave_programmable_thermostat_humidity
       below: 41
   condition:
     - condition: template
@@ -75,7 +77,8 @@
            and states('sensor.timmerflotte_temp_hmd_sensor_humidity_4') | float(0) <= 40
            and states('sensor.timmerflotte_temp_hmd_sensor_humidity_5') | float(0) <= 40
            and states('sensor.timmerflotte_temp_hmd_sensor_humidity_6') | float(0) <= 40
-           and states('sensor.temperature_and_humidity_sensor_humidity') | float(0) <= 40 }}
+           and states('sensor.temperature_and_humidity_sensor_humidity') | float(0) <= 40
+           and states('sensor.t6_pro_z_wave_programmable_thermostat_humidity') | float(0) <= 40 }}
   action:
     - service: humidifier.turn_off
       target:

@@ -232,6 +232,84 @@ views:
             name: Holonet Uplink IP
             icon: mdi:ip-network
 
+      - type: custom:imperial-header
+        title: Forward Command Post — Climate Control
+        subtitle: Atmospheric temperature regulation — Forward sector
+        icon: mdi:thermostat
+
+      - type: horizontal-stack
+        cards:
+          - type: thermostat
+            entity: climate.t6_pro_z_wave_programmable_thermostat
+            name: Forward Command Post
+
+          - type: vertical-stack
+            cards:
+              - type: grid
+                columns: 2
+                square: false
+                cards:
+                  - type: custom:imperial-button
+                    name: Off
+                    icon: mdi:power-off
+                    service: climate.turn_off
+                    service_data:
+                      entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                    color: red
+                  - type: custom:imperial-button
+                    name: Heat
+                    icon: mdi:fire
+                    service: climate.set_hvac_mode
+                    service_data:
+                      entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                      hvac_mode: heat
+                    color: red
+                  - type: custom:imperial-button
+                    name: Cool
+                    icon: mdi:snowflake
+                    service: climate.set_hvac_mode
+                    service_data:
+                      entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                      hvac_mode: cool
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Heat + Cool
+                    icon: mdi:thermostat-auto
+                    service: climate.set_hvac_mode
+                    service_data:
+                      entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                      hvac_mode: heat_cool
+                    color: amber
+
+              - type: grid
+                columns: 3
+                square: false
+                cards:
+                  - type: custom:imperial-button
+                    name: Fan Auto
+                    icon: mdi:fan-auto
+                    service: climate.set_fan_mode
+                    service_data:
+                      entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                      fan_mode: "Auto low"
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Fan Low
+                    icon: mdi:fan-speed-1
+                    service: climate.set_fan_mode
+                    service_data:
+                      entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                      fan_mode: Low
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Circulation
+                    icon: mdi:fan-chevron-up
+                    service: climate.set_fan_mode
+                    service_data:
+                      entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                      fan_mode: Circulation
+                    color: amber
+
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 5: IMPERIAL GALLEY
   # ═══════════════════════════════════════════════════════════════════════════
@@ -390,6 +468,18 @@ views:
                     icon: mdi:thermometer
                     round: true
                   - entity: sensor.temperature_and_humidity_sensor_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+                    round: true
+
+              - type: custom:imperial-panel
+                title: Forward Command Post
+                entities:
+                  - entity: sensor.t6_pro_z_wave_programmable_thermostat_air_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.t6_pro_z_wave_programmable_thermostat_humidity
                     name: Humidity
                     icon: mdi:water-percent
                     round: true
