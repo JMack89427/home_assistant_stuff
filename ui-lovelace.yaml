@@ -204,34 +204,6 @@ views:
         subtitle: Execute standing orders with precision
         icon: local:sith
 
-      - type: grid
-        columns: 2
-        square: false
-        cards:
-          - type: custom:imperial-button
-            name: Good Night Protocol
-            icon: mdi:power-sleep
-            service: script.turn_on
-            service_data:
-              entity_id: script.good_night
-            entity: script.good_night
-            color: red
-          - type: custom:imperial-button
-            name: Movie Mode
-            icon: mdi:movie-open
-            service: script.turn_on
-            service_data:
-              entity_id: script.movie_mode
-            entity: script.movie_mode
-            color: amber
-
-      - type: custom:imperial-panel
-        title: Holonet Status
-        entities:
-          - entity: sensor.eero_external_ip
-            name: Holonet Uplink IP
-            icon: mdi:ip-network
-
       - type: custom:imperial-header
         title: Forward Command Post — Climate Control
         subtitle: Atmospheric temperature regulation — Forward sector
