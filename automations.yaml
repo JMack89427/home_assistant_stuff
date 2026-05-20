@@ -31,6 +31,57 @@
         entity_id: vacuum.roborock_qr_798
   mode: single
 
+# ── Dehumidifier: Force on when any room exceeds 40% humidity ────────────────
+- id: dehumidifier_force_on_any_room_humid
+  alias: "Dehumidifier: Force on — any room above 40% humidity"
+  trigger:
+    - platform: numeric_state
+      entity_id:
+        - sensor.timmerflotte_temp_hmd_sensor_humidity
+        - sensor.timmerflotte_temp_hmd_sensor_humidity_2
+        - sensor.timmerflotte_temp_hmd_sensor_humidity_3
+        - sensor.timmerflotte_temp_hmd_sensor_humidity_4
+        - sensor.timmerflotte_temp_hmd_sensor_humidity_5
+        - sensor.timmerflotte_temp_hmd_sensor_humidity_6
+        - sensor.temperature_and_humidity_sensor_humidity
+      above: 40
+  condition: []
+  action:
+    - service: humidifier.turn_on
+      target:
+        entity_id: humidifier.150633095484711_humidifier
+  mode: single
+
+# ── Dehumidifier: Allow off when all rooms drop to 40% or below ──────────────
+- id: dehumidifier_allow_off_all_rooms_dry
+  alias: "Dehumidifier: Allow off — all rooms at or below 40% humidity"
+  trigger:
+    - platform: numeric_state
+      entity_id:
+        - sensor.timmerflotte_temp_hmd_sensor_humidity
+        - sensor.timmerflotte_temp_hmd_sensor_humidity_2
+        - sensor.timmerflotte_temp_hmd_sensor_humidity_3
+        - sensor.timmerflotte_temp_hmd_sensor_humidity_4
+        - sensor.timmerflotte_temp_hmd_sensor_humidity_5
+        - sensor.timmerflotte_temp_hmd_sensor_humidity_6
+        - sensor.temperature_and_humidity_sensor_humidity
+      below: 41
+  condition:
+    - condition: template
+      value_template: >
+        {{ states('sensor.timmerflotte_temp_hmd_sensor_humidity') | float(0) <= 40
+           and states('sensor.timmerflotte_temp_hmd_sensor_humidity_2') | float(0) <= 40
+           and states('sensor.timmerflotte_temp_hmd_sensor_humidity_3') | float(0) <= 40
+           and states('sensor.timmerflotte_temp_hmd_sensor_humidity_4') | float(0) <= 40
+           and states('sensor.timmerflotte_temp_hmd_sensor_humidity_5') | float(0) <= 40
+           and states('sensor.timmerflotte_temp_hmd_sensor_humidity_6') | float(0) <= 40
+           and states('sensor.temperature_and_humidity_sensor_humidity') | float(0) <= 40 }}
+  action:
+    - service: humidifier.turn_off
+      target:
+        entity_id: humidifier.150633095484711_humidifier
+  mode: single
+
 # ── Example: notify when someone arrives home ─────────────────────────────────
 - id: notify_someone_arrived_home
   alias: "Notify: Someone arrived home"
