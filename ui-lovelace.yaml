@@ -512,6 +512,20 @@ views:
                     icon: mdi:water-percent
                     round: true
 
+          - type: horizontal-stack
+            cards:
+              - type: custom:imperial-panel
+                title: Fleet Average
+                entities:
+                  - entity: sensor.house_average_temperature
+                    name: Avg Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.house_average_humidity
+                    name: Avg Humidity
+                    icon: mdi:water-percent
+                    round: true
+
           - type: custom:imperial-header
             title: Atmospheric Moisture Control
             subtitle: Moisture extraction systems — maintaining optimal cabin humidity

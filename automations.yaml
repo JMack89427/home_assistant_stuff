@@ -31,6 +31,38 @@
         entity_id: vacuum.roborock_qr_798
   mode: single
 
+# ── Climate: Room-balanced heat_cool setpoints ────────────────────────────────
+# Runs at 7am (day → 72°F), 10pm (night → 68°F), and every 15 min to
+# recalibrate. Offsets the T6 setpoint so the whole-house average hits target.
+- id: climate_apply_setpoints
+  alias: "Climate: Room-balanced heat/cool setpoints"
+  trigger:
+    - platform: time
+      at: "07:00:00"
+    - platform: time
+      at: "22:00:00"
+    - platform: time_pattern
+      minutes: "/15"
+  action:
+    - variables:
+        target: >
+          {% if now().hour >= 7 and now().hour < 22 %}72{% else %}68{% endif %}
+        t6_temp: >
+          {{ states('sensor.t6_pro_z_wave_programmable_thermostat_air_temperature') | float(72) }}
+        house_avg: >
+          {{ states('sensor.house_average_temperature') | float(72) }}
+        offset: "{{ house_avg - t6_temp }}"
+        adjusted: "{{ (target | float - offset) | round(0) | int }}"
+        cool_sp: "{{ [[adjusted + 1, 69] | max, 78] | min }}"
+        heat_sp: "{{ [[cool_sp - 4, 60] | max, 60] | min }}"
+    - service: climate.set_temperature
+      data:
+        entity_id: climate.t6_pro_z_wave_programmable_thermostat
+        hvac_mode: heat_cool
+        target_temp_high: "{{ cool_sp }}"
+        target_temp_low: "{{ heat_sp }}"
+  mode: single
+
 # ── Dehumidifier: Force on when any room exceeds 40% humidity ────────────────
 - id: dehumidifier_force_on_any_room_humid
   alias: "Dehumidifier: Force on — any room above 40% humidity"
