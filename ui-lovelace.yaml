@@ -444,6 +444,79 @@ views:
                     icon: mdi:water-percent
                     round: true
 
+          - type: custom:imperial-header
+            title: Atmospheric Moisture Control
+            subtitle: Moisture extraction systems — maintaining optimal cabin humidity
+            icon: mdi:water-percent
+
+          - type: horizontal-stack
+            cards:
+              - type: custom:imperial-panel
+                title: Moisture Extractor MX-50
+                entities:
+                  - entity: humidifier.150633095484711_humidifier
+                    name: System Power
+                    icon: mdi:power
+                  - entity: humidifier.150633095484711_humidifier
+                    name: Current Humidity
+                    icon: mdi:water-percent
+                    attribute: current_humidity
+                    unit: "%"
+                  - entity: humidifier.150633095484711_humidifier
+                    name: Target Humidity
+                    icon: mdi:target
+                    attribute: humidity
+                    unit: "%"
+                  - entity: humidifier.150633095484711_humidifier
+                    name: Active Mode
+                    icon: mdi:cog
+                    attribute: mode
+
+              - type: grid
+                columns: 3
+                square: false
+                cards:
+                  - type: custom:imperial-button
+                    name: Manual
+                    icon: mdi:hand-back-right
+                    service: humidifier.set_mode
+                    service_data:
+                      entity_id: humidifier.150633095484711_humidifier
+                      mode: Manual
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Auto
+                    icon: mdi:auto-fix
+                    service: humidifier.set_mode
+                    service_data:
+                      entity_id: humidifier.150633095484711_humidifier
+                      mode: Auto
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Continuous
+                    icon: mdi:infinity
+                    service: humidifier.set_mode
+                    service_data:
+                      entity_id: humidifier.150633095484711_humidifier
+                      mode: Continuous
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Clothes-Dry
+                    icon: mdi:tshirt-crew
+                    service: humidifier.set_mode
+                    service_data:
+                      entity_id: humidifier.150633095484711_humidifier
+                      mode: Clothes-Dry
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Shoes-Dry
+                    icon: mdi:shoe-sneaker
+                    service: humidifier.set_mode
+                    service_data:
+                      entity_id: humidifier.150633095484711_humidifier
+                      mode: Shoes-Dry
+                    color: amber
+
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 7: MSE-6 DROID BAY
   # ═══════════════════════════════════════════════════════════════════════════
