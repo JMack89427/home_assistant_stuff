@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.7.1';
+  const VERSION = '2.7.2';
 
   const WX_ICONS = {
     'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
@@ -982,10 +982,12 @@
   // imperial-camera  (rotatable camera viewer — polls /api/camera_proxy)
   // ============================================================================
   class ImperialCamera extends HTMLElement {
+    constructor() {
+      super();
+      this.attachShadow({ mode: 'open' });
+    }
     setConfig(c) {
-      if (!c.entity) throw new Error('imperial-camera: entity required');
-      this._c = c;
-      if (!this.shadowRoot) this.attachShadow({ mode: 'open' });
+      this._c = c || {};
       this._built = false;
     }
     set hass(h) {
@@ -994,6 +996,7 @@
       this._refresh();
     }
     _build() {
+      if (!this._c?.entity) return;
       const { rotation = 0, title = '', aspect_ratio = '' } = this._c;
       const rot = parseInt(rotation) || 0;
       const sideways = rot === 90 || rot === 270;
@@ -1021,14 +1024,12 @@
       this._img = this.shadowRoot.getElementById('cam');
       this._built = true;
       this._refresh();
-      // Refresh snapshot every 5 seconds
       this._timer = setInterval(() => this._refresh(), 5000);
     }
     _refresh() {
-      if (!this._img || !this._h) return;
+      if (!this._img || !this._h || !this._c?.entity) return;
       const token = this._h.auth?.data?.access_token || '';
-      const ts = Date.now();
-      this._img.src = `/api/camera_proxy/${this._c.entity}?token=${token}&_t=${ts}`;
+      this._img.src = `/api/camera_proxy/${this._c.entity}?token=${token}&_t=${Date.now()}`;
     }
     disconnectedCallback() { clearInterval(this._timer); }
     getCardSize() { return 3; }
