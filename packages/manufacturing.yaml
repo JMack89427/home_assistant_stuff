@@ -7,5 +7,4 @@ template:
       - name: "Prusa MK4S Printing"
         unique_id: prusa_mk4s_printing
         device_class: running
-        # Standby draws ~14W. Heating/printing pulls 50W+.
-        state: "{{ states('sensor.prusa_mk4s_plug_current_consumption') | float(0) > 50 }}"
+        state: "{{ states('sensor.prusa_mk4s') in ['printing', 'busy'] }}"

@@ -589,7 +589,7 @@ views:
         cards:
           - type: custom:imperial-header
             title: Prusa MK4S
-            subtitle: FDM fabrication unit — power monitoring active
+            subtitle: FDM fabrication unit — PrusaLink online
             icon: mdi:printer-3d-nozzle
 
           - type: custom:imperial-responsive-columns
@@ -597,16 +597,52 @@ views:
               - type: horizontal-stack
                 cards:
                   - type: custom:imperial-readout
+                    entity: sensor.prusa_mk4s_progress
+                    name: Print Progress
+                    color: green
+                    unit: "%"
+                    round: true
+                  - type: custom:imperial-readout
                     entity: sensor.prusa_mk4s_plug_current_consumption
                     name: Power Draw
                     color: amber
                     unit: W
                     round: true
-                  - type: custom:imperial-readout
-                    entity: sensor.prusa_mk4s_plug_today_s_consumption
-                    name: Today
+
+              - type: picture-entity
+                entity: camera.prusa_mk4s_preview
+                name: Job Preview
+                show_name: false
+                show_state: false
+
+              - type: grid
+                columns: 3
+                square: false
+                cards:
+                  - type: custom:imperial-button
+                    name: Pause
+                    icon: mdi:pause-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.prusa_mk4s_pause_job
+                    entity: button.prusa_mk4s_pause_job
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Resume
+                    icon: mdi:play-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.prusa_mk4s_resume_job
+                    entity: button.prusa_mk4s_resume_job
                     color: green
-                    unit: kWh
+                  - type: custom:imperial-button
+                    name: Cancel
+                    icon: mdi:stop-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.prusa_mk4s_cancel_job
+                    entity: button.prusa_mk4s_cancel_job
+                    color: red
 
               - type: grid
                 columns: 2
@@ -631,38 +667,71 @@ views:
 
             right:
               - type: custom:imperial-panel
+                title: Fabrication Status
+                entities:
+                  - entity: sensor.prusa_mk4s
+                    name: Printer State
+                    icon: mdi:printer-3d
+                  - entity: sensor.prusa_mk4s_filename
+                    name: Job Name
+                    icon: mdi:file-document-outline
+                  - entity: sensor.prusa_mk4s_material
+                    name: Material
+                    icon: mdi:spool
+                  - entity: sensor.prusa_mk4s_print_speed
+                    name: Print Speed
+                    icon: mdi:speedometer
+                  - entity: sensor.prusa_mk4s_print_start
+                    name: Print Started
+                    icon: mdi:clock-start
+                  - entity: sensor.prusa_mk4s_print_finish
+                    name: Est. Completion
+                    icon: mdi:clock-end
+
+              - type: custom:imperial-panel
+                title: Thermal Systems
+                entities:
+                  - entity: sensor.prusa_mk4_nozzle_temperature
+                    name: Nozzle Temp
+                    icon: mdi:printer-3d-nozzle-heat
+                    round: true
+                  - entity: sensor.prusa_mk4_nozzle_target_temperature
+                    name: Nozzle Target
+                    icon: mdi:printer-3d-nozzle-heat-outline
+                    round: true
+                  - entity: sensor.prusa_mk4_heatbed_temperature
+                    name: Bed Temp
+                    icon: mdi:radiator
+                    round: true
+                  - entity: sensor.prusa_mk4_heatbed_target_temperature
+                    name: Bed Target
+                    icon: mdi:radiator
+                    round: true
+                  - entity: sensor.prusa_mk4_hotend_fan
+                    name: Hotend Fan
+                    icon: mdi:fan
+                  - entity: sensor.prusa_mk4_print_fan
+                    name: Part Fan
+                    icon: mdi:fan-chevron-up
+
+              - type: custom:imperial-panel
                 title: Power Systems
                 entities:
                   - entity: switch.prusa_mk4s_plug
-                    name: Outlet Power
+                    name: Outlet
                     icon: mdi:power-plug
-                  - entity: binary_sensor.prusa_mk4s_printing
-                    name: Print Active
-                    icon: mdi:printer-3d
                   - entity: sensor.prusa_mk4s_plug_current_consumption
                     name: Current Draw
                     icon: mdi:lightning-bolt
-                    unit: W
                   - entity: sensor.prusa_mk4s_plug_voltage
                     name: Voltage
                     icon: mdi:sine-wave
-                  - entity: sensor.prusa_mk4s_plug_current
-                    name: Current
-                    icon: mdi:current-ac
-
-              - type: custom:imperial-panel
-                title: Energy Consumption
-                entities:
                   - entity: sensor.prusa_mk4s_plug_today_s_consumption
                     name: Today
                     icon: mdi:calendar-today
                   - entity: sensor.prusa_mk4s_plug_this_month_s_consumption
                     name: This Month
                     icon: mdi:calendar-month
-
-              - type: custom:imperial-panel
-                title: Safety Systems
-                entities:
                   - entity: binary_sensor.prusa_mk4s_plug_overheated
                     name: Overheat Alert
                     icon: mdi:thermometer-alert
