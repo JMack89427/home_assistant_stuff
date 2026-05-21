@@ -66,7 +66,7 @@
             states('sensor.t6_pro_z_wave_programmable_thermostat_air_temperature') | float(72)
           ] }}
         spread: "{{ room_temps | max - room_temps | min }}"
-        fan_mode: "{{ 'Circulation' if spread > 3 else 'Auto low' }}"
+        fan_mode: "{{ 'Low' if spread > 3 else 'Circulation' }}"
     - service: climate.set_temperature
       data:
         entity_id: climate.t6_pro_z_wave_programmable_thermostat
