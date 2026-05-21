@@ -39,12 +39,16 @@
   trigger:
     - platform: time
       at: "07:00:00"
+      id: day
     - platform: time
       at: "21:00:00"
+      id: night
     - platform: time_pattern
       minutes: "/15"
+      id: recalibrate
   action:
     - variables:
+        is_scheduled: "{{ trigger.id in ['day', 'night'] }}"
         target: >
           {% if now().hour >= 7 and now().hour < 21 %}72{% else %}68{% endif %}
         t6_temp: >
@@ -67,6 +71,15 @@
           ] }}
         spread: "{{ room_temps | max - room_temps | min }}"
         fan_mode: "{{ 'Low' if spread > 3 else 'Circulation' }}"
+    # Skip recalibration ticks when manual override is active.
+    # Scheduled triggers (day/night) always run and clear the override.
+    - condition: or
+      conditions:
+        - condition: template
+          value_template: "{{ is_scheduled }}"
+        - condition: state
+          entity_id: input_boolean.climate_manual_override
+          state: "off"
     - service: climate.set_temperature
       data:
         entity_id: climate.t6_pro_z_wave_programmable_thermostat
@@ -77,6 +90,13 @@
       data:
         entity_id: climate.t6_pro_z_wave_programmable_thermostat
         fan_mode: "{{ fan_mode }}"
+    - if:
+        - condition: template
+          value_template: "{{ is_scheduled }}"
+      then:
+        - service: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.climate_manual_override
   mode: single
 
 # ── Dehumidifier: Force on when any room exceeds 40% humidity ────────────────

@@ -16,6 +16,11 @@
 #   adjusted_target = target - (house_avg - t6_reading)
 # ─────────────────────────────────────────────────────────────────────────────
 
+input_boolean:
+  climate_manual_override:
+    name: Climate Manual Override
+    icon: mdi:hand-back-right
+
 template:
   - sensor:
       - name: "House Average Temperature"

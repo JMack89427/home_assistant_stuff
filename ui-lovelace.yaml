@@ -228,6 +228,9 @@ views:
           - entity: sensor.t6_fan_status
             name: Fan Status
             icon: mdi:fan-clock
+          - entity: input_boolean.climate_manual_override
+            name: Manual Override
+            icon: mdi:hand-back-right
 
       - type: thermostat
         entity: climate.t6_pro_z_wave_programmable_thermostat
