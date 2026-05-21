@@ -225,10 +225,9 @@ views:
             name: Fan Mode
             icon: mdi:fan
             attribute: fan_mode
-          - entity: climate.t6_pro_z_wave_programmable_thermostat
+          - entity: sensor.t6_fan_status
             name: Fan Status
             icon: mdi:fan-clock
-            attribute: fan_state
 
       - type: thermostat
         entity: climate.t6_pro_z_wave_programmable_thermostat

@@ -34,6 +34,17 @@ template:
               states('sensor.t6_pro_z_wave_programmable_thermostat_air_temperature') | float(72)
             ) / 7) | round(1) }}
 
+      - name: "T6 Fan Status"
+        unique_id: t6_fan_status
+        icon: mdi:fan-clock
+        state: >
+          {% set s = state_attr('climate.t6_pro_z_wave_programmable_thermostat', 'fan_state') | lower %}
+          {% if 'high' in s %}High
+          {% elif 'low' in s %}Low
+          {% elif 'running' in s %}Running
+          {% else %}Idle
+          {% endif %}
+
       - name: "House Average Humidity"
         unique_id: house_average_humidity
         unit_of_measurement: "%"
