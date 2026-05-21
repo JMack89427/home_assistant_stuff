@@ -186,6 +186,60 @@ views:
                 entity: camera.flsuns1pro_camera
                 rotation: 90
                 title: Fabrication Bay
+            right:
+              - type: custom:imperial-panel
+                title: Fabrication Status
+                entities:
+                  - entity: sensor.flsuns1pro_filename
+                    name: Job Name
+                    icon: mdi:file-document-outline
+                  - entity: sensor.flsuns1pro_current_print_state
+                    name: Print Status
+                    icon: mdi:printer-3d
+                  - entity: sensor.flsuns1pro_printer_state
+                    name: System State
+                    icon: mdi:state-machine
+                  - entity: sensor.flsuns1pro_print_time_left
+                    name: Time Remaining
+                    icon: mdi:timer-outline
+                  - entity: sensor.flsuns1pro_print_eta
+                    name: Est. Completion
+                    icon: mdi:clock-end
+              - type: custom:imperial-panel
+                title: Thermal Systems
+                entities:
+                  - entity: sensor.flsuns1pro_extruder_temperature
+                    name: Extruder Temp
+                    icon: mdi:printer-3d-nozzle-heat
+                    round: true
+                  - entity: sensor.flsuns1pro_bed_temperature
+                    name: Bed Temp
+                    icon: mdi:radiator
+                    round: true
+              - type: custom:imperial-panel
+                title: Power Systems
+                entities:
+                  - entity: switch.s1_pro_plug
+                    name: Outlet
+                    icon: mdi:power-plug
+                  - entity: sensor.s1_pro_plug_current_consumption
+                    name: Current Draw
+                    icon: mdi:lightning-bolt
+                  - entity: sensor.s1_pro_plug_voltage
+                    name: Voltage
+                    icon: mdi:sine-wave
+                  - entity: sensor.s1_pro_plug_today_s_consumption
+                    name: Today
+                    icon: mdi:calendar-today
+                  - entity: sensor.s1_pro_plug_this_month_s_consumption
+                    name: This Month
+                    icon: mdi:calendar-month
+                  - entity: binary_sensor.s1_pro_plug_overheated
+                    name: Overheat Alert
+                    icon: mdi:thermometer-alert
+                  - entity: binary_sensor.s1_pro_plug_overloaded
+                    name: Overload Alert
+                    icon: mdi:alert-circle
               - type: grid
                 columns: 4
                 square: false
@@ -242,60 +296,6 @@ views:
                       entity_id: switch.s1_pro_plug
                     entity: switch.s1_pro_plug
                     color: red
-            right:
-              - type: custom:imperial-panel
-                title: Fabrication Status
-                entities:
-                  - entity: sensor.flsuns1pro_filename
-                    name: Job Name
-                    icon: mdi:file-document-outline
-                  - entity: sensor.flsuns1pro_current_print_state
-                    name: Print Status
-                    icon: mdi:printer-3d
-                  - entity: sensor.flsuns1pro_printer_state
-                    name: System State
-                    icon: mdi:state-machine
-                  - entity: sensor.flsuns1pro_print_time_left
-                    name: Time Remaining
-                    icon: mdi:timer-outline
-                  - entity: sensor.flsuns1pro_print_eta
-                    name: Est. Completion
-                    icon: mdi:clock-end
-              - type: custom:imperial-panel
-                title: Thermal Systems
-                entities:
-                  - entity: sensor.flsuns1pro_extruder_temperature
-                    name: Extruder Temp
-                    icon: mdi:printer-3d-nozzle-heat
-                    round: true
-                  - entity: sensor.flsuns1pro_bed_temperature
-                    name: Bed Temp
-                    icon: mdi:radiator
-                    round: true
-              - type: custom:imperial-panel
-                title: Power Systems
-                entities:
-                  - entity: switch.s1_pro_plug
-                    name: Outlet
-                    icon: mdi:power-plug
-                  - entity: sensor.s1_pro_plug_current_consumption
-                    name: Current Draw
-                    icon: mdi:lightning-bolt
-                  - entity: sensor.s1_pro_plug_voltage
-                    name: Voltage
-                    icon: mdi:sine-wave
-                  - entity: sensor.s1_pro_plug_today_s_consumption
-                    name: Today
-                    icon: mdi:calendar-today
-                  - entity: sensor.s1_pro_plug_this_month_s_consumption
-                    name: This Month
-                    icon: mdi:calendar-month
-                  - entity: binary_sensor.s1_pro_plug_overheated
-                    name: Overheat Alert
-                    icon: mdi:thermometer-alert
-                  - entity: binary_sensor.s1_pro_plug_overloaded
-                    name: Overload Alert
-                    icon: mdi:alert-circle
 
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 4: PRINTZ
