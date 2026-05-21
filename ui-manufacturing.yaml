@@ -32,6 +32,8 @@ views:
                 name: RatRig
               - prefix: magneto_x
                 name: Magneto X
+              - prefix: prusa_mk4s
+                name: Prusa MK4S
 
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 2: BAMBU P1P — UNIT ALPHA

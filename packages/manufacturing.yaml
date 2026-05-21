@@ -3,6 +3,29 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 template:
+  - sensor:
+      # Bridge sensors so imperial-fleet-grid can find Prusa MK4S by prefix.
+      # PrusaLink uses mixed prusa_mk4s / prusa_mk4 naming and different suffixes.
+      - name: "prusa mk4s print status"
+        unique_id: prusa_mk4s_print_status
+        state: >
+          {% set s = states('sensor.prusa_mk4s') %}
+          {% if s == 'finished' %}finish
+          {% else %}{{ s }}
+          {% endif %}
+
+      - name: "prusa mk4s nozzle temperature"
+        unique_id: prusa_mk4s_nozzle_temperature
+        unit_of_measurement: "°F"
+        device_class: temperature
+        state: "{{ states('sensor.prusa_mk4_nozzle_temperature') }}"
+
+      - name: "prusa mk4s bed temperature"
+        unique_id: prusa_mk4s_bed_temperature
+        unit_of_measurement: "°F"
+        device_class: temperature
+        state: "{{ states('sensor.prusa_mk4_heatbed_temperature') }}"
+
   - binary_sensor:
       - name: "Prusa MK4S Printing"
         unique_id: prusa_mk4s_printing
