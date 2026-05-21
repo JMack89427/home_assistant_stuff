@@ -1,6 +1,6 @@
 title: Imperial Command Center
 resources:
-  - url: /local/imperial-cards.js?v=38
+  - url: /local/imperial-cards.js?v=32
     type: module
   - url: /hacsfiles/calendar-card-pro/calendar-card-pro.js
     type: module
