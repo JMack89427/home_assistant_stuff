@@ -210,6 +210,10 @@ views:
           - entity: climate.t6_pro_z_wave_programmable_thermostat
             name: System Mode
             icon: mdi:thermostat
+          - entity: climate.t6_pro_z_wave_programmable_thermostat
+            name: System Action
+            icon: mdi:lightning-bolt
+            attribute: hvac_action
           - entity: sensor.t6_pro_z_wave_programmable_thermostat_air_temperature
             name: Current Temp
             icon: mdi:thermometer
@@ -217,6 +221,14 @@ views:
             name: Current Humidity
             icon: mdi:water-percent
             round: true
+          - entity: climate.t6_pro_z_wave_programmable_thermostat
+            name: Fan Mode
+            icon: mdi:fan
+            attribute: fan_mode
+          - entity: climate.t6_pro_z_wave_programmable_thermostat
+            name: Fan Status
+            icon: mdi:fan-clock
+            attribute: fan_state
 
       - type: thermostat
         entity: climate.t6_pro_z_wave_programmable_thermostat
