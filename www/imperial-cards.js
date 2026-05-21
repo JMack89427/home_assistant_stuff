@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.7.3';
+  const VERSION = '2.7.4';
 
   const WX_ICONS = {
     'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
@@ -1026,18 +1026,11 @@
       this._refresh();
       this._timer = setInterval(() => this._refresh(), 5000);
     }
-    async _refresh() {
+    _refresh() {
       if (!this._img || !this._h || !this._c?.entity) return;
-      try {
-        const { path } = await this._h.connection.sendMessagePromise({
-          type: 'auth/sign_path',
-          path: `/api/camera_proxy/${this._c.entity}`,
-          expires: 30,
-        });
-        this._img.src = path;
-      } catch (e) {
-        console.warn('imperial-camera: sign_path failed', e);
-      }
+      const state = this._h.states[this._c.entity];
+      const token = state?.attributes?.access_token || '';
+      this._img.src = `/api/camera_proxy/${this._c.entity}?token=${token}&_t=${Date.now()}`;
     }
     disconnectedCallback() { clearInterval(this._timer); }
     getCardSize() { return 3; }
