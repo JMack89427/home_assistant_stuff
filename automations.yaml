@@ -40,13 +40,13 @@
     - platform: time
       at: "07:00:00"
     - platform: time
-      at: "22:00:00"
+      at: "21:00:00"
     - platform: time_pattern
       minutes: "/15"
   action:
     - variables:
         target: >
-          {% if now().hour >= 7 and now().hour < 22 %}72{% else %}68{% endif %}
+          {% if now().hour >= 7 and now().hour < 21 %}72{% else %}68{% endif %}
         t6_temp: >
           {{ states('sensor.t6_pro_z_wave_programmable_thermostat_air_temperature') | float(72) }}
         house_avg: >
