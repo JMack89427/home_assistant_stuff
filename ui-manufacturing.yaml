@@ -176,6 +176,12 @@ views:
                     entity: sensor.flsuns1pro_total_layer
                     name: Total Layers
                     color: red
+                  - type: custom:imperial-readout
+                    entity: sensor.s1_pro_plug_current_consumption
+                    name: Power Draw
+                    color: amber
+                    unit: W
+                    round: true
               - type: picture-glance
                 title: Fabrication Bay
                 camera_image: camera.flsuns1pro_camera
@@ -183,6 +189,11 @@ views:
                 entities:
                   - entity: binary_sensor.flsuns1pro_filament_sensor
                     icon: mdi:alert-circle
+                card_mod:
+                  style: |
+                    img {
+                      transform: rotate(90deg) scale(1.4);
+                    }
               - type: grid
                 columns: 4
                 square: false
@@ -219,6 +230,26 @@ views:
                       entity_id: button.flsuns1pro_emergency_stop
                     entity: button.flsuns1pro_emergency_stop
                     color: red
+              - type: grid
+                columns: 2
+                square: false
+                cards:
+                  - type: custom:imperial-button
+                    name: Power On
+                    icon: mdi:power-plug
+                    service: switch.turn_on
+                    service_data:
+                      entity_id: switch.s1_pro_plug
+                    entity: switch.s1_pro_plug
+                    color: green
+                  - type: custom:imperial-button
+                    name: Power Off
+                    icon: mdi:power-plug-off
+                    service: switch.turn_off
+                    service_data:
+                      entity_id: switch.s1_pro_plug
+                    entity: switch.s1_pro_plug
+                    color: red
             right:
               - type: custom:imperial-panel
                 title: Fabrication Status
@@ -249,6 +280,30 @@ views:
                     name: Bed Temp
                     icon: mdi:radiator
                     round: true
+              - type: custom:imperial-panel
+                title: Power Systems
+                entities:
+                  - entity: switch.s1_pro_plug
+                    name: Outlet
+                    icon: mdi:power-plug
+                  - entity: sensor.s1_pro_plug_current_consumption
+                    name: Current Draw
+                    icon: mdi:lightning-bolt
+                  - entity: sensor.s1_pro_plug_voltage
+                    name: Voltage
+                    icon: mdi:sine-wave
+                  - entity: sensor.s1_pro_plug_today_s_consumption
+                    name: Today
+                    icon: mdi:calendar-today
+                  - entity: sensor.s1_pro_plug_this_month_s_consumption
+                    name: This Month
+                    icon: mdi:calendar-month
+                  - entity: binary_sensor.s1_pro_plug_overheated
+                    name: Overheat Alert
+                    icon: mdi:thermometer-alert
+                  - entity: binary_sensor.s1_pro_plug_overloaded
+                    name: Overload Alert
+                    icon: mdi:alert-circle
 
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 4: PRINTZ
