@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.6.9';
+  const VERSION = '2.7.0';
 
   const WX_ICONS = {
     'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
@@ -994,15 +994,21 @@
       if (this._cam) this._cam.hass = h;
     }
     _build() {
-      const { entity, rotation = 0, title = '', camera_view = 'auto' } = this._c;
+      const { entity, rotation = 0, title = '', camera_view = 'auto', aspect_ratio = '' } = this._c;
       const rot = parseInt(rotation) || 0;
-      const scale = (rot === 90 || rot === 270) ? 1.45 : 1;
+      const sideways = rot === 90 || rot === 270;
+      // For 90/270: the rotated landscape image needs to fill a portrait container.
+      // Default portrait ratio for a rotated 16:9 camera is 9/16 ≈ 0.5625.
+      // Scale needed to fill that container = 16/9 ≈ 1.778.
+      const containerRatio = aspect_ratio || (sideways ? '9 / 16' : '16 / 9');
+      const scale = sideways ? (16 / 9) : 1;
       this.shadowRoot.innerHTML = `
         <style>
-          :host { display: block; position: relative; overflow: hidden; background: #000; }
+          :host { display: block; position: relative; overflow: hidden; background: #000;
+                  aspect-ratio: ${containerRatio}; }
           hui-image {
-            display: block; width: 100%;
-            ${rot ? `transform: rotate(${rot}deg) scale(${scale}); transform-origin: center;` : ''}
+            display: block; width: 100%; height: 100%;
+            ${rot ? `transform: rotate(${rot}deg) scale(${scale.toFixed(3)}); transform-origin: center;` : ''}
           }
           .lbl {
             position: absolute; bottom: 0; left: 0; right: 0;
@@ -1012,7 +1018,7 @@
             pointer-events: none; z-index: 2;
           }
         </style>
-        <div id="wrap"></div>
+        <div id="wrap" style="width:100%;height:100%;position:relative;"></div>
         ${title ? `<div class="lbl">${title}</div>` : ''}
       `;
       const cam = document.createElement('hui-image');
