@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.7.0';
+  const VERSION = '2.7.1';
 
   const WX_ICONS = {
     'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
@@ -979,7 +979,7 @@
   }
 
   // ============================================================================
-  // imperial-camera  (rotatable camera viewer using HA's hui-image element)
+  // imperial-camera  (rotatable camera viewer — polls /api/camera_proxy)
   // ============================================================================
   class ImperialCamera extends HTMLElement {
     setConfig(c) {
@@ -991,24 +991,21 @@
     set hass(h) {
       this._h = h;
       if (!this._built) { this._build(); return; }
-      if (this._cam) this._cam.hass = h;
+      this._refresh();
     }
     _build() {
-      const { entity, rotation = 0, title = '', camera_view = 'auto', aspect_ratio = '' } = this._c;
+      const { rotation = 0, title = '', aspect_ratio = '' } = this._c;
       const rot = parseInt(rotation) || 0;
       const sideways = rot === 90 || rot === 270;
-      // For 90/270: the rotated landscape image needs to fill a portrait container.
-      // Default portrait ratio for a rotated 16:9 camera is 9/16 ≈ 0.5625.
-      // Scale needed to fill that container = 16/9 ≈ 1.778.
       const containerRatio = aspect_ratio || (sideways ? '9 / 16' : '16 / 9');
-      const scale = sideways ? (16 / 9) : 1;
+      const scale = sideways ? (16 / 9).toFixed(3) : '1';
       this.shadowRoot.innerHTML = `
         <style>
           :host { display: block; position: relative; overflow: hidden; background: #000;
                   aspect-ratio: ${containerRatio}; }
-          hui-image {
-            display: block; width: 100%; height: 100%;
-            ${rot ? `transform: rotate(${rot}deg) scale(${scale.toFixed(3)}); transform-origin: center;` : ''}
+          img {
+            display: block; width: 100%; height: 100%; object-fit: cover;
+            ${rot ? `transform: rotate(${rot}deg) scale(${scale}); transform-origin: center;` : ''}
           }
           .lbl {
             position: absolute; bottom: 0; left: 0; right: 0;
@@ -1018,16 +1015,22 @@
             pointer-events: none; z-index: 2;
           }
         </style>
-        <div id="wrap" style="width:100%;height:100%;position:relative;"></div>
+        <img id="cam" />
         ${title ? `<div class="lbl">${title}</div>` : ''}
       `;
-      const cam = document.createElement('hui-image');
-      cam.imageConfig = { camera_image: entity, camera_view };
-      if (this._h) cam.hass = this._h;
-      this.shadowRoot.getElementById('wrap').appendChild(cam);
-      this._cam = cam;
+      this._img = this.shadowRoot.getElementById('cam');
       this._built = true;
+      this._refresh();
+      // Refresh snapshot every 5 seconds
+      this._timer = setInterval(() => this._refresh(), 5000);
     }
+    _refresh() {
+      if (!this._img || !this._h) return;
+      const token = this._h.auth?.data?.access_token || '';
+      const ts = Date.now();
+      this._img.src = `/api/camera_proxy/${this._c.entity}?token=${token}&_t=${ts}`;
+    }
+    disconnectedCallback() { clearInterval(this._timer); }
     getCardSize() { return 3; }
     static getStubConfig() { return { entity: 'camera.example', rotation: 0, title: '' }; }
   }
