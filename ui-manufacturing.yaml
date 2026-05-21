@@ -2,6 +2,8 @@ title: Imperial Manufacturing Facility
 resources:
   - url: /local/imperial-cards.js?v=25
     type: module
+  - url: /hacsfiles/lovelace-card-mod/card-mod.js
+    type: module
 views:
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -190,10 +192,11 @@ views:
                   - entity: binary_sensor.flsuns1pro_filament_sensor
                     icon: mdi:alert-circle
                 card_mod:
-                  style: |
-                    img {
-                      transform: rotate(90deg) scale(1.4);
-                    }
+                  style:
+                    hui-image$: |
+                      img {
+                        transform: rotate(90deg) scale(1.4);
+                      }
               - type: grid
                 columns: 4
                 square: false
