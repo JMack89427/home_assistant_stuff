@@ -1,8 +1,6 @@
 title: Imperial Manufacturing Facility
 resources:
-  - url: /local/imperial-cards.js?v=25
-    type: module
-  - url: /hacsfiles/lovelace-card-mod/card-mod.js
+  - url: /local/imperial-cards.js?v=26
     type: module
 views:
 
@@ -184,18 +182,10 @@ views:
                     color: amber
                     unit: W
                     round: true
-              - type: picture-glance
+              - type: custom:imperial-camera
+                entity: camera.flsuns1pro_camera
+                rotation: 90
                 title: Fabrication Bay
-                camera_image: camera.flsuns1pro_camera
-                camera_view: auto
-                entities:
-                  - entity: binary_sensor.flsuns1pro_filament_sensor
-                    icon: mdi:alert-circle
-                card_mod:
-                  style: |
-                    :host {
-                      transform: rotate(90deg);
-                    }
               - type: grid
                 columns: 4
                 square: false

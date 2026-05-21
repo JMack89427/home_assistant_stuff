@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.6.8';
+  const VERSION = '2.6.9';
 
   const WX_ICONS = {
     'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
@@ -978,6 +978,54 @@
     static getStubConfig() { return { battery_threshold: 20 }; }
   }
 
+  // ============================================================================
+  // imperial-camera  (rotatable camera viewer using HA's hui-image element)
+  // ============================================================================
+  class ImperialCamera extends HTMLElement {
+    setConfig(c) {
+      if (!c.entity) throw new Error('imperial-camera: entity required');
+      this._c = c;
+      if (!this.shadowRoot) this.attachShadow({ mode: 'open' });
+      this._built = false;
+    }
+    set hass(h) {
+      this._h = h;
+      if (!this._built) { this._build(); return; }
+      if (this._cam) this._cam.hass = h;
+    }
+    _build() {
+      const { entity, rotation = 0, title = '', camera_view = 'auto' } = this._c;
+      const rot = parseInt(rotation) || 0;
+      const scale = (rot === 90 || rot === 270) ? 1.45 : 1;
+      this.shadowRoot.innerHTML = `
+        <style>
+          :host { display: block; position: relative; overflow: hidden; background: #000; }
+          hui-image {
+            display: block; width: 100%;
+            ${rot ? `transform: rotate(${rot}deg) scale(${scale}); transform-origin: center;` : ''}
+          }
+          .lbl {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            padding: 4px 8px; background: rgba(0,0,0,0.65);
+            color: #E8E8E8; font-family: 'Courier New', monospace;
+            font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+            pointer-events: none; z-index: 2;
+          }
+        </style>
+        <div id="wrap"></div>
+        ${title ? `<div class="lbl">${title}</div>` : ''}
+      `;
+      const cam = document.createElement('hui-image');
+      cam.imageConfig = { camera_image: entity, camera_view };
+      if (this._h) cam.hass = this._h;
+      this.shadowRoot.getElementById('wrap').appendChild(cam);
+      this._cam = cam;
+      this._built = true;
+    }
+    getCardSize() { return 3; }
+    static getStubConfig() { return { entity: 'camera.example', rotation: 0, title: '' }; }
+  }
+
   // ── Register cards ─────────────────────────────────────────────────────────
   [
     ['imperial-header',          ImperialHeader],
@@ -989,6 +1037,7 @@
     ['imperial-responsive-columns', ImperialResponsiveColumns],
     ['imperial-clock',              ImperialClock],
     ['imperial-alert-panel',        ImperialAlertPanel],
+    ['imperial-camera',             ImperialCamera],
   ].forEach(([tag, cls]) => {
     if (!customElements.get(tag)) customElements.define(tag, cls);
   });
@@ -1004,6 +1053,7 @@
     { type: 'imperial-responsive-columns', name: 'Imperial Responsive Columns', description: 'Responsive 2-col layout, stacks on mobile' },
     { type: 'imperial-clock',              name: 'Imperial Clock',              description: 'Self-updating time and date display' },
     { type: 'imperial-alert-panel',        name: 'Imperial Alert Panel',        description: 'Low battery and unavailable entity scanner' },
+    { type: 'imperial-camera',             name: 'Imperial Camera',             description: 'Rotatable camera viewer' },
   );
 
   console.info(
