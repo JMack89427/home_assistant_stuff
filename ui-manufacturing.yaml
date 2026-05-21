@@ -575,3 +575,97 @@ views:
                     name: Beacon Coil Temp
                     icon: mdi:radar
                     round: true
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # VIEW 7: PRUSA MK4S
+  # ═══════════════════════════════════════════════════════════════════════════
+  - title: Prusa MK4S
+    path: prusa-mk4s
+    panel: true
+    icon: mdi:printer-3d-nozzle
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:imperial-header
+            title: Prusa MK4S
+            subtitle: FDM fabrication unit — power monitoring active
+            icon: mdi:printer-3d-nozzle
+
+          - type: custom:imperial-responsive-columns
+            left:
+              - type: horizontal-stack
+                cards:
+                  - type: custom:imperial-readout
+                    entity: sensor.prusa_mk4s_plug_current_consumption
+                    name: Power Draw
+                    color: amber
+                    unit: W
+                    round: true
+                  - type: custom:imperial-readout
+                    entity: sensor.prusa_mk4s_plug_today_s_consumption
+                    name: Today
+                    color: green
+                    unit: kWh
+
+              - type: grid
+                columns: 2
+                square: false
+                cards:
+                  - type: custom:imperial-button
+                    name: Power On
+                    icon: mdi:power-plug
+                    service: switch.turn_on
+                    service_data:
+                      entity_id: switch.prusa_mk4s_plug
+                    entity: switch.prusa_mk4s_plug
+                    color: green
+                  - type: custom:imperial-button
+                    name: Power Off
+                    icon: mdi:power-plug-off
+                    service: switch.turn_off
+                    service_data:
+                      entity_id: switch.prusa_mk4s_plug
+                    entity: switch.prusa_mk4s_plug
+                    color: red
+
+            right:
+              - type: custom:imperial-panel
+                title: Power Systems
+                entities:
+                  - entity: switch.prusa_mk4s_plug
+                    name: Outlet Power
+                    icon: mdi:power-plug
+                  - entity: binary_sensor.prusa_mk4s_printing
+                    name: Print Active
+                    icon: mdi:printer-3d
+                  - entity: sensor.prusa_mk4s_plug_current_consumption
+                    name: Current Draw
+                    icon: mdi:lightning-bolt
+                    unit: W
+                  - entity: sensor.prusa_mk4s_plug_voltage
+                    name: Voltage
+                    icon: mdi:sine-wave
+                  - entity: sensor.prusa_mk4s_plug_current
+                    name: Current
+                    icon: mdi:current-ac
+
+              - type: custom:imperial-panel
+                title: Energy Consumption
+                entities:
+                  - entity: sensor.prusa_mk4s_plug_today_s_consumption
+                    name: Today
+                    icon: mdi:calendar-today
+                  - entity: sensor.prusa_mk4s_plug_this_month_s_consumption
+                    name: This Month
+                    icon: mdi:calendar-month
+
+              - type: custom:imperial-panel
+                title: Safety Systems
+                entities:
+                  - entity: binary_sensor.prusa_mk4s_plug_overheated
+                    name: Overheat Alert
+                    icon: mdi:thermometer-alert
+                  - entity: binary_sensor.prusa_mk4s_plug_overloaded
+                    name: Overload Alert
+                    icon: mdi:alert-circle
