@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.7.4';
+  const VERSION = '2.7.5';
 
   const WX_ICONS = {
     'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
@@ -1001,15 +1001,20 @@
       const rot = parseInt(rotation) || 0;
       const sideways = rot === 90 || rot === 270;
       const containerRatio = aspect_ratio || (sideways ? '9 / 16' : '16 / 9');
-      const scale = sideways ? (16 / 9).toFixed(3) : '1';
+      // For 90/270°: img must be as wide as the container is tall (16/9 × container width)
+      // so that after rotation, its visual width = container width and height = container height.
+      // Center it with absolute positioning + translate(-50%,-50%), then rotate in place.
+      const imgCss = sideways
+        ? `position:absolute; left:50%; top:50%; width:177.78%; height:auto;
+           transform: translate(-50%,-50%) rotate(${rot}deg);`
+        : rot
+        ? `width:100%; height:auto; transform: rotate(${rot}deg);`
+        : `width:100%; height:auto;`;
       this.shadowRoot.innerHTML = `
         <style>
           :host { display: block; position: relative; overflow: hidden; background: #000;
                   aspect-ratio: ${containerRatio}; }
-          img {
-            display: block; width: 100%; height: 100%; object-fit: cover;
-            ${rot ? `transform: rotate(${rot}deg) scale(${scale}); transform-origin: center;` : ''}
-          }
+          img { display: block; ${imgCss} }
           .lbl {
             position: absolute; bottom: 0; left: 0; right: 0;
             padding: 4px 8px; background: rgba(0,0,0,0.65);
