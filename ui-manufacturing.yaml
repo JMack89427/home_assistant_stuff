@@ -192,11 +192,10 @@ views:
                   - entity: binary_sensor.flsuns1pro_filament_sensor
                     icon: mdi:alert-circle
                 card_mod:
-                  style:
-                    hui-image$: |
-                      img {
-                        transform: rotate(90deg) scale(1.4);
-                      }
+                  style: |
+                    :host {
+                      transform: rotate(90deg);
+                    }
               - type: grid
                 columns: 4
                 square: false
