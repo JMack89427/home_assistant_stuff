@@ -5,8 +5,8 @@
 # NOTE: Carbonite Vault (freezer) is intentionally excluded from all averages.
 #
 # Automation logic:
-#   - 7:00 AM  → daytime setpoint (72°F cool / 68°F heat band)
-#   - 10:00 PM → night setpoint   (68°F cool / 64°F heat band)
+#   - 7:00 AM  → daytime setpoint  (cool 73°F / heat 69°F)
+#   - 9:00 PM  → night setpoint    (cool 68°F / heat 65°F)
 #   - Every 15 min → recalculate adjusted setpoints based on room offset
 #
 # Room offset compensation:

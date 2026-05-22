@@ -49,16 +49,16 @@
   action:
     - variables:
         is_scheduled: "{{ trigger.id in ['day', 'night'] }}"
-        target: >
-          {% if now().hour >= 7 and now().hour < 21 %}72{% else %}68{% endif %}
+        is_day: "{{ now().hour >= 7 and now().hour < 21 }}"
+        base_cool: "{{ 73 if is_day else 68 }}"
+        base_heat: "{{ 69 if is_day else 65 }}"
         t6_temp: >
           {{ states('sensor.t6_pro_z_wave_programmable_thermostat_air_temperature') | float(72) }}
         house_avg: >
           {{ states('sensor.house_average_temperature') | float(72) }}
         offset: "{{ house_avg - t6_temp }}"
-        adjusted: "{{ (target | float - offset) | round(0) | int }}"
-        cool_sp: "{{ [[adjusted + 1, 69] | max, 78] | min }}"
-        heat_sp: "{{ [[cool_sp - 4, 60] | max, cool_sp - 3] | min }}"
+        cool_sp: "{{ (base_cool | float - offset) | round(0) | int }}"
+        heat_sp: "{{ [[(base_heat | float - offset) | round(0) | int, 60] | max, cool_sp - 3] | min }}"
         room_temps: >
           {{ [
             states('sensor.timmerflotte_temp_hmd_sensor_temperature') | float(72),
