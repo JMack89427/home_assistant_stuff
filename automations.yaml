@@ -38,7 +38,7 @@
   alias: "Climate: Room-balanced heat/cool setpoints"
   trigger:
     - platform: time
-      at: "07:00:00"
+      at: "06:00:00"
       id: day
     - platform: time
       at: "21:00:00"
@@ -49,9 +49,9 @@
   action:
     - variables:
         is_scheduled: "{{ trigger.id in ['day', 'night'] }}"
-        is_day: "{{ now().hour >= 7 and now().hour < 21 }}"
-        base_cool: "{{ 73 if is_day else 68 }}"
-        base_heat: "{{ 69 if is_day else 65 }}"
+        is_day: "{{ now().hour >= 6 and now().hour < 21 }}"
+        base_cool: "{{ 72 if is_day else 68 }}"
+        base_heat: "{{ 68 if is_day else 64 }}"
         t6_temp: >
           {{ states('sensor.t6_pro_z_wave_programmable_thermostat_air_temperature') | float(72) }}
         house_avg: >
