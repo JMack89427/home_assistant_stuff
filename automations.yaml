@@ -81,14 +81,16 @@
           entity_id: input_boolean.climate_manual_override
           state: "off"
     - service: climate.set_temperature
-      data:
+      target:
         entity_id: climate.t6_pro_z_wave_programmable_thermostat
+      data:
         hvac_mode: heat_cool
         target_temp_high: "{{ cool_sp }}"
         target_temp_low: "{{ heat_sp }}"
     - service: climate.set_fan_mode
-      data:
+      target:
         entity_id: climate.t6_pro_z_wave_programmable_thermostat
+      data:
         fan_mode: "{{ fan_mode }}"
     - if:
         - condition: template
