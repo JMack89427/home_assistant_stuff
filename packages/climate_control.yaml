@@ -2,7 +2,7 @@
 # packages/climate_control.yaml — House climate management
 #
 # Template sensors: house_average_temperature, house_average_humidity
-# NOTE: Carbonite Vault (freezer) is intentionally excluded from all averages.
+# NOTE: Carbonite Vault (freezer) and Fabrication Bay are intentionally excluded from all averages.
 #
 # Automation logic:
 #   - 6:00 AM  → daytime setpoint  (cool 72°F / heat 68°F)
@@ -31,13 +31,12 @@ template:
         state: >
           {{ ((
               states('sensor.timmerflotte_temp_hmd_sensor_temperature') | float(72) +
-              states('sensor.timmerflotte_temp_hmd_sensor_temperature_2') | float(72) +
               states('sensor.timmerflotte_temp_hmd_sensor_temperature_3') | float(72) +
               states('sensor.timmerflotte_temp_hmd_sensor_temperature_4') | float(72) +
               states('sensor.timmerflotte_temp_hmd_sensor_temperature_5') | float(72) +
               states('sensor.timmerflotte_temp_hmd_sensor_temperature_6') | float(72) +
               states('sensor.t6_pro_z_wave_programmable_thermostat_air_temperature') | float(72)
-            ) / 7) | round(1) }}
+            ) / 6) | round(1) }}
 
       - name: "T6 Fan Status"
         unique_id: t6_fan_status
@@ -58,10 +57,9 @@ template:
         state: >
           {{ ((
               states('sensor.timmerflotte_temp_hmd_sensor_humidity') | float(50) +
-              states('sensor.timmerflotte_temp_hmd_sensor_humidity_2') | float(50) +
               states('sensor.timmerflotte_temp_hmd_sensor_humidity_3') | float(50) +
               states('sensor.timmerflotte_temp_hmd_sensor_humidity_4') | float(50) +
               states('sensor.timmerflotte_temp_hmd_sensor_humidity_5') | float(50) +
               states('sensor.timmerflotte_temp_hmd_sensor_humidity_6') | float(50) +
               states('sensor.t6_pro_z_wave_programmable_thermostat_humidity') | float(50)
-            ) / 7) | round(1) }}
+            ) / 6) | round(1) }}
