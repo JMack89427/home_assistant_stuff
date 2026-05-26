@@ -32,7 +32,7 @@ views:
                 name: RatRig
               - prefix: magneto_x
                 name: Magneto X
-              - prefix: prusa_mk4s
+              - prefix: prusa_mk4
                 name: Prusa MK4S
 
   # ═══════════════════════════════════════════════════════════════════════════
@@ -646,7 +646,7 @@ views:
               - type: horizontal-stack
                 cards:
                   - type: custom:imperial-readout
-                    entity: sensor.prusa_mk4s_progress
+                    entity: sensor.prusa_mk4_progress
                     name: Print Progress
                     color: green
                     unit: "%"
@@ -659,7 +659,7 @@ views:
                     round: true
 
               - type: picture-entity
-                entity: camera.prusa_mk4s_preview
+                entity: camera.prusa_mk4_preview
                 name: Job Preview
                 show_name: false
                 show_state: false
@@ -673,24 +673,24 @@ views:
                     icon: mdi:pause-circle
                     service: button.press
                     service_data:
-                      entity_id: button.prusa_mk4s_pause_job
-                    entity: button.prusa_mk4s_pause_job
+                      entity_id: button.prusa_mk4_pause_job
+                    entity: button.prusa_mk4_pause_job
                     color: amber
                   - type: custom:imperial-button
                     name: Resume
                     icon: mdi:play-circle
                     service: button.press
                     service_data:
-                      entity_id: button.prusa_mk4s_resume_job
-                    entity: button.prusa_mk4s_resume_job
+                      entity_id: button.prusa_mk4_resume_job
+                    entity: button.prusa_mk4_resume_job
                     color: green
                   - type: custom:imperial-button
                     name: Cancel
                     icon: mdi:stop-circle
                     service: button.press
                     service_data:
-                      entity_id: button.prusa_mk4s_cancel_job
-                    entity: button.prusa_mk4s_cancel_job
+                      entity_id: button.prusa_mk4_cancel_job
+                    entity: button.prusa_mk4_cancel_job
                     color: red
 
               - type: grid
@@ -718,22 +718,22 @@ views:
               - type: custom:imperial-panel
                 title: Fabrication Status
                 entities:
-                  - entity: sensor.prusa_mk4s
+                  - entity: sensor.prusa_mk4
                     name: Printer State
                     icon: mdi:printer-3d
-                  - entity: sensor.prusa_mk4s_filename
+                  - entity: sensor.prusa_mk4_filename
                     name: Job Name
                     icon: mdi:file-document-outline
-                  - entity: sensor.prusa_mk4s_material
+                  - entity: sensor.prusa_mk4_material
                     name: Material
                     icon: mdi:spool
-                  - entity: sensor.prusa_mk4s_print_speed
+                  - entity: sensor.prusa_mk4_print_speed
                     name: Print Speed
                     icon: mdi:speedometer
-                  - entity: sensor.prusa_mk4s_print_start
+                  - entity: sensor.prusa_mk4_print_start
                     name: Print Started
                     icon: mdi:clock-start
-                  - entity: sensor.prusa_mk4s_print_finish
+                  - entity: sensor.prusa_mk4_print_finish
                     name: Est. Completion
                     icon: mdi:clock-end
 
