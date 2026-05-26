@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.7.7';
+  const VERSION = '2.7.8';
 
   const WX_ICONS = {
     'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
@@ -95,11 +95,11 @@
     const statusEnt       = eid('current_print_state', 'print_status', '');
     const progressEnt     = eid('progress', 'print_progress');
     const taskEnt         = eid('filename', 'task_name');
-    const remainEnt       = eid('print_time_left', 'remaining_time');
+    const remainEnt       = eid('print_time_left', 'remaining_time', 'print_finish');
     const curLayEnt       = eid('current_layer');
     const totLayEnt       = eid('total_layer', 'total_layer_count');
     const nozzEnt         = eid('extruder_temperature', 'nozzle_temperature');
-    const bedEnt          = eid('bed_temperature');
+    const bedEnt          = eid('heatbed_temperature', 'bed_temperature');
     const errEnt          = eid('print_error');
     const nameEnt         = eid('printer_name');
 
@@ -138,9 +138,12 @@
       isActive, isPrinting, isPaused, isDone, isFailed, isCancelled, isOffline, hasError,
       statusColor, statusLabel, pct,
       taskStr:  clean(taskEnt),
-      remStr:   remVal ? (parseFloat(remVal) < 1
-        ? `${Math.round(parseFloat(remVal) * 60)}M`
-        : `${parseFloat(remVal).toFixed(1)}H`) : '---',
+      remStr:   remVal ? (remVal.includes('T')
+        ? (() => { const m = Math.round((new Date(remVal) - Date.now()) / 60000);
+                   return m <= 0 ? 'DONE' : m < 60 ? `${m}M` : `${(m/60).toFixed(1)}H`; })()
+        : parseFloat(remVal) < 1
+          ? `${Math.round(parseFloat(remVal) * 60)}M`
+          : `${parseFloat(remVal).toFixed(1)}H`) : '---',
       layerStr: (clean(curLayEnt) && clean(totLayEnt))
         ? `${curLayEnt.state}/${totLayEnt.state}` : '---',
       nozzStr:  nc !== null ? `${nc}°C` : '---',
