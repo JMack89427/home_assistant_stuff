@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.7.5';
+  const VERSION = '2.7.6';
 
   const WX_ICONS = {
     'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
@@ -84,15 +84,15 @@
   function getPrinterInfo(h, prefix) {
     const eid = (...sfx) => {
       for (const s of sfx) {
-        const key = `${prefix}_${s}`;
+        const key = s !== '' ? `${prefix}_${s}` : prefix;
         const e = Object.values(h?.states || {}).find(x => x.entity_id.endsWith('.' + key));
         if (e) return e;
       }
       return null;
     };
     const onlineEnt       = eid('online');
-    const printerStateEnt = eid('printer_state');
-    const statusEnt       = eid('current_print_state', 'print_status');
+    const printerStateEnt = eid('printer_state', '');
+    const statusEnt       = eid('current_print_state', 'print_status', '');
     const progressEnt     = eid('progress', 'print_progress');
     const taskEnt         = eid('filename', 'task_name');
     const remainEnt       = eid('print_time_left', 'remaining_time');
