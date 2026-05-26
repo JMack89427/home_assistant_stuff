@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.7.6';
+  const VERSION = '2.7.7';
 
   const WX_ICONS = {
     'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
@@ -130,7 +130,10 @@
     else                       { statusColor = 'var(--igreyl)'; statusLabel = 'IDLE'; }
 
     const clean  = e => (!e || ['unavailable','unknown','none',''].includes(e.state)) ? null : e.state;
+    const degC   = e => { const v = parseFloat(clean(e)); if (isNaN(v)) return null;
+                          return e.attributes?.unit_of_measurement === '°F' ? Math.round((v-32)*5/9) : Math.round(v); };
     const remVal = clean(remainEnt);
+    const nc = degC(nozzEnt), bc = degC(bedEnt);
     return {
       isActive, isPrinting, isPaused, isDone, isFailed, isCancelled, isOffline, hasError,
       statusColor, statusLabel, pct,
@@ -140,8 +143,8 @@
         : `${parseFloat(remVal).toFixed(1)}H`) : '---',
       layerStr: (clean(curLayEnt) && clean(totLayEnt))
         ? `${curLayEnt.state}/${totLayEnt.state}` : '---',
-      nozzStr:  clean(nozzEnt) ? `${nozzEnt.state}°` : '---',
-      bedStr:   clean(bedEnt)  ? `${bedEnt.state}°`  : '---',
+      nozzStr:  nc !== null ? `${nc}°C` : '---',
+      bedStr:   bc  !== null ? `${bc}°C`  : '---',
       barColor: isPrinting ? 'var(--ir)' : isDone ? 'var(--ig)' : 'var(--igreyl)',
       barGlow:  isPrinting ? 'box-shadow:0 0 8px rgba(204,0,0,.7)' : '',
       fallbackName: clean(nameEnt),
