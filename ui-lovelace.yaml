@@ -150,6 +150,14 @@ views:
               - entity: switch.side_motion_detection
                 icon: mdi:motion-sensor
 
+      - type: horizontal-stack
+        cards:
+          - type: picture-glance
+            title: Central Command
+            camera_image: camera.front_door_live_view_2
+            camera_view: auto
+            entities: []
+
       - type: custom:imperial-panel
         title: Perimeter Defense Systems
         entities:
