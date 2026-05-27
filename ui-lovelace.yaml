@@ -108,71 +108,67 @@ views:
   # ═══════════════════════════════════════════════════════════════════════════
   - title: Detention Block
     path: detention
+    panel: true
     icon: local:first-order
     badges: []
     cards:
-      - type: custom:imperial-header
-        title: Detention Block AA-23
-        subtitle: Surveillance grid active — no unauthorized movement tolerated
-        icon: local:first-order
-
-      - type: horizontal-stack
+      - type: vertical-stack
         cards:
-          - type: picture-glance
-            title: Main Airlock
-            camera_image: camera.front_door_live_view
-            camera_view: auto
+          - type: custom:imperial-header
+            title: Detention Block AA-23
+            subtitle: Surveillance grid active — no unauthorized movement tolerated
+            icon: local:first-order
+
+          - type: horizontal-stack
+            cards:
+              - type: custom:imperial-camera
+                entity: camera.front_door_live_view
+                title: Main Airlock
+                aspect_ratio: "3 / 4"
+              - type: custom:imperial-camera
+                entity: camera.front_door_live_view_2
+                title: Central Command
+                aspect_ratio: "3 / 4"
+
+          - type: horizontal-stack
+            cards:
+              - type: picture-glance
+                title: Forward Sector
+                camera_image: camera.front_live_view
+                camera_view: auto
+                entities:
+                  - entity: switch.front_motion_detection
+                    icon: mdi:motion-sensor
+              - type: picture-glance
+                title: Hangar Bay Alpha
+                camera_image: camera.garage_live_view
+                camera_view: auto
+                entities:
+                  - entity: switch.garage_motion_detection
+                    icon: mdi:motion-sensor
+              - type: picture-glance
+                title: Starboard Sector
+                camera_image: camera.side_live_view
+                camera_view: auto
+                entities:
+                  - entity: switch.side_motion_detection
+                    icon: mdi:motion-sensor
+
+          - type: custom:imperial-panel
+            title: Perimeter Defense Systems
             entities:
               - entity: switch.front_door_motion_detection
-                icon: mdi:motion-sensor
-          - type: picture-glance
-            title: Forward Sector
-            camera_image: camera.front_live_view
-            camera_view: auto
-            entities:
+                name: Main Airlock Sensors
+                icon: mdi:shield-lock
               - entity: switch.front_motion_detection
-                icon: mdi:motion-sensor
-
-      - type: horizontal-stack
-        cards:
-          - type: picture-glance
-            title: Hangar Bay Alpha
-            camera_image: camera.garage_live_view
-            camera_view: auto
-            entities:
+                name: Forward Sector Sensors
+                icon: mdi:shield-lock
               - entity: switch.garage_motion_detection
-                icon: mdi:motion-sensor
-          - type: picture-glance
-            title: Starboard Sector
-            camera_image: camera.side_live_view
-            camera_view: auto
-            entities:
+                name: Hangar Bay Sensors
+                icon: mdi:shield-lock
               - entity: switch.side_motion_detection
-                icon: mdi:motion-sensor
-
-      - type: horizontal-stack
-        cards:
-          - type: picture-glance
-            title: Central Command
-            camera_image: camera.front_door_live_view_2
-            camera_view: auto
-            entities: []
-
-      - type: custom:imperial-panel
-        title: Perimeter Defense Systems
-        entities:
-          - entity: switch.front_door_motion_detection
-            name: Main Airlock Sensors
-            icon: mdi:shield-lock
-          - entity: switch.front_motion_detection
-            name: Forward Sector Sensors
-            icon: mdi:shield-lock
-          - entity: switch.garage_motion_detection
-            name: Hangar Bay Sensors
-            icon: mdi:shield-lock
-          - entity: switch.side_motion_detection
-            name: Starboard Sensors
-            icon: mdi:shield-lock
+                name: Starboard Sensors
+                icon: mdi:shield-lock
 
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 3: SHIP COMMUNICATIONS
