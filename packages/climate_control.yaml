@@ -14,12 +14,17 @@
 #   average runs warmer/cooler than the T6, we shift the T6 setpoint to
 #   compensate so the whole-house average lands at the target.
 #   adjusted_target = target - (house_avg - t6_reading)
+#   Offset is forced to 0 when climate_sensor_bypass is ON or house_average
+#   is unavailable/unknown — base setpoints apply directly to the T6.
 # ─────────────────────────────────────────────────────────────────────────────
 
 input_boolean:
   climate_manual_override:
     name: Climate Manual Override
     icon: mdi:hand-back-right
+  climate_sensor_bypass:
+    name: Climate Sensor Bypass
+    icon: mdi:thermometer-off
 
 template:
   - sensor:

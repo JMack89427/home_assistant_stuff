@@ -56,7 +56,13 @@
           {{ states('sensor.t6_pro_z_wave_programmable_thermostat_air_temperature') | float(72) }}
         house_avg: >
           {{ states('sensor.house_average_temperature') | float(72) }}
-        offset: "{{ house_avg - t6_temp }}"
+        offset: >
+          {% if is_state('input_boolean.climate_sensor_bypass', 'on')
+             or states('sensor.house_average_temperature') in ['unavailable', 'unknown'] %}
+            0
+          {% else %}
+            {{ house_avg - t6_temp }}
+          {% endif %}
         cool_sp: "{{ (base_cool | float - offset) | round(0) | int }}"
         heat_sp: "{{ [[(base_heat | float - offset) | round(0) | int, 60] | max, cool_sp - 3] | min }}"
         room_temps: >
