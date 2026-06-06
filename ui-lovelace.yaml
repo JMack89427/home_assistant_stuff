@@ -169,6 +169,12 @@ views:
               - entity: switch.side_motion_detection
                 name: Starboard Sensors
                 icon: mdi:shield-lock
+              - entity: sensor.front_door_battery_2
+                name: Central Command Battery
+                icon: mdi:battery
+              - entity: sensor.front_door_last_activity_2
+                name: Central Command Last Activity
+                icon: mdi:clock-outline
 
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 3: SHIP COMMUNICATIONS
@@ -921,4 +927,148 @@ views:
                       - entity: sensor.roborock_qr_798_total_cleaning_count
                         name: Missions Complete
                         icon: mdi:counter
+
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # BOTANICAL BAY — Grow Room Operations
+  # Entity IDs below match grow_sre config defaults — verify against your HA.
+  # ═══════════════════════════════════════════════════════════════════════════
+  - title: Botanical Bay
+    path: botanical-bay
+    icon: mdi:cannabis
+    panel: true
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:imperial-header
+            title: Botanical Bay — Grow Room Systems
+            subtitle: Atmospheric control · VPD · DLI · Canopy health
+            icon: mdi:cannabis
+
+          - type: horizontal-stack
+            cards:
+              - type: custom:imperial-panel
+                title: Atmospheric Conditions
+                entities:
+                  - entity: sensor.grow_tent_vpd
+                    name: VPD
+                    icon: mdi:water-thermometer
+                  - entity: sensor.grow_tent_temp
+                    name: Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.grow_tent_rh
+                    name: Humidity
+                    icon: mdi:water-percent
+                    round: true
+                  - entity: sensor.grow_tent_co2
+                    name: CO₂
+                    icon: mdi:molecule-co2
+
+              - type: custom:imperial-panel
+                title: Light & Fan Systems
+                entities:
+                  - entity: fan.ac_infinity_cloudline
+                    name: Exhaust Fan
+                    icon: mdi:fan
+                  - entity: fan.ac_infinity_cloudline
+                    name: Fan Speed
+                    icon: mdi:speedometer
+                    attribute: percentage
+                  - entity: switch.grow_lights
+                    name: Grow Lights
+                    icon: mdi:lightbulb-on
+
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.grow_tent_vpd
+                name: VPD (kPa)
+                min: 0
+                max: 3
+                severity:
+                  green: 0.8
+                  yellow: 1.4
+                  red: 1.8
+
+              - type: gauge
+                entity: sensor.grow_tent_temp
+                name: Temp (°C)
+                min: 15
+                max: 35
+                severity:
+                  green: 20
+                  yellow: 28
+                  red: 31
+
+              - type: gauge
+                entity: sensor.grow_tent_rh
+                name: Humidity (%)
+                min: 0
+                max: 100
+                severity:
+                  green: 50
+                  yellow: 75
+                  red: 85
+
+              - type: gauge
+                entity: sensor.grow_tent_co2
+                name: CO₂ (ppm)
+                min: 300
+                max: 2000
+                severity:
+                  green: 800
+                  yellow: 1300
+                  red: 1600
+
+          - type: horizontal-stack
+            cards:
+              - type: grid
+                columns: 3
+                square: false
+                cards:
+                  - type: custom:imperial-button
+                    name: Fan Off
+                    icon: mdi:fan-off
+                    service: fan.turn_off
+                    service_data:
+                      entity_id: fan.ac_infinity_cloudline
+
+                  - type: custom:imperial-button
+                    name: Fan 50%
+                    icon: mdi:fan
+                    service: fan.set_percentage
+                    service_data:
+                      entity_id: fan.ac_infinity_cloudline
+                      percentage: 50
+
+                  - type: custom:imperial-button
+                    name: Fan 100%
+                    icon: mdi:fan-alert
+                    service: fan.set_percentage
+                    service_data:
+                      entity_id: fan.ac_infinity_cloudline
+                      percentage: 100
+
+                  - type: custom:imperial-button
+                    name: Lights On
+                    icon: mdi:lightbulb-on
+                    service: switch.turn_on
+                    service_data:
+                      entity_id: switch.grow_lights
+
+                  - type: custom:imperial-button
+                    name: Lights Off
+                    icon: mdi:lightbulb-off
+                    service: switch.turn_off
+                    service_data:
+                      entity_id: switch.grow_lights
+
+              - type: history-graph
+                title: VPD History
+                hours_to_show: 12
+                entities:
+                  - entity: sensor.grow_tent_vpd
+                    name: VPD (kPa)
 
