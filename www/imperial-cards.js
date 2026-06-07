@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.7.8';
+  const VERSION = '2.7.9';
 
   const WX_ICONS = {
     'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
@@ -658,7 +658,7 @@
         <style>
           :host { display: block; }
           .cols { display: grid; grid-template-columns: minmax(0,2fr) minmax(0,3fr); gap: 8px; align-items: start; }
-          @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } }
+          @media (max-width: 1024px) { .cols { grid-template-columns: 1fr; } }
           .col { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
         </style>
         <div class="cols">

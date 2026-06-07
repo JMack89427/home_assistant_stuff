@@ -1,6 +1,6 @@
 title: Imperial Manufacturing Facility
 resources:
-  - url: /local/imperial-cards.js?v=35
+  - url: /local/imperial-cards.js?v=36
     type: module
 views:
 
