@@ -930,6 +930,194 @@ views:
 
 
   # ═══════════════════════════════════════════════════════════════════════════
+  # TERRAIN OPERATIONS — Exterior grounds control (Chopper / LUBA VA624UNR)
+  # ═══════════════════════════════════════════════════════════════════════════
+  - title: Terrain Operations
+    path: terrain-ops
+    icon: mdi:robot-mower
+    panel: true
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:imperial-header
+            title: Terrain Operations Command
+            subtitle: Unit Chopper — LUBA VA624UNR — surface patrol active
+            icon: mdi:robot-mower
+
+          - type: grid
+            columns: 5
+            square: false
+            cards:
+              - type: custom:imperial-button
+                name: Deploy
+                icon: mdi:play
+                service: lawn_mower.start_mowing
+                service_data:
+                  entity_id: lawn_mower.garden_luba_va624unr
+                color: green
+              - type: custom:imperial-button
+                name: Pause
+                icon: mdi:pause
+                service: lawn_mower.pause
+                service_data:
+                  entity_id: lawn_mower.garden_luba_va624unr
+                color: amber
+              - type: custom:imperial-button
+                name: Return to Base
+                icon: mdi:home-import-outline
+                service: lawn_mower.dock
+                service_data:
+                  entity_id: lawn_mower.garden_luba_va624unr
+                color: amber
+              - type: custom:imperial-button
+                name: Cancel Task
+                icon: mdi:cancel
+                service: button.press
+                service_data:
+                  entity_id: button.garden_luba_va624unr_cancel_current_task
+                color: red
+              - type: custom:imperial-button
+                name: Restart
+                icon: mdi:restart
+                service: button.press
+                service_data:
+                  entity_id: button.garden_luba_va624unr_restart_mower
+                color: red
+
+          - type: horizontal-stack
+            cards:
+              - type: vertical-stack
+                cards:
+                  - type: custom:imperial-panel
+                    title: Unit Status
+                    entities:
+                      - entity: lawn_mower.garden_luba_va624unr
+                        name: State
+                        icon: mdi:robot-mower
+                      - entity: sensor.garden_luba_va624unr_battery
+                        name: Power Cell
+                        icon: mdi:battery
+                      - entity: sensor.garden_luba_va624unr_activity_mode
+                        name: Activity
+                        icon: mdi:information-outline
+                      - entity: sensor.garden_luba_va624unr_connection
+                        name: Uplink
+                        icon: mdi:wifi
+                      - entity: binary_sensor.garden_luba_va624unr_charging
+                        name: Charging
+                        icon: mdi:lightning-bolt
+                      - entity: sensor.garden_luba_va624unr_rtk_position
+                        name: RTK Fix
+                        icon: mdi:crosshairs-gps
+                      - entity: sensor.garden_luba_va624unr_satellites_robot
+                        name: Satellites
+                        icon: mdi:satellite-variant
+
+                  - type: custom:imperial-panel
+                    title: Active Mission
+                    entities:
+                      - entity: sensor.garden_luba_va624unr_progress
+                        name: Progress
+                        icon: mdi:progress-check
+                      - entity: sensor.garden_luba_va624unr_elapsed_time
+                        name: Elapsed
+                        icon: mdi:timer
+                      - entity: sensor.garden_luba_va624unr_time_left
+                        name: Time Left
+                        icon: mdi:timer-sand
+                      - entity: sensor.garden_luba_va624unr_area
+                        name: Area
+                        icon: mdi:texture-box
+                      - entity: sensor.garden_luba_va624unr_mowing_speed
+                        name: Speed
+                        icon: mdi:speedometer
+
+              - type: vertical-stack
+                cards:
+                  - type: custom:imperial-panel
+                    title: Terrain Zones
+                    entities:
+                      - entity: switch.garden_luba_va624unr_area_area_1
+                        name: Zone Alpha
+                        icon: mdi:map-marker-outline
+                      - entity: switch.garden_luba_va624unr_area_area_2
+                        name: Zone Bravo
+                        icon: mdi:map-marker-outline
+                      - entity: switch.garden_luba_va624unr_area_area_3
+                        name: Zone Charlie
+                        icon: mdi:map-marker-outline
+                      - entity: switch.garden_luba_va624unr_area_area_4
+                        name: Zone Delta
+                        icon: mdi:map-marker-outline
+
+                  - type: grid
+                    columns: 2
+                    square: false
+                    cards:
+                      - type: custom:imperial-button
+                        name: Task Alpha
+                        icon: mdi:play-circle-outline
+                        service: button.press
+                        service_data:
+                          entity_id: button.garden_luba_va624unr_task_1
+                        color: green
+                      - type: custom:imperial-button
+                        name: Task Bravo
+                        icon: mdi:play-circle-outline
+                        service: button.press
+                        service_data:
+                          entity_id: button.garden_luba_va624unr_task_2
+                        color: green
+
+                  - type: custom:imperial-panel
+                    title: Field Settings
+                    entities:
+                      - entity: switch.garden_luba_va624unr_rain_detection_mower_on_off
+                        name: Rain Detection
+                        icon: mdi:weather-rainy
+                      - entity: switch.garden_luba_va624unr_rain_detection_during_mow_on_off
+                        name: Rain During Mow
+                        icon: mdi:weather-pouring
+                      - entity: switch.garden_luba_va624unr_side_led_on_off
+                        name: Navigation LEDs
+                        icon: mdi:led-on
+                      - entity: select.garden_luba_va624unr_obstacle_detection
+                        name: Obstacle Detection
+                        icon: mdi:eye-outline
+                      - entity: select.garden_luba_va624unr_wildlife_safety
+                        name: Wildlife Safety
+                        icon: mdi:paw
+                      - entity: number.garden_luba_va624unr_blade_height
+                        name: Blade Height
+                        icon: mdi:ruler
+
+              - type: vertical-stack
+                cards:
+                  - type: custom:imperial-camera
+                    entity: camera.garden_luba_va624unr
+                    title: Ground Feed
+
+                  - type: custom:imperial-panel
+                    title: Maintenance
+                    entities:
+                      - entity: sensor.garden_luba_va624unr_blade_used_time
+                        name: Blade Hours
+                        icon: mdi:timer-outline
+                      - entity: sensor.garden_luba_va624unr_blade_wear_warning_time
+                        name: Blade Warning At
+                        icon: mdi:alert-outline
+                      - entity: sensor.garden_luba_va624unr_total_mileage
+                        name: Total Mileage
+                        icon: mdi:map-marker-distance
+                      - entity: sensor.garden_luba_va624unr_total_work_time
+                        name: Total Duty Time
+                        icon: mdi:timer
+                      - entity: sensor.garden_luba_va624unr_battery_cycles
+                        name: Battery Cycles
+                        icon: mdi:battery-sync
+
+  # ═══════════════════════════════════════════════════════════════════════════
   # BOTANICAL BAY — Grow Room Operations
   # Entity IDs below match grow_sre config defaults — verify against your HA.
   # ═══════════════════════════════════════════════════════════════════════════
