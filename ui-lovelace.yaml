@@ -1123,7 +1123,7 @@ views:
   # ═══════════════════════════════════════════════════════════════════════════
   - title: Botanical Bay
     path: botanical-bay
-    icon: mdi:cannabis
+    icon: mdi:greenhouse
     panel: true
     badges: []
     cards:
@@ -1132,7 +1132,7 @@ views:
           - type: custom:imperial-header
             title: Botanical Bay — Grow Room Systems
             subtitle: Atmospheric control · VPD · DLI · Canopy health
-            icon: mdi:cannabis
+            icon: mdi:greenhouse
 
           - type: horizontal-stack
             cards:
