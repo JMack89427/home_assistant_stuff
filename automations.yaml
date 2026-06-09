@@ -158,3 +158,82 @@
         entity_id: humidifier.150633095484711_humidifier
   mode: single
 
+# ── Terrain: Chopper rain delay ───────────────────────────────────────────────
+# Uses weather forecast entity — physical rain sensor unreliable under garage.
+# Morning check fires regardless of mower state (day-ahead notice).
+# Forecast-change trigger fires only if Chopper is already out mowing.
+- id: chopper_rain_delay
+  alias: "Terrain: Chopper rain delay"
+  trigger:
+    - platform: time
+      at: "07:00:00"
+      id: morning_check
+    - platform: state
+      entity_id: weather.forecast_home_3
+      to:
+        - rainy
+        - pouring
+        - lightning
+        - lightning-rainy
+        - hail
+      id: forecast_change
+  condition:
+    - condition: template
+      value_template: >
+        {{ states('weather.forecast_home_3') in
+           ['rainy', 'pouring', 'lightning', 'lightning-rainy', 'hail'] }}
+    - condition: template
+      value_template: >
+        {{ trigger.id == 'morning_check' or
+           not is_state('lawn_mower.garden_luba_va624unr', 'docked') }}
+  action:
+    - if:
+        - condition: not
+          conditions:
+            - condition: state
+              entity_id: lawn_mower.garden_luba_va624unr
+              state: docked
+      then:
+        - service: lawn_mower.dock
+          target:
+            entity_id: lawn_mower.garden_luba_va624unr
+    - service: notify.jason_s_iphone
+      data:
+        title: "Terrain Operations"
+        message: >
+          Rain forecast ({{ states('weather.forecast_home_3') }}) — Chopper mow delayed today
+    - service: notify.ipad
+      data:
+        title: "Terrain Operations"
+        message: >
+          Rain forecast ({{ states('weather.forecast_home_3') }}) — Chopper mow delayed today
+  mode: single
+
+# ── Terrain: Chopper stuck notification ──────────────────────────────────────
+# Template trigger holds for 2 min before firing — debounces momentary obstacles.
+- id: chopper_stuck_notification
+  alias: "Terrain: Chopper stuck notification"
+  trigger:
+    - platform: template
+      value_template: >
+        {{ 'STUCK' in states('sensor.garden_luba_va624unr_activity_mode') or
+           'TRAPPED' in states('sensor.garden_luba_va624unr_activity_mode') }}
+      for:
+        minutes: 2
+  condition:
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: lawn_mower.garden_luba_va624unr
+          state: docked
+  action:
+    - service: notify.jason_s_iphone
+      data:
+        title: "Terrain Operations — CHOPPER STUCK"
+        message: "{{ states('sensor.garden_luba_va624unr_last_error') }}"
+    - service: notify.ipad
+      data:
+        title: "Terrain Operations — CHOPPER STUCK"
+        message: "{{ states('sensor.garden_luba_va624unr_last_error') }}"
+  mode: single
+
