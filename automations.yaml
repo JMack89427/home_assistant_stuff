@@ -197,12 +197,11 @@
         - service: lawn_mower.dock
           target:
             entity_id: lawn_mower.garden_luba_va624unr
-    - service: notify.jason_s_iphone
-      data:
-        title: "Terrain Operations"
-        message: >
-          Rain forecast ({{ states('weather.forecast_home_3') }}) — Chopper mow delayed today
-    - service: notify.ipad
+    - service: notify.send_message
+      target:
+        entity_id:
+          - notify.jason_s_iphone
+          - notify.ipad
       data:
         title: "Terrain Operations"
         message: >
@@ -227,11 +226,11 @@
           entity_id: lawn_mower.garden_luba_va624unr
           state: docked
   action:
-    - service: notify.jason_s_iphone
-      data:
-        title: "Terrain Operations — CHOPPER STUCK"
-        message: "{{ states('sensor.garden_luba_va624unr_last_error') }}"
-    - service: notify.ipad
+    - service: notify.send_message
+      target:
+        entity_id:
+          - notify.jason_s_iphone
+          - notify.ipad
       data:
         title: "Terrain Operations — CHOPPER STUCK"
         message: "{{ states('sensor.garden_luba_va624unr_last_error') }}"
