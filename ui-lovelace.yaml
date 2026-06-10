@@ -1094,9 +1094,12 @@ views:
 
               - type: vertical-stack
                 cards:
-                  - type: custom:imperial-camera
-                    entity: camera.garden_luba_va624unr
-                    title: Ground Feed
+                  - type: map
+                    entities:
+                      - entity: device_tracker.garden_luba_va624unr_luba_va624unr
+                        label: Chopper
+                    hours_to_show: 1
+                    aspect_ratio: "16:9"
 
                   - type: custom:imperial-panel
                     title: Maintenance
