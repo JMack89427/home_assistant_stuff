@@ -1099,6 +1099,7 @@ views:
                       - entity: device_tracker.garden_luba_va624unr_luba_va624unr
                         label: Chopper
                     hours_to_show: 1
+                    default_zoom: 18
                     aspect_ratio: "16:9"
 
                   - type: custom:imperial-panel
