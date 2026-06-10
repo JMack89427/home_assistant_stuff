@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.7.9';
+  const VERSION = '2.8.0';
 
   const WX_ICONS = {
     'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
@@ -77,7 +77,9 @@
   function svc(hass, str, data = {}) {
     if (!hass || !str) return;
     const [d, s] = str.split('.');
-    hass.callService(d, s, data);
+    const { entity_id, ...rest } = data;
+    const target = entity_id ? { entity_id } : undefined;
+    hass.callService(d, s, rest, target);
   }
 
   // Shared printer data extractor — supports Bambu and Moonraker naming
