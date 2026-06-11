@@ -67,12 +67,10 @@
         heat_sp: "{{ [[(base_heat | float - offset) | round(0) | int, 60] | max, cool_sp - 3] | min }}"
         room_temps: >
           {{ [
-            states('sensor.timmerflotte_temp_hmd_sensor_temperature') | float(72),
-            states('sensor.timmerflotte_temp_hmd_sensor_temperature_2') | float(72),
-            states('sensor.timmerflotte_temp_hmd_sensor_temperature_3') | float(72),
-            states('sensor.timmerflotte_temp_hmd_sensor_temperature_4') | float(72),
-            states('sensor.timmerflotte_temp_hmd_sensor_temperature_5') | float(72),
-            states('sensor.timmerflotte_temp_hmd_sensor_temperature_6') | float(72),
+            states('sensor.ewelink_snzb_02p_temperature') | float(72),
+            states('sensor.master_bedroom_primary_suite_temp_humidity_temperature') | float(72),
+            states('sensor.cats_room_temp_humidity_sensor_temperature') | float(72),
+            states('sensor.spare_bedroom_temp_humidity_sensor_temperature') | float(72),
             states('sensor.t6_pro_z_wave_programmable_thermostat_air_temperature') | float(72)
           ] }}
         spread: "{{ room_temps | max - room_temps | min }}"
@@ -113,12 +111,10 @@
   trigger:
     - platform: numeric_state
       entity_id:
-        - sensor.timmerflotte_temp_hmd_sensor_humidity
-        - sensor.timmerflotte_temp_hmd_sensor_humidity_2
-        - sensor.timmerflotte_temp_hmd_sensor_humidity_3
-        - sensor.timmerflotte_temp_hmd_sensor_humidity_4
-        - sensor.timmerflotte_temp_hmd_sensor_humidity_5
-        - sensor.timmerflotte_temp_hmd_sensor_humidity_6
+        - sensor.ewelink_snzb_02p_humidity
+        - sensor.master_bedroom_primary_suite_temp_humidity_humidity
+        - sensor.cats_room_temp_humidity_sensor_humidity
+        - sensor.spare_bedroom_temp_humidity_sensor_humidity
         - sensor.t6_pro_z_wave_programmable_thermostat_humidity
       above: 40
   condition: []
@@ -134,23 +130,19 @@
   trigger:
     - platform: numeric_state
       entity_id:
-        - sensor.timmerflotte_temp_hmd_sensor_humidity
-        - sensor.timmerflotte_temp_hmd_sensor_humidity_2
-        - sensor.timmerflotte_temp_hmd_sensor_humidity_3
-        - sensor.timmerflotte_temp_hmd_sensor_humidity_4
-        - sensor.timmerflotte_temp_hmd_sensor_humidity_5
-        - sensor.timmerflotte_temp_hmd_sensor_humidity_6
+        - sensor.ewelink_snzb_02p_humidity
+        - sensor.master_bedroom_primary_suite_temp_humidity_humidity
+        - sensor.cats_room_temp_humidity_sensor_humidity
+        - sensor.spare_bedroom_temp_humidity_sensor_humidity
         - sensor.t6_pro_z_wave_programmable_thermostat_humidity
       below: 41
   condition:
     - condition: template
       value_template: >
-        {{ states('sensor.timmerflotte_temp_hmd_sensor_humidity') | float(0) <= 40
-           and states('sensor.timmerflotte_temp_hmd_sensor_humidity_2') | float(0) <= 40
-           and states('sensor.timmerflotte_temp_hmd_sensor_humidity_3') | float(0) <= 40
-           and states('sensor.timmerflotte_temp_hmd_sensor_humidity_4') | float(0) <= 40
-           and states('sensor.timmerflotte_temp_hmd_sensor_humidity_5') | float(0) <= 40
-           and states('sensor.timmerflotte_temp_hmd_sensor_humidity_6') | float(0) <= 40
+        {{ states('sensor.ewelink_snzb_02p_humidity') | float(0) <= 40
+           and states('sensor.master_bedroom_primary_suite_temp_humidity_humidity') | float(0) <= 40
+           and states('sensor.cats_room_temp_humidity_sensor_humidity') | float(0) <= 40
+           and states('sensor.spare_bedroom_temp_humidity_sensor_humidity') | float(0) <= 40
            and states('sensor.t6_pro_z_wave_programmable_thermostat_humidity') | float(0) <= 40 }}
   action:
     - service: humidifier.turn_off
