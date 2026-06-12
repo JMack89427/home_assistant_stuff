@@ -448,11 +448,11 @@ views:
               - type: custom:imperial-panel
                 title: Admiral's Quarters
                 entities:
-                  - entity: sensor.timmerflotte_temp_hmd_sensor_temperature_4
+                  - entity: sensor.master_bedroom_primary_suite_temp_humidity_temperature
                     name: Temperature
                     icon: mdi:thermometer
                     round: true
-                  - entity: sensor.timmerflotte_temp_hmd_sensor_humidity_4
+                  - entity: sensor.master_bedroom_primary_suite_temp_humidity_humidity
                     name: Humidity
                     icon: mdi:water-percent
                     round: true
@@ -498,11 +498,11 @@ views:
               - type: custom:imperial-panel
                 title: Tactical Operations
                 entities:
-                  - entity: sensor.timmerflotte_temp_hmd_sensor_temperature_3
+                  - entity: sensor.ewelink_snzb_02p_temperature
                     name: Temperature
                     icon: mdi:thermometer
                     round: true
-                  - entity: sensor.timmerflotte_temp_hmd_sensor_humidity_3
+                  - entity: sensor.ewelink_snzb_02p_humidity
                     name: Humidity
                     icon: mdi:water-percent
                     round: true
@@ -510,11 +510,11 @@ views:
               - type: custom:imperial-panel
                 title: Cadet's Quarters
                 entities:
-                  - entity: sensor.timmerflotte_temp_hmd_sensor_temperature_6
+                  - entity: sensor.cats_room_temp_humidity_sensor_temperature
                     name: Temperature
                     icon: mdi:thermometer
                     round: true
-                  - entity: sensor.timmerflotte_temp_hmd_sensor_humidity_6
+                  - entity: sensor.cats_room_temp_humidity_sensor_humidity
                     name: Humidity
                     icon: mdi:water-percent
                     round: true
@@ -522,11 +522,11 @@ views:
               - type: custom:imperial-panel
                 title: Reserve Barracks
                 entities:
-                  - entity: sensor.timmerflotte_temp_hmd_sensor_temperature_5
+                  - entity: sensor.spare_bedroom_temp_humidity_sensor_temperature
                     name: Temperature
                     icon: mdi:thermometer
                     round: true
-                  - entity: sensor.timmerflotte_temp_hmd_sensor_humidity_5
+                  - entity: sensor.spare_bedroom_temp_humidity_sensor_humidity
                     name: Humidity
                     icon: mdi:water-percent
                     round: true
