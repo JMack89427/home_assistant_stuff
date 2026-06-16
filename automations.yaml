@@ -229,3 +229,602 @@
         message: "{{ states('sensor.garden_luba_va624unr_last_error') }}"
   mode: single
 
+
+# ── Terrain: LUBA 3 Mow Automations ──────────────────────────────────────────
+
+# 1. Auto-start mowing on clear mornings
+- id: chopper_auto_mow_clear_morning
+  alias: "Terrain: Auto-mow clear morning"
+  trigger:
+    - platform: time
+      at: "10:30:00"
+  condition:
+    - condition: state
+      entity_id: lawn_mower.garden_luba_va624unr
+      state: docked
+    # Abort if precipitation is forecast — partly cloudy is acceptable
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: weather.forecast_home_3
+          state:
+            - rainy
+            - pouring
+            - lightning
+            - lightning-rainy
+            - hail
+  action:
+    - service: lawn_mower.start_mowing
+      target:
+        entity_id: lawn_mower.garden_luba_va624unr
+  mode: single
+
+# 2. Dock and alert on low battery
+- id: chopper_low_battery_dock
+  alias: "Terrain: Low battery dock + alert"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.garden_luba_va624unr_battery
+      below: 20
+  condition:
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: lawn_mower.garden_luba_va624unr
+          state: docked
+  action:
+    - service: lawn_mower.dock
+      target:
+        entity_id: lawn_mower.garden_luba_va624unr
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Terrain Operations — LOW BATTERY"
+        message: >
+          CHOPPER battery at {{ states('sensor.garden_luba_va624unr_battery') }}% — returning to dock.
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Terrain Operations — LOW BATTERY"
+        message: >
+          CHOPPER battery at {{ states('sensor.garden_luba_va624unr_battery') }}% — returning to dock.
+  mode: single
+
+# 3. Alert if mower has been paused for 30+ minutes during waking hours
+- id: chopper_paused_too_long
+  alias: "Terrain: Paused too long alert"
+  trigger:
+    # Wait 30 min after state transitions to paused before firing
+    - platform: state
+      entity_id: lawn_mower.garden_luba_va624unr
+      to: paused
+      for: "00:30:00"
+  condition:
+    # Suppress overnight — only alert during operational window
+    - condition: time
+      after: "08:00:00"
+      before: "22:00:00"
+  action:
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Terrain Operations — CHOPPER PAUSED"
+        message: >
+          CHOPPER has been paused for 30 min.
+          Mode: {{ states('sensor.garden_luba_va624unr_activity_mode') }} |
+          Last error: {{ states('sensor.garden_luba_va624unr_last_error') }}
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Terrain Operations — CHOPPER PAUSED"
+        message: >
+          CHOPPER has been paused for 30 min.
+          Mode: {{ states('sensor.garden_luba_va624unr_activity_mode') }} |
+          Last error: {{ states('sensor.garden_luba_va624unr_last_error') }}
+  mode: single
+
+# 4. Alert on any new error state (watchdog)
+- id: chopper_error_watchdog
+  alias: "Terrain: Error watchdog"
+  trigger:
+    # Fires on any change to the last_error sensor — no to: filter intentional
+    - platform: state
+      entity_id: sensor.garden_luba_va624unr_last_error
+  condition:
+    # Skip the sentinel "no error" value that the integration emits when clear
+    - condition: template
+      value_template: >
+        {{ trigger.to_state.state != 'Error message not found' }}
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: lawn_mower.garden_luba_va624unr
+          state: docked
+  action:
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Terrain Operations — CHOPPER ERROR"
+        message: "{{ trigger.to_state.state }}"
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Terrain Operations — CHOPPER ERROR"
+        message: "{{ trigger.to_state.state }}"
+  mode: single
+
+# 5. Resume mowing after rain clears
+- id: chopper_resume_after_rain
+  alias: "Terrain: Resume after rain clears"
+  trigger:
+    # Fires whenever weather leaves any rain state; to: intentionally open
+    - platform: state
+      entity_id: weather.forecast_home_3
+      from:
+        - rainy
+        - pouring
+        - lightning
+        - lightning-rainy
+        - hail
+  condition:
+    # Only resume during the main mow window
+    - condition: time
+      after: "10:30:00"
+      before: "15:00:00"
+    # Only issue start_mowing when fully docked — guards against issuing duplicate
+    # commands if the forecast oscillates between rain states while mower is mid-run
+    - condition: state
+      entity_id: lawn_mower.garden_luba_va624unr
+      state: docked
+    # Guard: don't resume if weather transitioned between rain states
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: weather.forecast_home_3
+          state:
+            - rainy
+            - pouring
+            - lightning
+            - lightning-rainy
+            - hail
+  action:
+    # Wait for ground to dry before resuming — mode: single drops duplicate triggers during delay
+    - delay: "00:30:00"
+    - service: lawn_mower.start_mowing
+      target:
+        entity_id: lawn_mower.garden_luba_va624unr
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Terrain Operations"
+        message: "Rain cleared — CHOPPER resuming mow."
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Terrain Operations"
+        message: "Rain cleared — CHOPPER resuming mow."
+  mode: single
+
+# 6. Notify when mow session completes (mower returns to dock)
+- id: chopper_mow_complete
+  alias: "Terrain: Mow complete notification"
+  trigger:
+    # from: mowing is required — without it this would also fire on low-battery
+    # dock events and manual recalls, producing spurious "mow complete" alerts
+    - platform: state
+      entity_id: lawn_mower.garden_luba_va624unr
+      from: mowing
+      to: docked
+  action:
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Terrain Operations"
+        message: >
+          CHOPPER mow complete. Battery: {{ states('sensor.garden_luba_va624unr_battery') }}%
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Terrain Operations"
+        message: >
+          CHOPPER mow complete. Battery: {{ states('sensor.garden_luba_va624unr_battery') }}%
+  mode: single
+
+# 7. Connectivity watchdog — reload integration and alert when Mammotion drops
+- id: chopper_connection_watchdog
+  alias: "Terrain Operations: CHOPPER connection lost"
+  trigger:
+    - platform: state
+      entity_id: sensor.garden_luba_va624unr_connection
+      to:
+        - unknown
+        - unavailable
+      for: "00:05:00"
+  condition: []
+  action:
+    - service: homeassistant.reload_config_entry
+      data:
+        entry_id: 01KG00YSDYK6AJ8M0QTCZ5GX2P
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Terrain Operations"
+        message: >
+          CHOPPER connection lost — integration reload attempted.
+          Check status if issue persists.
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Terrain Operations"
+        message: >
+          CHOPPER connection lost — integration reload attempted.
+          Check status if issue persists.
+  mode: single
+
+# ── Vacuum: Watchdog Automations ─────────────────────────────────────────────
+
+- id: vacuum_error_watchdog
+  alias: "Vacuum: Error Watchdog"
+  description: >
+    Notifies when any Roborock vacuum or dock reports a real error state.
+  trigger:
+    - platform: state
+      entity_id:
+        - sensor.roborock_qrevo_curv_series_vacuum_error
+        - sensor.roborock_qrevo_curv_series_dock_dock_error
+        - sensor.roborock_qr_798_vacuum_error
+        - sensor.roborock_qr_798_dock_dock_error
+  condition:
+    - condition: template
+      value_template: >
+        {{ trigger.to_state.state not in ['none', 'unknown', 'unavailable'] }}
+  action:
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Vacuum Operations"
+        message: >
+          {{ trigger.to_state.attributes.friendly_name }} error:
+          {{ trigger.to_state.state }}
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Vacuum Operations"
+        message: >
+          {{ trigger.to_state.attributes.friendly_name }} error:
+          {{ trigger.to_state.state }}
+  mode: single
+
+- id: vacuum_connection_watchdog
+  alias: "Vacuum: Connection Watchdog"
+  description: >
+    Reloads the Roborock config entry and notifies when either vacuum goes
+    unavailable for 5 minutes.
+  trigger:
+    - platform: state
+      entity_id:
+        - vacuum.roborock_qrevo_curv_series
+        - vacuum.roborock_qr_798
+      to: unavailable
+      for: "00:05:00"
+  action:
+    - service: homeassistant.reload_config_entry
+      data:
+        entry_id: 01KRYAJJ7DTE9BCXKM30X3HEMB
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Vacuum Operations"
+        message: >
+          {{ trigger.to_state.attributes.friendly_name }} went offline —
+          integration reload attempted.
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Vacuum Operations"
+        message: >
+          {{ trigger.to_state.attributes.friendly_name }} went offline —
+          integration reload attempted.
+  mode: single
+
+# ── Maintenance: Consumable & Wear Alerts ────────────────────────────────────
+
+- id: vacuum_consumable_alert
+  alias: "Vacuum: Consumable Overdue Alert"
+  description: >
+    Notifies when any Qrevo Curv consumable drops below 10 hours remaining
+    (negative values = overdue). Uses mode: queued so each sensor fires its
+    own notification rather than being dropped when multiple are simultaneously
+    overdue.
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.roborock_qrevo_curv_series_sensor_time_left
+      below: 10
+    - platform: numeric_state
+      entity_id: sensor.roborock_qrevo_curv_series_filter_time_left
+      below: 10
+    - platform: numeric_state
+      entity_id: sensor.roborock_qrevo_curv_series_side_brush_time_left
+      below: 10
+    - platform: numeric_state
+      entity_id: sensor.roborock_qrevo_curv_series_main_brush_time_left
+      below: 10
+    - platform: numeric_state
+      entity_id: sensor.roborock_qrevo_curv_series_dock_strainer_time_left
+      below: 10
+  condition:
+    - condition: template
+      value_template: >
+        {{ trigger.to_state.state not in ['unavailable', 'unknown'] }}
+  action:
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Vacuum Operations"
+        message: >
+          Curv consumable service due:
+          {{ trigger.to_state.attributes.friendly_name }}
+          ({{ trigger.to_state.state | round(1) }}h remaining)
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Vacuum Operations"
+        message: >
+          Curv consumable service due:
+          {{ trigger.to_state.attributes.friendly_name }}
+          ({{ trigger.to_state.state | round(1) }}h remaining)
+  mode: queued
+  max: 5
+
+- id: chopper_blade_wear_alert
+  alias: "Chopper: Blade Wear Alert"
+  description: >
+    Notifies when the Mammotion Luba blade used time exceeds 90 hours —
+    the recommended replacement interval. Triggers on blade_used_time rather
+    than blade_wear_warning_time because the semantics of the warning sensor
+    (0.0 = no warning vs. positive = warning hours remaining) are unverified
+    from integration docs. Revisit once sensor history is available to confirm
+    whether blade_wear_warning_time can replace this trigger.
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.garden_luba_va624unr_blade_used_time
+      above: 90
+  action:
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Chopper Maintenance"
+        message: >
+          Chopper blade service due. Blade used time:
+          {{ states('sensor.garden_luba_va624unr_blade_used_time') | round(1) }}h
+          (recommended interval: 90h)
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Chopper Maintenance"
+        message: >
+          Chopper blade service due. Blade used time:
+          {{ states('sensor.garden_luba_va624unr_blade_used_time') | round(1) }}h
+          (recommended interval: 90h)
+  mode: single
+
+- id: vacuum_curv_dock_problem
+  alias: "Vacuum: Curv Dock Problem Alert"
+  description: >
+    Notifies when any Qrevo Curv dock problem sensor turns on (water shortage,
+    dirty water box full, or clean water box empty). Sensors use
+    device_class: problem where on = problem active.
+  trigger:
+    - platform: state
+      entity_id:
+        - binary_sensor.roborock_qrevo_curv_series_water_shortage
+        - binary_sensor.roborock_qrevo_curv_series_dock_dirty_water_box
+        - binary_sensor.roborock_qrevo_curv_series_dock_clean_water_box
+      to: "on"
+  action:
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Vacuum Operations"
+        message: >
+          Curv dock problem: {{ trigger.to_state.attributes.friendly_name }}
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Vacuum Operations"
+        message: >
+          Curv dock problem: {{ trigger.to_state.attributes.friendly_name }}
+  mode: single
+
+# ── Manufacturing: Print Monitoring ──────────────────────────────────────────
+
+- id: manufacturing_print_complete
+  alias: "Manufacturing: Print Job Complete"
+  description: >
+    Notifies when any of the six printers completes a print job. Handles
+    three different integration state schemas: Moonraker (printing→complete),
+    Bambu (running→finish), and PrusaLink (PRINTING→FINISHED). Uses
+    mode: parallel so simultaneous completions each generate a notification.
+  trigger:
+    - platform: state
+      entity_id: sensor.flsuns1pro_current_print_state
+      from: printing
+      to: complete
+    - platform: state
+      entity_id: sensor.magneto_x_current_print_state
+      from: printing
+      to: complete
+    - platform: state
+      entity_id: sensor.printz_current_print_state
+      from: printing
+      to: complete
+    - platform: state
+      entity_id: sensor.ratrig_current_print_state
+      from: printing
+      to: complete
+    - platform: state
+      entity_id: sensor.p1p_01s00c431300106_print_status
+      from: running
+      to: finish
+    - platform: state
+      entity_id: sensor.prusa_mk4s_print_status
+      from: PRINTING
+      to: FINISHED
+  variables:
+    filename_map:
+      sensor.flsuns1pro_current_print_state: sensor.flsuns1pro_filename
+      sensor.magneto_x_current_print_state: sensor.magneto_x_filename
+      sensor.printz_current_print_state: sensor.printz_filename
+      sensor.ratrig_current_print_state: sensor.ratrig_filename
+      sensor.p1p_01s00c431300106_print_status: sensor.p1p_01s00c431300106_gcode_filename
+      sensor.prusa_mk4s_print_status: sensor.prusa_mk4_filename
+    filename: "{{ states(filename_map[trigger.entity_id]) }}"
+    printer: "{{ trigger.to_state.attributes.friendly_name }}"
+  action:
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Manufacturing"
+        message: "{{ printer }} print complete: {{ filename }}"
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Manufacturing"
+        message: "{{ printer }} print complete: {{ filename }}"
+  mode: parallel
+  max: 6
+
+- id: manufacturing_filament_runout
+  alias: "Manufacturing: Filament Runout Alert"
+  description: >
+    Notifies mid-print filament runout on printers with confirmed filament
+    sensors. Sensor semantics: off = no filament / runout for all three
+    integrations (Moonraker and Bambu both use off = runout/not-loaded).
+    Condition ensures the printer is actively printing before alerting,
+    suppressing spurious triggers when loading/unloading outside a print.
+  trigger:
+    - platform: state
+      entity_id:
+        - binary_sensor.flsuns1pro_filament_sensor
+        - binary_sensor.ratrig_toolhead_filament_sensor_t0
+        - binary_sensor.p1p_01s00c431300106_extruder_filament_state
+      to: "off"
+  condition:
+    - condition: template
+      value_template: >
+        {% set print_map = {
+          'binary_sensor.flsuns1pro_filament_sensor':
+            'sensor.flsuns1pro_current_print_state',
+          'binary_sensor.ratrig_toolhead_filament_sensor_t0':
+            'sensor.ratrig_current_print_state',
+          'binary_sensor.p1p_01s00c431300106_extruder_filament_state':
+            'sensor.p1p_01s00c431300106_print_status'
+        } %}
+        {% set active_states = {
+          'binary_sensor.flsuns1pro_filament_sensor': 'printing',
+          'binary_sensor.ratrig_toolhead_filament_sensor_t0': 'printing',
+          'binary_sensor.p1p_01s00c431300106_extruder_filament_state': 'running'
+        } %}
+        {{ states(print_map[trigger.entity_id]) == active_states[trigger.entity_id] }}
+  action:
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Manufacturing — FILAMENT RUNOUT"
+        message: >
+          {{ trigger.to_state.attributes.friendly_name }}
+          — filament runout detected mid-print!
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Manufacturing — FILAMENT RUNOUT"
+        message: >
+          {{ trigger.to_state.attributes.friendly_name }}
+          — filament runout detected mid-print!
+  mode: parallel
+  max: 3
+
+- id: manufacturing_prusa_plug_off
+  alias: "Manufacturing: Prusa MK4S Auto Plug-Off"
+  description: >
+    Automatically powers off the Prusa MK4S smart plug after print completion.
+    The 5-minute delay allows post-print sequences (nozzle park, bed cooling
+    fan rundown, final homing moves) to complete before cutting power.
+  trigger:
+    - platform: state
+      entity_id: sensor.prusa_mk4s_print_status
+      to: FINISHED
+  condition:
+    - condition: state
+      entity_id: switch.prusa_mk4s_plug
+      state: "on"
+  action:
+    - delay: "00:05:00"
+    - service: switch.turn_off
+      target:
+        entity_id: switch.prusa_mk4s_plug
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Manufacturing"
+        message: "Prusa MK4S print complete — plug powered off."
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Manufacturing"
+        message: "Prusa MK4S print complete — plug powered off."
+  mode: single
+
+# ── Infrastructure: Connectivity & Hardware ───────────────────────────────────
+
+- id: infrastructure_wan_outage
+  alias: "Infrastructure: WAN Outage"
+  description: >
+    Fires a local persistent notification (visible without internet) and
+    attempts mobile push (queued for delivery when connectivity returns)
+    after the eero WAN sensor reports offline for 2 minutes.
+    eero_wan_status semantics: on = WAN connected, off = WAN down
+    (standard HA binary sensor convention for connectivity sensors).
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.eero_wan_status
+      to: "off"
+      for: "00:02:00"
+  action:
+    - service: persistent_notification.create
+      data:
+        notification_id: wan_outage
+        title: "WAN Outage"
+        message: >
+          Internet connection lost. Cloud integrations (Roborock, Mammotion,
+          Bambu, Ring) will appear unavailable.
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Infrastructure"
+        message: "WAN outage detected. Internet connection lost."
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Infrastructure"
+        message: "WAN outage detected. Internet connection lost."
+  mode: single
+
+- id: infrastructure_wan_restored
+  alias: "Infrastructure: WAN Restored"
+  description: >
+    Dismisses the wan_outage persistent notification and sends a recovery
+    push when the eero WAN sensor returns to on (connected).
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.eero_wan_status
+      from: "off"
+      to: "on"
+  action:
+    - service: persistent_notification.dismiss
+      data:
+        notification_id: wan_outage
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Infrastructure"
+        message: "Internet connection restored."
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Infrastructure"
+        message: "Internet connection restored."
+  mode: single
+
+- id: infrastructure_rpi_undervoltage
+  alias: "Infrastructure: RPi Under-Voltage Alert"
+  description: >
+    Notifies immediately when the RPi power monitor detects under-voltage.
+    Under-voltage during SD card writes risks filesystem corruption.
+    device_class: problem — on = problem detected.
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.rpi_power_status
+      to: "on"
+  action:
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Infrastructure — HA HOST ALERT"
+        message: >
+          Raspberry Pi under-voltage detected. Check power supply to prevent
+          SD card corruption.
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Infrastructure — HA HOST ALERT"
+        message: >
+          Raspberry Pi under-voltage detected. Check power supply to prevent
+          SD card corruption.
+  mode: single
