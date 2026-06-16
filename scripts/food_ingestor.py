@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """
 Imperial Food Ingestor — Claude Vision → Grocy
-Analyzes a food image and adds identified items to Grocy inventory.
+Analyzes food images and adds identified items to Grocy inventory.
 
 Usage:
-    python food_ingestor.py <image_path>
-    python food_ingestor.py /path/to/fridge.jpg
-    python food_ingestor.py /path/to/receipt.png
+    python food_ingestor.py <image_path>       # single image
+    python food_ingestor.py <directory>        # all images in directory
 
 Environment variables (set in .env or export before running):
     GROCY_URL         Base URL of your Grocy instance
@@ -207,14 +206,44 @@ def ingest(image_path: str) -> None:
 
 # ── Entry point ────────────────────────────────────────────────────────────────
 
+IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.webp', '.gif'}
+
+
+def ingest_directory(directory: str) -> None:
+    images = sorted(
+        p for p in Path(directory).iterdir()
+        if p.is_file() and p.suffix.lower() in IMAGE_EXTENSIONS
+    )
+    if not images:
+        print(f'[ERROR] No image files found in: {directory}')
+        sys.exit(1)
+
+    print(f'[IMPERIAL INGESTOR] Found {len(images)} image(s) in {directory}')
+    total_failed = 0
+
+    for img in images:
+        print(f'\n{"═" * 60}')
+        try:
+            ingest(str(img))
+        except Exception as e:
+            print(f'[ERROR] Failed to process {img.name}: {e}')
+            total_failed += 1
+
+    print(f'\n{"═" * 60}')
+    print(f'[IMPERIAL INGESTOR] Batch complete — {len(images) - total_failed} processed, {total_failed} failed.')
+
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print(__doc__)
         sys.exit(1)
 
-    path = sys.argv[1]
-    if not Path(path).exists():
-        print(f'[ERROR] File not found: {path}')
+    target = Path(sys.argv[1])
+    if not target.exists():
+        print(f'[ERROR] Path not found: {target}')
         sys.exit(1)
 
-    ingest(path)
+    if target.is_dir():
+        ingest_directory(str(target))
+    else:
+        ingest(str(target))
