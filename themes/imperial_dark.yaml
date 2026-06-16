@@ -12,20 +12,20 @@ imperial_dark:
   clear-background-color: "transparent"
 
   # ── Imperial Color System ───────────────────────────────────────────────────
-  primary-color: "#CC0000"                   # Sith Lightsaber Red
+  primary-color: "#C8C8C8"                   # Sith Lightsaber Red
   accent-color: "#3D3D3D"                    # Imperial Grey
-  light-primary-color: "#FF2222"             # Alert red (hover)
-  dark-primary-color: "#990000"              # Deep red (active/pressed)
+  light-primary-color: "#E8E8E8"             # Alert red (hover)
+  dark-primary-color: "#8C8C8C"              # Deep red (active/pressed)
 
   # ── Text Hierarchy ──────────────────────────────────────────────────────────
   primary-text-color: "#E8E8E8"              # Primary readout text
   text-primary-color: "#FFFFFF"              # High-contrast labels
   secondary-text-color: "#909090"            # Secondary annotations
   disabled-text-color: "#484848"             # Offline / inactive
-  text-accent-color: "#CC0000"               # Highlighted text
+  text-accent-color: "#C8C8C8"               # Highlighted text
 
   # ── State Color System ──────────────────────────────────────────────────────
-  state-on-color: "#CC0000"                  # Active — Sith Red
+  state-on-color: "#C8C8C8"                  # Active — Sith Red
   state-off-color: "#3D3D3D"                 # Offline — Imperial Grey
   state-unavailable-color: "#484848"
   state-unknown-color: "#686868"
@@ -34,35 +34,35 @@ imperial_dark:
   # ── Status Indicator Colors ─────────────────────────────────────────────────
   success-color: "#1B5E20"                   # Systems operational
   warning-color: "#E65100"                   # Alert status
-  error-color: "#B71C1C"                     # Critical failure
+  error-color: "#CC0000"                     # Critical failure
   info-color: "#0D47A1"                      # Holonet data
 
   # ── Card Styling — Angular, harsh Imperial design ───────────────────────────
   ha-card-border-radius: "0px"               # No curves — the Empire is angular
   ha-card-border-width: "1px"
-  ha-card-border-color: "rgba(204, 0, 0, 0.35)"
-  ha-card-box-shadow: "0 0 14px rgba(204, 0, 0, 0.12), inset 0 0 1px rgba(255,255,255,0.03)"
+  ha-card-border-color: "rgba(200,200,200,0.30)"
+  ha-card-box-shadow: "0 0 14px rgba(200,200,200,0.10), inset 0 0 1px rgba(255,255,255,0.03)"
   ha-card-background: "var(--card-background-color)"
-  ha-card-header-color: "#CC0000"            # Card titles in Imperial Red
+  ha-card-header-color: "#E8E8E8"            # Card titles in Imperial Red
   ha-card-header-font-size: "16px"
 
   # ── App Header / Top Bar ────────────────────────────────────────────────────
-  app-header-background-color: "#050505"
+  app-header-background-color: "#0A0A0A"
   app-header-text-color: "#E8E8E8"
   app-header-edit-background-color: "#0F0F0F"
-  app-header-edit-text-color: "#CC0000"
+  app-header-edit-text-color: "#C8C8C8"
 
   # ── Sidebar / Navigation ────────────────────────────────────────────────────
   sidebar-background-color: "#0A0A0A"
   sidebar-text-color: "#909090"
   sidebar-icon-color: "#686868"
-  sidebar-selected-icon-color: "#CC0000"
-  sidebar-selected-text-color: "#CC0000"
-  sidebar-selected-background-color: "rgba(204, 0, 0, 0.1)"
+  sidebar-selected-icon-color: "#C8C8C8"
+  sidebar-selected-text-color: "#C8C8C8"
+  sidebar-selected-background-color: "rgba(200,200,200,0.10)"
 
   # ── Switches & Toggles ──────────────────────────────────────────────────────
   switch-checked-button-color: "#FFFFFF"
-  switch-checked-track-color: "#CC0000"
+  switch-checked-track-color: "#C8C8C8"
   switch-unchecked-button-color: "#686868"
   switch-unchecked-track-color: "#2A2A2A"
 
@@ -71,13 +71,13 @@ imperial_dark:
   paper-slider-knob-color: "var(--primary-color)"
   paper-slider-knob-start-color: "var(--accent-color)"
   paper-slider-pin-color: "var(--primary-color)"
-  paper-slider-secondary-color: "rgba(204, 0, 0, 0.3)"
+  paper-slider-secondary-color: "rgba(200,200,200,0.30)"
 
   # ── Chips (Filter / Tag elements) ───────────────────────────────────────────
-  chip-background-color: "rgba(204, 0, 0, 0.12)"
+  chip-background-color: "rgba(200,200,200,0.12)"
   chip-text-color: "var(--primary-text-color)"
   chip-icon-color: "var(--primary-color)"
-  chip-border-color: "rgba(204, 0, 0, 0.4)"
+  chip-border-color: "rgba(200,200,200,0.40)"
 
   # ── Badges & Labels ─────────────────────────────────────────────────────────
   label-badge-background-color: "var(--primary-background-color)"
@@ -92,22 +92,22 @@ imperial_dark:
   input-fill-color: "rgba(255,255,255,0.04)"
   input-ink-color: "var(--primary-text-color)"
   input-label-ink-color: "var(--secondary-text-color)"
-  input-idle-line-color: "rgba(204, 0, 0, 0.2)"
-  input-hover-line-color: "rgba(204, 0, 0, 0.5)"
-  input-disabled-line-color: "rgba(204, 0, 0, 0.1)"
-  input-outlined-idle-border-color: "rgba(204, 0, 0, 0.3)"
-  input-outlined-hover-border-color: "rgba(204, 0, 0, 0.6)"
-  input-outlined-disabled-border-color: "rgba(204, 0, 0, 0.1)"
+  input-idle-line-color: "rgba(200,200,200,0.20)"
+  input-hover-line-color: "rgba(200,200,200,0.50)"
+  input-disabled-line-color: "rgba(200,200,200,0.10)"
+  input-outlined-idle-border-color: "rgba(200,200,200,0.30)"
+  input-outlined-hover-border-color: "rgba(200,200,200,0.60)"
+  input-outlined-disabled-border-color: "rgba(200,200,200,0.10)"
   input-disabled-fill-color: "rgba(255,255,255,0.02)"
   input-disabled-ink-color: "var(--disabled-text-color)"
   input-disabled-label-ink-color: "var(--disabled-text-color)"
 
   # ── Dividers & Scroll ───────────────────────────────────────────────────────
-  divider-color: "rgba(204, 0, 0, 0.15)"
-  scrollbar-thumb-color: "rgba(204, 0, 0, 0.3)"
+  divider-color: "rgba(200,200,200,0.15)"
+  scrollbar-thumb-color: "rgba(200,200,200,0.30)"
 
   # ── MDC Material Components (complete set) ──────────────────────────────────
-  mdc-theme-primary: "#CC0000"
+  mdc-theme-primary: "#C8C8C8"
   mdc-theme-secondary: "#3D3D3D"
   mdc-theme-background: "var(--primary-background-color)"
   mdc-theme-surface: "var(--card-background-color)"
@@ -120,7 +120,7 @@ imperial_dark:
   mdc-theme-text-primary-on-background: "var(--primary-text-color)"
   mdc-theme-text-secondary-on-background: "var(--secondary-text-color)"
   mdc-theme-text-disabled-on-background: "var(--disabled-text-color)"
-  mdc-ripple-color: "#CC0000"
+  mdc-ripple-color: "#C8C8C8"
   mdc-ripple-unconstrained-opacity: "0.15"
 
   # ── Paper Components ────────────────────────────────────────────────────────
@@ -131,11 +131,11 @@ imperial_dark:
   paper-toast-background-color: "#1F1F1F"
 
   # ── Energy Dashboard ────────────────────────────────────────────────────────
-  energy-grid-consumption-color: "#CC0000"
+  energy-grid-consumption-color: "#C8C8C8"
   energy-grid-return-color: "#1B5E20"
   energy-solar-color: "#E65100"
   energy-non-fossil-color: "#1B5E20"
-  energy-battery-out-color: "#CC0000"
+  energy-battery-out-color: "#C8C8C8"
   energy-battery-in-color: "#1B5E20"
 
   # ── Map Tiles — Dark Space aesthetic ────────────────────────────────────────

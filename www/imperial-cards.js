@@ -21,6 +21,7 @@
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
     --ir: #CC0000; --ir-dim: rgba(204,0,0,0.25); --ir-glow: rgba(204,0,0,0.15);
+    --ic:#C8C8C8;--ic-dim:rgba(200,200,200,0.12);--ic-glow:rgba(200,200,200,0.15);--iborder:rgba(200,200,200,0.30);
     --ig: #00C853; --ig-glow: rgba(0,200,83,0.5);
     --ia: #FFB300; --ia-glow: rgba(255,179,0,0.5);
     --ibg: #0A0A0A; --ipanel: #1A1A1A;
@@ -34,11 +35,11 @@
     .sl { position:absolute; inset:0; pointer-events:none; z-index:0;
       background: repeating-linear-gradient(
         to bottom, transparent 0, transparent 3px,
-        rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px); }
+        rgba(0,0,0,0.20) 3px, rgba(0,0,0,0.20) 4px); }
   `;
 
   const PIPS = `
-    .p { position:absolute; width:8px; height:8px; background:var(--ir); z-index:3; }
+    .p { position:absolute; width:8px; height:8px; background:var(--ic); z-index:3; }
     .p.tl { top:0;    left:0;  } .p.tr { top:0;    right:0; }
     .p.bl { bottom:0; left:0;  } .p.br { bottom:0; right:0; }
   `;
@@ -58,7 +59,7 @@
   function col(so) {
     if (!so || so.state === 'unavailable') return 'var(--igrey)';
     return ['on','playing','home','open','active','true'].includes(so.state)
-      ? 'var(--ir)' : 'var(--igreyl)';
+      ? 'var(--ic)' : 'var(--igreyl)';
   }
   function icon(id) {
     const m = { light:'mdi:lightbulb', switch:'mdi:toggle-switch',
@@ -150,8 +151,8 @@
         ? `${curLayEnt.state}/${totLayEnt.state}` : '---',
       nozzStr:  nc !== null ? `${nc}°C` : '---',
       bedStr:   bc  !== null ? `${bc}°C`  : '---',
-      barColor: isPrinting ? 'var(--ir)' : isDone ? 'var(--ig)' : 'var(--igreyl)',
-      barGlow:  isPrinting ? 'box-shadow:0 0 8px rgba(204,0,0,.7)' : '',
+      barColor: isPrinting ? 'var(--ia)' : isDone ? 'var(--ig)' : 'var(--igreyl)',
+      barGlow:  isPrinting ? 'box-shadow:0 0 8px rgba(255,179,0,.7)' : '',
       fallbackName: clean(nameEnt),
     };
   }
@@ -173,8 +174,8 @@
         <style>
           :host{display:block}
           .w{${V} position:relative}
-          .b{background:linear-gradient(90deg,var(--ir) 0%,rgba(204,0,0,.2) 45%,transparent 100%);
-            border:1px solid rgba(204,0,0,.45);padding:18px 29px;
+          .b{background:linear-gradient(90deg,var(--ic) 0%,rgba(200,200,200,.2) 45%,transparent 100%);
+            border:1px solid rgba(200,200,200,.45);padding:18px 29px;
             display:flex;align-items:center;gap:18px}
           .b > ha-icon{color:#000;--mdc-icon-size:36px;flex-shrink:0}
           .t{flex:1}
@@ -182,7 +183,7 @@
             letter-spacing:5px;text-transform:uppercase;color:#fff}
           .su{font-family:var(--imono);font-size:13px;letter-spacing:3px;
             color:#fff;margin-top:3px}
-          .di{width:14px;height:14px;flex-shrink:0;background:var(--ir);
+          .di{width:14px;height:14px;flex-shrink:0;background:var(--ic);
             clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%)}
           .lk{cursor:pointer;display:flex;align-items:center;padding:4px;
             color:rgba(255,255,255,.45);transition:color .15s;flex-shrink:0}
@@ -259,19 +260,19 @@
       this.shadowRoot.innerHTML = `
         <style>
           :host{display:block}
-          .card{${V} background:var(--ipanel);border:1px solid rgba(204,0,0,.3);position:relative}
+          .card{${V} background:var(--ipanel);border:1px solid var(--iborder);position:relative}
           ${PIPS} ${SCAN}
-          .hd{background:linear-gradient(90deg,rgba(204,0,0,.5),rgba(204,0,0,.1) 55%,transparent);
-            border-bottom:1px solid rgba(204,0,0,.25);padding:10px 20px;
+          .hd{background:linear-gradient(90deg,rgba(200,200,200,.5),rgba(200,200,200,.1) 55%,transparent);
+            border-bottom:1px solid rgba(200,200,200,.25);padding:10px 20px;
             font-family:var(--iui);font-size:14px;font-weight:700;
             letter-spacing:4px;text-transform:uppercase;color:#fff;position:relative;z-index:1}
           .row{display:flex;align-items:center;gap:14px;padding:13px 20px;
-            border-bottom:1px solid rgba(204,0,0,.07);position:relative;z-index:1;
+            border-bottom:1px solid rgba(200,200,200,.10);position:relative;z-index:1;
             transition:background .12s}
           .row:last-child{border-bottom:none}
           .row.tog{cursor:pointer}
-          .row.tog:hover{background:rgba(204,0,0,.06)}
-          .row.tog:active{background:rgba(204,0,0,.12)}
+          .row.tog:hover{background:rgba(200,200,200,.06)}
+          .row.tog:active{background:rgba(200,200,200,.12)}
           ha-icon{--mdc-icon-size:24px;flex-shrink:0}
           .nm{flex:1;min-width:0;font-family:var(--iui);font-size:15px;letter-spacing:2px;color:var(--itext);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
           .vl{flex-shrink:0;font-family:var(--imono);font-size:15px;letter-spacing:.5px;white-space:nowrap}
@@ -369,7 +370,7 @@
     set hass(h) { this._h = h; this._r(); }
     _r() {
       if (!this.shadowRoot || !this._c) return;
-      const { name, icon: ic = 'mdi:power', color = 'red',
+      const { name, icon: ic = 'mdi:power', color = 'grey',
               service: sv, service_data: sd, entity } = this._c;
       const so     = entity ? st(this._h, entity) : null;
       const active = so && ['on','playing','active'].includes(so.state);
@@ -377,13 +378,14 @@
         red:   ['#CC0000','rgba(204,0,0,.45)','rgba(204,0,0,.12)'],
         green: ['#00C853','rgba(0,200,83,.45)','rgba(0,200,83,.1)'],
         amber: ['#FFB300','rgba(255,179,0,.45)','rgba(255,179,0,.1)'],
+        grey:  ['#C8C8C8','rgba(200,200,200,.45)','rgba(200,200,200,.12)'],
       };
-      const [c2, gl, dm] = pal[color] || pal.red;
+      const [c2, gl, dm] = pal[color] || pal.grey;
       this.shadowRoot.innerHTML = `
         <style>
           :host{display:block;cursor:pointer}
           .b{${V} background:${active?dm:'var(--ipanel)'};
-            border:1px solid ${active?c2:'rgba(204,0,0,.3)'};
+            border:1px solid ${active?c2:'var(--iborder)'};
             padding:22px 17px 17px;display:flex;flex-direction:column;
             align-items:center;gap:11px;text-align:center;
             position:relative;overflow:hidden;min-height:140px;
@@ -439,11 +441,11 @@
       this.shadowRoot.innerHTML = `
         <style>
           :host{display:block}
-          .card{${V} background:var(--ipanel);border:1px solid rgba(204,0,0,.3);
+          .card{${V} background:var(--ipanel);border:1px solid var(--iborder);
             position:relative;overflow:hidden}
           ${PIPS} ${SCAN}
           .hd{display:flex;align-items:center;gap:10px;padding:10px 14px;
-            border-bottom:1px solid rgba(204,0,0,.12);position:relative;z-index:1}
+            border-bottom:1px solid rgba(200,200,200,.15);position:relative;z-index:1}
           .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;
             background:${statusColor};
             ${isPrinting?`box-shadow:0 0 8px ${statusColor};animation:pulse 1.8s ease-in-out infinite`:''}}
@@ -459,15 +461,15 @@
             font-family:var(--imono);font-size:8px;color:${barColor};opacity:.7;z-index:2;
             ${pct===0?'display:none':''}}
           .st{display:grid;grid-template-columns:repeat(4,1fr);position:relative;z-index:1;
-            border-bottom:1px solid rgba(204,0,0,.08)}
-          .sc{padding:9px 10px;text-align:center;border-right:1px solid rgba(204,0,0,.08)}
+            border-bottom:1px solid rgba(200,200,200,.10)}
+          .sc{padding:9px 10px;text-align:center;border-right:1px solid rgba(200,200,200,.10)}
           .sc:last-child{border-right:none}
           .sl2{font-family:var(--imono);font-size:8px;letter-spacing:1.5px;
             color:var(--itextd);text-transform:uppercase}
           .sv{font-family:var(--imono);font-size:13px;color:var(--itext);margin-top:3px}
           .jb{padding:8px 14px;position:relative;z-index:1;
             display:flex;align-items:center;gap:8px;
-            border-top:1px solid rgba(204,0,0,.08)}
+            border-top:1px solid rgba(200,200,200,.10)}
           .jl{font-family:var(--imono);font-size:9px;letter-spacing:1.5px;color:var(--itextd)}
           .jn{font-family:var(--imono);font-size:10px;color:var(--itext);flex:1;
             overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
@@ -578,11 +580,11 @@
           /* 2-col grid */
           .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px}
           /* printer block */
-          .pb-wrap{${V} background:var(--ipanel);border:1px solid rgba(204,0,0,.28);
+          .pb-wrap{${V} background:var(--ipanel);border:1px solid var(--iborder);
             position:relative;overflow:hidden}
           ${PIPS} ${SCAN}
           .phd{display:flex;align-items:center;gap:12px;padding:14px 18px;
-            border-bottom:1px solid rgba(204,0,0,.1);position:relative;z-index:1}
+            border-bottom:1px solid rgba(200,200,200,.12);position:relative;z-index:1}
           .dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
           .pname{flex:1;font-family:var(--iui);font-size:15px;font-weight:700;
             letter-spacing:3px;text-transform:uppercase;color:#fff;
@@ -594,8 +596,8 @@
           .ppct{position:absolute;right:6px;top:50%;transform:translateY(-50%);
             font-family:var(--imono);font-size:10px;color:var(--itext);opacity:.6;z-index:2}
           .stats{display:grid;grid-template-columns:repeat(4,1fr);
-            border-bottom:1px solid rgba(204,0,0,.07);position:relative;z-index:1}
-          .stat{padding:9px 6px;text-align:center;border-right:1px solid rgba(204,0,0,.07)}
+            border-bottom:1px solid rgba(200,200,200,.10);position:relative;z-index:1}
+          .stat{padding:9px 6px;text-align:center;border-right:1px solid rgba(200,200,200,.10)}
           .stat:last-child{border-right:none}
           .slabel{font-family:var(--imono);font-size:11px;letter-spacing:1px;
             color:var(--itextd);text-transform:uppercase}
@@ -713,7 +715,7 @@
       this.shadowRoot.innerHTML = `
         <style>
           :host{display:block}
-          .card{${V} background:var(--ipanel);border:1px solid rgba(204,0,0,.3);
+          .card{${V} background:var(--ipanel);border:1px solid var(--iborder);
             position:relative;overflow:hidden;padding:28px 24px;}
           ${PIPS} ${SCAN}
           .top{position:relative;z-index:1;display:flex;align-items:baseline;
@@ -722,18 +724,18 @@
             letter-spacing:6px;text-transform:uppercase;color:var(--ia);opacity:.85}
           .dt{font-family:var(--iui);font-size:12px;letter-spacing:4px;
             text-transform:uppercase;color:var(--igreyl)}
-          .dv{height:1px;background:linear-gradient(90deg,transparent,var(--ir),transparent);
+          .dv{height:1px;background:linear-gradient(90deg,transparent,var(--ic),transparent);
             margin:0 0 14px;opacity:.25;position:relative;z-index:1}
           .main{position:relative;z-index:1;display:flex;align-items:center;
             justify-content:space-between;gap:12px}
           .tc{display:flex;align-items:baseline;gap:6px}
           .tm{font-family:var(--imono);font-size:72px;font-weight:700;
-            letter-spacing:-3px;line-height:1;color:var(--ir);
-            text-shadow:0 0 20px rgba(204,0,0,.55),0 0 50px rgba(204,0,0,.2)}
+            letter-spacing:-3px;line-height:1;color:var(--ic);
+            text-shadow:0 0 20px rgba(200,200,200,.45),0 0 50px rgba(200,200,200,.15)}
           .ap{font-family:var(--imono);font-size:20px;letter-spacing:2px;
-            color:var(--ir);opacity:.5;align-self:flex-end;padding-bottom:8px}
+            color:var(--ic);opacity:.5;align-self:flex-end;padding-bottom:8px}
           .wx{display:flex;align-items:center;gap:12px}
-          .wx-svg{flex-shrink:0;fill:var(--ir);filter:drop-shadow(0 0 8px rgba(204,0,0,.45))}
+          .wx-svg{flex-shrink:0;fill:var(--ic);filter:drop-shadow(0 0 8px rgba(200,200,200,.35))}
           .wx-rows{text-align:left}
           .wx-row{font-family:var(--iui);font-size:11px;letter-spacing:3px;
             text-transform:uppercase;color:var(--igreyl);line-height:2}
@@ -940,11 +942,11 @@
       this.shadowRoot.innerHTML = `
         <style>
           :host{display:block}
-          .card{${V} background:var(--ipanel);border:1px solid rgba(204,0,0,.3);
+          .card{${V} background:var(--ipanel);border:1px solid var(--iborder);
             position:relative;overflow:hidden}
           ${PIPS} ${SCAN}
-          .hd{background:linear-gradient(90deg,rgba(204,0,0,.5),rgba(204,0,0,.1) 55%,transparent);
-            border-bottom:1px solid rgba(204,0,0,.25);padding:10px 20px;
+          .hd{background:linear-gradient(90deg,rgba(200,200,200,.5),rgba(200,200,200,.1) 55%,transparent);
+            border-bottom:1px solid rgba(200,200,200,.25);padding:10px 20px;
             font-family:var(--iui);font-size:14px;font-weight:700;
             letter-spacing:4px;text-transform:uppercase;color:#fff;
             position:relative;z-index:1}
@@ -955,7 +957,7 @@
             letter-spacing:3px;text-transform:uppercase}
           .shcount{font-family:var(--imono);font-size:14px}
           .row{display:flex;align-items:center;gap:14px;padding:9px 20px;
-            border-bottom:1px solid rgba(204,0,0,.06);position:relative;z-index:1}
+            border-bottom:1px solid rgba(200,200,200,.10);position:relative;z-index:1}
           .row:last-of-type{border-bottom:none}
           ha-icon{--mdc-icon-size:20px;flex-shrink:0}
           .nm{flex:1;font-family:var(--iui);font-size:13px;letter-spacing:1.5px;
@@ -1082,7 +1084,7 @@
 
   console.info(
     '%c IMPERIAL COMMAND INTERFACE %c v' + VERSION + ' ',
-    'background:#CC0000;color:#fff;font-weight:700;padding:2px 6px;',
-    'background:#111;color:#CC0000;font-weight:700;padding:2px 6px;'
+    'background:#C8C8C8;color:#000;font-weight:700;padding:2px 6px;',
+    'background:#111;color:#C8C8C8;font-weight:700;padding:2px 6px;'
   );
 })();
