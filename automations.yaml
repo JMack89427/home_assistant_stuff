@@ -570,7 +570,12 @@
   trigger:
     - platform: numeric_state
       entity_id: sensor.garden_luba_va624unr_blade_used_time
-      above: 90
+      above: 200
+  condition:
+    - condition: template
+      value_template: >
+        {{ this.last_triggered is none or
+           (now() - this.last_triggered).total_seconds() > 604800 }}
   action:
     - service: notify.mobile_app_jason_s_iphone
       data:
@@ -578,7 +583,7 @@
         message: >
           Chopper blade service due. Blade used time:
           {{ states('sensor.garden_luba_va624unr_blade_used_time') | round(1) }}h
-          (recommended interval: 90h)
+          (recommended interval: 200h)
     - service: notify.mobile_app_ipad
       data:
         title: "Chopper Maintenance"
