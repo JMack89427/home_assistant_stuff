@@ -1123,8 +1123,8 @@ views:
 
   # ═══════════════════════════════════════════════════════════════════════════
   # KAMINO STATION — Pool operations (Mammotion Spino E1 / R2-D2)
-  # TODO: Replace all placeholder entity IDs after pairing Spino E1 to HA.
-  #       Mammotion integration registers under vacuum.* or a custom domain.
+  # Control buttons withheld — Mammotion integration exposes status entities
+  # only at this time. Re-add when vacuum domain or button entities appear.
   # ═══════════════════════════════════════════════════════════════════════════
   - title: Kamino Station
     path: kamino
@@ -1139,89 +1139,24 @@ views:
             subtitle: Unit R2-D2 — Spino E1 — aquatic sanitation protocol active
             icon: mdi:pool
 
-          # TODO: Verify service names once Spino E1 is paired
-          - type: grid
-            columns: 4
-            square: false
-            cards:
-              - type: custom:imperial-button
-                name: Deploy
-                icon: mdi:play
-                service: vacuum.start
-                service_data:
-                  entity_id: vacuum.pool_spino_e1
-                color: green
-              - type: custom:imperial-button
-                name: Pause
-                icon: mdi:pause
-                service: vacuum.pause
-                service_data:
-                  entity_id: vacuum.pool_spino_e1
-                color: amber
-              - type: custom:imperial-button
-                name: Return to Base
-                icon: mdi:home-import-outline
-                service: vacuum.return_to_base
-                service_data:
-                  entity_id: vacuum.pool_spino_e1
-                color: amber
-              - type: custom:imperial-button
-                name: Stop
-                icon: mdi:stop
-                service: vacuum.stop
-                service_data:
-                  entity_id: vacuum.pool_spino_e1
-                color: red
-
           - type: horizontal-stack
             cards:
               - type: custom:imperial-panel
                 title: Unit Status
                 entities:
-                  # TODO: replace with real entity IDs after pairing
-                  - entity: vacuum.pool_spino_e1
-                    name: State
-                    icon: mdi:robot
-                  - entity: sensor.pool_spino_e1_battery
+                  - entity: sensor.pool_battery
                     name: Power Cell
                     icon: mdi:battery
-                  - entity: sensor.pool_spino_e1_connection
-                    name: Uplink
-                    icon: mdi:wifi
-                  - entity: binary_sensor.pool_spino_e1_charging
-                    name: Charging
-                    icon: mdi:lightning-bolt
+                  - entity: sensor.pool_last_activity
+                    name: Last Active
+                    icon: mdi:clock-outline
+                  - entity: number.pool_volume
+                    name: Pool Volume
+                    icon: mdi:pool
 
-              - type: custom:imperial-panel
-                title: Active Mission
-                entities:
-                  # TODO: replace with real entity IDs after pairing
-                  - entity: sensor.pool_spino_e1_progress
-                    name: Progress
-                    icon: mdi:progress-check
-                  - entity: sensor.pool_spino_e1_elapsed_time
-                    name: Elapsed
-                    icon: mdi:timer
-                  - entity: sensor.pool_spino_e1_time_left
-                    name: Time Left
-                    icon: mdi:timer-sand
-                  - entity: sensor.pool_spino_e1_area
-                    name: Area
-                    icon: mdi:texture-box
-
-              - type: custom:imperial-panel
-                title: Maintenance
-                entities:
-                  # TODO: replace with real entity IDs after pairing
-                  - entity: sensor.pool_spino_e1_total_work_time
-                    name: Total Duty Time
-                    icon: mdi:timer
-                  - entity: sensor.pool_spino_e1_total_mileage
-                    name: Total Mileage
-                    icon: mdi:map-marker-distance
-                  - entity: sensor.pool_spino_e1_battery_cycles
-                    name: Battery Cycles
-                    icon: mdi:battery-sync
+              - type: custom:imperial-camera
+                entity: camera.pool_live_view
+                title: Pool Surveillance Feed
                   - entity: sensor.pool_spino_e1_last_error
                     name: Last Error
                     icon: mdi:alert-circle-outline
