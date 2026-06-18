@@ -1207,7 +1207,7 @@ views:
 
               - type: custom:imperial-camera
                 entity: camera.pool_live_view
-                title: Pool Surveillance Feed
+                title: Pool Perimeter — Ring
 
           - type: horizontal-stack
             cards:
