@@ -1157,9 +1157,6 @@ views:
               - type: custom:imperial-camera
                 entity: camera.pool_live_view
                 title: Pool Surveillance Feed
-                  - entity: sensor.pool_spino_e1_last_error
-                    name: Last Error
-                    icon: mdi:alert-circle-outline
 
   # ═══════════════════════════════════════════════════════════════════════════
   # BOTANICAL BAY — Grow Room Operations
