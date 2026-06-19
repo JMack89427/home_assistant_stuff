@@ -1179,15 +1179,15 @@ views:
                   - entity: sensor.pool_spino_e13d6btg_battery
                     name: Power Cell
                     icon: mdi:battery
+                  - entity: vacuum.pool_spino_e13d6btg
+                    name: State
+                    icon: mdi:robot
                   - entity: sensor.pool_spino_e13d6btg_status
                     name: Status
-                    icon: mdi:robot
+                    icon: mdi:information-outline
                   - entity: sensor.pool_spino_e13d6btg_cleaning_mode
                     name: Mode
                     icon: mdi:washing-machine
-                  - entity: sensor.pool_last_activity
-                    name: Last Active
-                    icon: mdi:clock-outline
 
               - type: custom:imperial-panel
                 title: Operations
@@ -1223,9 +1223,9 @@ views:
                   - entity: select.pool_spino_e13d6btg_pool_bottom_shape
                     name: Bottom Shape
                     icon: mdi:shape
-                  - entity: number.pool_volume
-                    name: Pool Volume
-                    icon: mdi:pool
+                  - entity: number.pool_spino_e13d6btg_pool_floor_movement_speed
+                    name: Floor Speed
+                    icon: mdi:speedometer
 
               - type: grid
                 columns: 3
