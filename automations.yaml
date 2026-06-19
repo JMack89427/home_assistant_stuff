@@ -833,3 +833,47 @@
           Raspberry Pi under-voltage detected. Check power supply to prevent
           SD card corruption.
   mode: single
+
+# ── Kamino Station: R2 (Spino E1) ────────────────────────────────────────────
+- id: r2_low_battery_alert
+  alias: "R2: Low Battery Alert"
+  description: >
+    Alerts when R2's battery drops below 10% while it is accessible (signal
+    range). Fires on two paths: (1) battery crosses below 10% while already
+    reachable, (2) R2 reconnects after a dive and battery is already low.
+    Underwater the vacuum entity goes unavailable — the guard condition blocks
+    false triggers from stale sensor values during that window.
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.pool_spino_e13d6btg_battery
+      below: 10
+    - platform: state
+      entity_id: vacuum.pool_spino_e13d6btg
+      from: unavailable
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.pool_spino_e13d6btg_battery
+      below: 10
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: vacuum.pool_spino_e13d6btg
+          state: unavailable
+    - condition: template
+      value_template: >
+        {{ this.last_triggered is none or
+           (now() - this.last_triggered).total_seconds() > 3600 }}
+  action:
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Kamino Station"
+        message: >
+          R2 battery critical: {{ states('sensor.pool_spino_e13d6btg_battery') | int }}%.
+          Unit is accessible — retrieve or dock for recharge.
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Kamino Station"
+        message: >
+          R2 battery critical: {{ states('sensor.pool_spino_e13d6btg_battery') | int }}%.
+          Unit is accessible — retrieve or dock for recharge.
+  mode: single
