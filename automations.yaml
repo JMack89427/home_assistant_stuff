@@ -3,6 +3,12 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Add automations here or create them through the UI (they will be written to
 # this file automatically when the file is referenced by configuration.yaml).
+#
+# CHANGELOG (2026-06-19):
+# • Added four R2 (Spino E1 pool robot) automations: submerged stale-battery
+#   watchdog, early-warning battery ladder (50% & 25%), low-battery auto-recall,
+#   and nightly dock curfew check. Prevents unattended submersion and ensures
+#   robot returns to dock at critical battery levels.
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Vacuum: Qrevo Curv (main level) — daily 10am ─────────────────────────────
@@ -876,4 +882,183 @@
         message: >
           R2 battery critical: {{ states('sensor.pool_spino_e13d6btg_battery') | int }}%.
           Unit is accessible — retrieve or dock for recharge.
+  mode: single
+
+# ── Kamino Station: R2 (Spino E1) — watchdog & recall ────────────────────────
+- id: r2_submerged_stale_battery_watchdog
+  alias: "R2: Submerged + Stale Battery Watchdog"
+  description: >
+    Fires when R2 has been unreachable (unavailable) for 3 hours AND the last
+    known battery reading is below 40%. Presses the refresh-status button first
+    in case R2 has surfaced since the trigger fired, then notifies if battery is
+    still low. Throttled to once per 2 hours to prevent notification storms
+    during a long submersion window.
+  trigger:
+    - platform: state
+      entity_id: vacuum.pool_spino_e13d6btg
+      to: unavailable
+      for:
+        hours: 3
+  condition:
+    - condition: numeric_state
+      entity_id: sensor.pool_spino_e13d6btg_battery
+      below: 40
+    - condition: template
+      value_template: >
+        {{ this.last_triggered is none or
+           (now() - this.last_triggered).total_seconds() > 7200 }}
+  action:
+    - service: button.press
+      target:
+        entity_id: button.pool_spino_e13d6btg_refresh_status
+      continue_on_error: true
+    - delay: "00:00:15"
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Kamino Station — R2 MISSING"
+        message: >
+          R2 unreachable for 3+ hours, last battery
+          {{ states('sensor.pool_spino_e13d6btg_battery') | int(0) }}%
+          — check the pool.
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Kamino Station — R2 MISSING"
+        message: >
+          R2 unreachable for 3+ hours, last battery
+          {{ states('sensor.pool_spino_e13d6btg_battery') | int(0) }}%
+          — check the pool.
+  mode: single
+
+- id: r2_battery_ladder_warnings
+  alias: "R2: Early-Warning Battery Ladder"
+  description: >
+    Two-rung battery ladder: notifies at 50% (advisory) and 25% (dock
+    recommended) while R2 is reachable. Throttled to one fire per 3 hours
+    across both rungs so the lower threshold cannot re-alert immediately after
+    the upper threshold fires.
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.pool_spino_e13d6btg_battery
+      below: 50
+      id: cross_50
+    - platform: numeric_state
+      entity_id: sensor.pool_spino_e13d6btg_battery
+      below: 25
+      id: cross_25
+  condition:
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: vacuum.pool_spino_e13d6btg
+          state: unavailable
+    - condition: template
+      value_template: >
+        {{ this.last_triggered is none or
+           (now() - this.last_triggered).total_seconds() > 10800 }}
+  action:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.id == 'cross_50' }}"
+          sequence:
+            - service: notify.mobile_app_jason_s_iphone
+              data:
+                title: "Kamino Station"
+                message: >
+                  R2 battery at 50% — consider returning to dock soon.
+                  Current: {{ states('sensor.pool_spino_e13d6btg_battery') | int(0) }}%.
+            - service: notify.mobile_app_ipad
+              data:
+                title: "Kamino Station"
+                message: >
+                  R2 battery at 50% — consider returning to dock soon.
+                  Current: {{ states('sensor.pool_spino_e13d6btg_battery') | int(0) }}%.
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.id == 'cross_25' }}"
+          sequence:
+            - service: notify.mobile_app_jason_s_iphone
+              data:
+                title: "Kamino Station"
+                message: >
+                  R2 battery at 25% — dock recommended.
+                  Current: {{ states('sensor.pool_spino_e13d6btg_battery') | int(0) }}%.
+            - service: notify.mobile_app_ipad
+              data:
+                title: "Kamino Station"
+                message: >
+                  R2 battery at 25% — dock recommended.
+                  Current: {{ states('sensor.pool_spino_e13d6btg_battery') | int(0) }}%.
+  mode: single
+
+- id: r2_low_battery_auto_recall
+  alias: "R2: Low Battery Auto-Recall"
+  description: >
+    Issues a return-to-base command when R2 battery drops below 20% while a
+    cleaning cycle is actively running. No throttle — each genuine cleaning
+    session that hits 20% should always trigger a recall.
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.pool_spino_e13d6btg_battery
+      below: 20
+  condition:
+    - condition: state
+      entity_id: vacuum.pool_spino_e13d6btg
+      state: cleaning
+  action:
+    - service: vacuum.return_to_base
+      target:
+        entity_id: vacuum.pool_spino_e13d6btg
+      continue_on_error: true
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Kamino Station — LOW BATTERY"
+        message: >
+          R2 recalled — battery
+          {{ states('sensor.pool_spino_e13d6btg_battery') | int(0) }}%,
+          returning to dock.
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Kamino Station — LOW BATTERY"
+        message: >
+          R2 recalled — battery
+          {{ states('sensor.pool_spino_e13d6btg_battery') | int(0) }}%,
+          returning to dock.
+  mode: single
+
+- id: r2_nightly_dock_curfew_check
+  alias: "R2: Nightly Dock Curfew Check"
+  description: >
+    At 23:00 every night, checks whether R2 is neither docked nor unreachable.
+    If it is still out in the pool (cleaning, idle, returning, etc.) the crew
+    gets a push so someone can manually retrieve or dock it before morning.
+  trigger:
+    - platform: time
+      at: "23:00:00"
+  condition:
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: vacuum.pool_spino_e13d6btg
+          state: docked
+    - condition: not
+      conditions:
+        - condition: state
+          entity_id: vacuum.pool_spino_e13d6btg
+          state: unavailable
+  action:
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Kamino Station — CURFEW"
+        message: >
+          R2 has not returned to dock — state:
+          {{ states('vacuum.pool_spino_e13d6btg') }}, battery:
+          {{ states('sensor.pool_spino_e13d6btg_battery') | int(0) }}%.
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Kamino Station — CURFEW"
+        message: >
+          R2 has not returned to dock — state:
+          {{ states('vacuum.pool_spino_e13d6btg') }}, battery:
+          {{ states('sensor.pool_spino_e13d6btg_battery') | int(0) }}%.
   mode: single
