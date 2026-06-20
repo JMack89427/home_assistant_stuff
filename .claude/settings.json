@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "homeassistant": {
+      "command": "uvx",
+      "args": ["hass-mcp"],
+      "env": {
+        "HASS_URL": "https://cvqrhv2hxcwsibdurk1gjxv2wvkhq8xc.ui.nabu.casa"
+      }
+    }
+  }
+}
