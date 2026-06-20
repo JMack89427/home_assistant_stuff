@@ -36,3 +36,4 @@ Thumbs.db
 .idea/
 .vscode/
 .claude/worktrees/
+.claude/settings.local.json
