@@ -308,6 +308,10 @@
     - condition: time
       after: "08:00:00"
       before: "22:00:00"
+    # Don't alert if paused state is actually the mower sitting on the charger
+    - condition: state
+      entity_id: binary_sensor.garden_luba_va624unr_charging
+      state: "off"
   action:
     - service: notify.mobile_app_jason_s_iphone
       data:
