@@ -1139,7 +1139,7 @@ views:
             icon: mdi:pool
 
           - type: grid
-            columns: 4
+            columns: 2
             square: false
             cards:
               - type: custom:imperial-button
@@ -1150,24 +1150,10 @@ views:
                 service_data:
                   entity_id: vacuum.pool_spino_e13d6btg
               - type: custom:imperial-button
-                name: Pause
-                icon: mdi:pause
-                color: amber
-                service: vacuum.pause
-                service_data:
-                  entity_id: vacuum.pool_spino_e13d6btg
-              - type: custom:imperial-button
                 name: Return to Base
                 icon: mdi:home-import-outline
                 color: amber
                 service: vacuum.return_to_base
-                service_data:
-                  entity_id: vacuum.pool_spino_e13d6btg
-              - type: custom:imperial-button
-                name: Stop
-                icon: mdi:stop
-                color: red
-                service: vacuum.stop
                 service_data:
                   entity_id: vacuum.pool_spino_e13d6btg
 
