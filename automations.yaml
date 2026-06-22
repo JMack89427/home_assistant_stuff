@@ -327,10 +327,15 @@
     - platform: state
       entity_id: sensor.garden_luba_va624unr_last_error
   condition:
-    # Skip the sentinel "no error" value that the integration emits when clear
+    # Skip sentinel/transient values the integration emits on reconnect
     - condition: template
       value_template: >
-        {{ trigger.to_state.state != 'Error message not found' }}
+        {{ trigger.to_state.state not in
+           ['Error message not found', 'unavailable', 'unknown'] }}
+    # Skip stale errors — only alert if the sensor changed within the last 60s
+    - condition: template
+      value_template: >
+        {{ (now() - trigger.to_state.last_changed).total_seconds() < 60 }}
     - condition: not
       conditions:
         - condition: state
