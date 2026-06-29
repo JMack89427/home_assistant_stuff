@@ -882,3 +882,53 @@
           R2 battery critical: {{ states('sensor.pool_spino_e13d6btg_battery') | int }}%.
           Unit is accessible — retrieve or dock for recharge.
   mode: single
+
+- id: cadets_barracks_fan_temp_control
+  alias: "Cadet's Barracks: Fan Speed — Temperature Adaptive"
+  trigger:
+    - platform: time_pattern
+      minutes: "/15"
+  condition:
+    - condition: time
+      after: "07:00:00"
+      before: "21:00:00"
+  action:
+    - variables:
+        setpoint: >
+          {{ state_attr('climate.t6_pro_z_wave_programmable_thermostat', 'target_temp_high')
+             | float(state_attr('climate.t6_pro_z_wave_programmable_thermostat', 'temperature') | float(72)) }}
+        room_temp: "{{ states('sensor.cats_room_temp_humidity_sensor_temperature') | float }}"
+        drift: "{{ room_temp - setpoint }}"
+        pct: >
+          {% if drift <= 0 %} 0
+          {% elif drift < 1 %} 25
+          {% elif drift < 2 %} 50
+          {% elif drift < 3 %} 75
+          {% else %} 100
+          {% endif %}
+    - choose:
+        - conditions: "{{ pct | int == 0 }}"
+          sequence:
+            - service: fan.turn_off
+              target:
+                entity_id: fan.cats_ceiling_fan_fan
+      default:
+        - service: fan.set_percentage
+          target:
+            entity_id: fan.cats_ceiling_fan_fan
+          data:
+            percentage: "{{ pct | int }}"
+  mode: single
+
+- id: cadets_barracks_fan_night_high
+  alias: "Cadet's Barracks: Fan — Night High"
+  trigger:
+    - platform: time
+      at: "21:00:00"
+  action:
+    - service: fan.set_percentage
+      target:
+        entity_id: fan.cats_ceiling_fan_fan
+      data:
+        percentage: 100
+  mode: single
