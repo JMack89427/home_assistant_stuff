@@ -41,6 +41,13 @@ lovelace:
       icon: mdi:printer-3d-nozzle
       show_in_sidebar: true
       require_admin: false
+    cadets-barracks:
+      mode: yaml
+      filename: ui-cadets-barracks.yaml
+      title: Cadet's Barracks
+      icon: mdi:ceiling-fan
+      show_in_sidebar: true
+      require_admin: false
 
 
 # ── HTTP ──────────────────────────────────────────────────────────────────────

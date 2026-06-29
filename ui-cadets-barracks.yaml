@@ -1,0 +1,94 @@
+title: Cadet's Barracks
+resources:
+  - url: /local/imperial-cards.js?v=38
+    type: module
+views:
+  - title: Cadet's Barracks
+    path: cadets-barracks
+    icon: mdi:ceiling-fan
+    panel: true
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:imperial-header
+            title: Cadet's Barracks
+            subtitle: Environmental control — Sector BB-4 — Hampton Bay unit active
+            icon: mdi:ceiling-fan
+
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: custom:imperial-button
+                name: Fan On — Low
+                icon: mdi:fan-speed-1
+                color: grey
+                service: fan.set_percentage
+                service_data:
+                  entity_id: fan.cats_ceiling_fan_fan
+                  percentage: 25
+              - type: custom:imperial-button
+                name: Fan Off
+                icon: mdi:fan-off
+                color: red
+                service: fan.turn_off
+                service_data:
+                  entity_id: fan.cats_ceiling_fan_fan
+
+          - type: grid
+            columns: 3
+            square: false
+            cards:
+              - type: custom:imperial-button
+                name: Medium
+                icon: mdi:fan-speed-2
+                color: amber
+                service: fan.set_percentage
+                service_data:
+                  entity_id: fan.cats_ceiling_fan_fan
+                  percentage: 50
+              - type: custom:imperial-button
+                name: Medium High
+                icon: mdi:fan-speed-3
+                color: amber
+                service: fan.set_percentage
+                service_data:
+                  entity_id: fan.cats_ceiling_fan_fan
+                  percentage: 75
+              - type: custom:imperial-button
+                name: High
+                icon: mdi:fan
+                color: green
+                service: fan.set_percentage
+                service_data:
+                  entity_id: fan.cats_ceiling_fan_fan
+                  percentage: 100
+
+          - type: horizontal-stack
+            cards:
+              - type: custom:imperial-panel
+                title: Atmospheric Conditions
+                entities:
+                  - entity: sensor.cats_room_temp_humidity_sensor_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.cats_room_temp_humidity_sensor_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+                    round: true
+                  - entity: sensor.cats_room_temp_humidity_sensor_battery
+                    name: Sensor Battery
+                    icon: mdi:battery
+
+              - type: custom:imperial-panel
+                title: Fan Status
+                entities:
+                  - entity: fan.cats_ceiling_fan_fan
+                    name: Fan
+                  - entity: light.cats_ceiling_fan_light
+                    name: Light
+                  - entity: sensor.cats_ceiling_fan_wifi_rssi
+                    name: Signal
+                    icon: mdi:wifi
