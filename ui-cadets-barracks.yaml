@@ -1,6 +1,6 @@
 title: Cadet's Barracks
 resources:
-  - url: /local/imperial-cards.js?v=38
+  - url: /local/imperial-cards.js?v=39
     type: module
 views:
   - title: Cadet's Barracks
@@ -28,6 +28,9 @@ views:
                 service_data:
                   entity_id: fan.cats_ceiling_fan_fan
                   percentage: 25
+                active_entity: fan.cats_ceiling_fan_fan
+                active_attribute: percentage
+                active_value: 25
               - type: custom:imperial-button
                 name: Fan Off
                 icon: mdi:fan-off
@@ -35,6 +38,8 @@ views:
                 service: fan.turn_off
                 service_data:
                   entity_id: fan.cats_ceiling_fan_fan
+                active_entity: fan.cats_ceiling_fan_fan
+                active_value: "off"
 
           - type: grid
             columns: 3
@@ -48,6 +53,9 @@ views:
                 service_data:
                   entity_id: fan.cats_ceiling_fan_fan
                   percentage: 50
+                active_entity: fan.cats_ceiling_fan_fan
+                active_attribute: percentage
+                active_value: 50
               - type: custom:imperial-button
                 name: Medium High
                 icon: mdi:fan-speed-3
@@ -56,6 +64,9 @@ views:
                 service_data:
                   entity_id: fan.cats_ceiling_fan_fan
                   percentage: 75
+                active_entity: fan.cats_ceiling_fan_fan
+                active_attribute: percentage
+                active_value: 75
               - type: custom:imperial-button
                 name: High
                 icon: mdi:fan
@@ -64,6 +75,9 @@ views:
                 service_data:
                   entity_id: fan.cats_ceiling_fan_fan
                   percentage: 100
+                active_entity: fan.cats_ceiling_fan_fan
+                active_attribute: percentage
+                active_value: 100
 
           - type: horizontal-stack
             cards:

@@ -371,9 +371,17 @@
     _r() {
       if (!this.shadowRoot || !this._c) return;
       const { name, icon: ic = 'mdi:power', color = 'grey',
-              service: sv, service_data: sd, entity } = this._c;
-      const so     = entity ? st(this._h, entity) : null;
-      const active = so && ['on','playing','active'].includes(so.state);
+              service: sv, service_data: sd, entity,
+              active_entity, active_attribute, active_value } = this._c;
+      const so = entity ? st(this._h, entity) : null;
+      let active;
+      if (active_entity !== undefined && active_value !== undefined) {
+        const ae = st(this._h, active_entity);
+        const cur = active_attribute ? ae?.attributes?.[active_attribute] : ae?.state;
+        active = ae && String(cur) === String(active_value);
+      } else {
+        active = so && ['on','playing','active'].includes(so.state);
+      }
       const pal    = {
         red:   ['#CC0000','rgba(204,0,0,.45)','rgba(204,0,0,.12)'],
         green: ['#00C853','rgba(0,200,83,.45)','rgba(0,200,83,.1)'],
