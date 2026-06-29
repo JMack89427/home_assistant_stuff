@@ -89,9 +89,9 @@ imperial_dark:
   label-badge-gray: "#3D3D3D"
 
   # ── Input Fields ────────────────────────────────────────────────────────────
-  input-fill-color: "rgba(255,255,255,0.04)"
-  input-ink-color: "var(--primary-text-color)"
-  input-label-ink-color: "var(--secondary-text-color)"
+  input-fill-color: "rgba(255,255,255,0.08)"
+  input-ink-color: "#1A1A1A"
+  input-label-ink-color: "#444444"
   input-idle-line-color: "rgba(200,200,200,0.20)"
   input-hover-line-color: "rgba(200,200,200,0.50)"
   input-disabled-line-color: "rgba(200,200,200,0.10)"
