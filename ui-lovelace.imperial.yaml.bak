@@ -1,20 +1,4 @@
-# ─────────────────────────────────────────────────────────────────────────────
-# ui-lovelace.yaml  —  Main household dashboard (8 views, plain naming)
-# ─────────────────────────────────────────────────────────────────────────────
-# Primary Lovelace dashboard with standard card types (entities, tile, clock,
-# picture-entity). Custom imperial-* cards replaced except imperial-alert-panel,
-# which has no standard-card equivalent for dynamic low-battery/offline entity
-# scanning. Dashboard uses plain household naming (e.g. Home, Cat's Room) for
-# all view titles and labels.
-#
-# NOTE: ui-manufacturing.yaml and ui-cadets-barracks.yaml still retain full
-# Imperial theming internally — planned for separate redesign pass.
-#
-# See ui-lovelace.imperial.yaml.bak for the pre-redesign version (Star Wars
-# theming, 10 views, custom imperial-* cards throughout).
-# ─────────────────────────────────────────────────────────────────────────────
-
-title: Home
+title: Imperial Command Center
 resources:
   - url: /local/imperial-cards.js?v=39
     type: module
@@ -25,67 +9,65 @@ resources:
 views:
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 1: HOME — DEFAULT LANDING VIEW
+  # VIEW 1: KIOSK — DEFAULT LANDING VIEW
   # ═══════════════════════════════════════════════════════════════════════════
-  - title: Home
+  - title: Kiosk
     path: kiosk
-    icon: mdi:home
+    icon: local:empire
     panel: true
     badges: []
     cards:
       - type: vertical-stack
         cards:
+          - type: custom:imperial-header
+            title: Imperial Command Center
+            icon: local:empire
+            lock: true
+
           - type: horizontal-stack
             cards:
               - type: vertical-stack
                 cards:
-                  - type: clock
-                    clock_size: large
-                    show_seconds: false
-                  - type: entities
+                  - type: custom:imperial-clock
+                    weather: weather.forecast_home_3
+                  - type: custom:imperial-panel
                     title: Atmospheric Conditions
                     entities:
                       - entity: weather.forecast_home_3
                         name: Conditions
                         icon: mdi:weather-cloudy
-                      - type: attribute
-                        entity: weather.forecast_home_3
+                      - entity: weather.forecast_home_3
                         name: Temperature
                         icon: mdi:thermometer
                         attribute: temperature
-                        suffix: "°F"
-                      - type: attribute
-                        entity: weather.forecast_home_3
+                        unit: "°F"
+                      - entity: weather.forecast_home_3
                         name: Humidity
                         icon: mdi:water-percent
                         attribute: humidity
-                        suffix: "%"
-                      - type: attribute
-                        entity: weather.forecast_home_3
+                        unit: "%"
+                      - entity: weather.forecast_home_3
                         name: Wind Speed
                         icon: mdi:weather-windy
                         attribute: wind_speed
-                      - type: attribute
-                        entity: weather.forecast_home_3
+                      - entity: weather.forecast_home_3
                         name: Pressure
                         icon: mdi:gauge
                         attribute: pressure
-                      - type: attribute
-                        entity: weather.forecast_home_3
+                      - entity: weather.forecast_home_3
                         name: UV Index
                         icon: mdi:sun-wireless
                         attribute: uv_index
-                      - type: attribute
-                        entity: weather.forecast_home_3
+                      - entity: weather.forecast_home_3
                         name: Cloud Cover
                         icon: mdi:cloud-percent
                         attribute: cloud_coverage
-                        suffix: "%"
+                        unit: "%"
 
               - type: vertical-stack
                 cards:
                   - type: custom:mealie-mealplan-card
-                    title: "Tonight's Dinner"
+                    title: "Tonight's Rations"
                     config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
                     day_offset: 0
                     show_image: true
@@ -96,17 +78,17 @@ views:
                     show_rating: false
                     show_servings: true
                     layout: horizontal
-                  - type: entities
-                    title: Outdoor Lights
+                  - type: custom:imperial-panel
+                    title: Perimeter Illumination Grid
                     entities:
                       - entity: light.garage_light
-                        name: Garage
+                        name: Hangar Alpha
                         icon: mdi:light-flood-down
                       - entity: light.front_light
-                        name: Front
+                        name: Forward Array
                         icon: mdi:outdoor-lamp
                       - entity: light.side_light
-                        name: Side
+                        name: Starboard Array
                         icon: mdi:wall-sconce-flat
                   - type: custom:imperial-alert-panel
                     title: System Alerts
@@ -122,114 +104,128 @@ views:
                 days_to_show: 7
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 2: CAMERAS
+  # VIEW 2: DETENTION BLOCK
   # ═══════════════════════════════════════════════════════════════════════════
-  - title: Cameras
+  - title: Detention Block
     path: detention
     panel: true
-    icon: mdi:cctv
+    icon: local:first-order
     badges: []
     cards:
       - type: vertical-stack
         cards:
+          - type: custom:imperial-header
+            title: Detention Block AA-23
+            subtitle: Surveillance grid active — no unauthorized movement tolerated
+            icon: local:first-order
+
           - type: horizontal-stack
             cards:
-              - type: picture-entity
+              - type: custom:imperial-camera
                 entity: camera.front_door_live_view
-                name: Front Door
+                title: Main Airlock
                 aspect_ratio: "3 / 4"
-              - type: picture-entity
+              - type: custom:imperial-camera
                 entity: camera.front_door_live_view_2
-                name: Doorbell
+                title: Central Command
                 aspect_ratio: "3 / 4"
 
           - type: horizontal-stack
             cards:
               - type: picture-glance
-                title: Front
+                title: Forward Sector
                 camera_image: camera.front_live_view
                 camera_view: auto
                 entities:
                   - entity: switch.front_motion_detection
                     icon: mdi:motion-sensor
               - type: picture-glance
-                title: Garage
+                title: Hangar Bay Alpha
                 camera_image: camera.garage_live_view
                 camera_view: auto
                 entities:
                   - entity: switch.garage_motion_detection
                     icon: mdi:motion-sensor
               - type: picture-glance
-                title: Side
+                title: Starboard Sector
                 camera_image: camera.side_live_view
                 camera_view: auto
                 entities:
                   - entity: switch.side_motion_detection
                     icon: mdi:motion-sensor
 
-          - type: entities
-            title: Motion Detection
+          - type: custom:imperial-panel
+            title: Perimeter Defense Systems
             entities:
               - entity: switch.front_door_motion_detection
-                name: Front Door Motion
+                name: Main Airlock Sensors
                 icon: mdi:shield-lock
               - entity: switch.front_motion_detection
-                name: Front Motion
+                name: Forward Sector Sensors
                 icon: mdi:shield-lock
               - entity: switch.garage_motion_detection
-                name: Garage Motion
+                name: Hangar Bay Sensors
                 icon: mdi:shield-lock
               - entity: switch.side_motion_detection
-                name: Side Motion
+                name: Starboard Sensors
                 icon: mdi:shield-lock
               - entity: sensor.front_door_battery_2
-                name: Doorbell Battery
+                name: Central Command Battery
                 icon: mdi:battery
               - entity: sensor.front_door_last_activity_2
-                name: Doorbell Last Activity
+                name: Central Command Last Activity
                 icon: mdi:clock-outline
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 3: MEDIA
+  # VIEW 3: SHIP COMMUNICATIONS
   # ═══════════════════════════════════════════════════════════════════════════
-  - title: Media
+  - title: Ship Comms
     path: communications
-    icon: mdi:speaker
+    icon: local:galactic-senate
     badges: []
     cards:
+      - type: custom:imperial-header
+        title: Ship Communications Array
+        subtitle: Holographic broadcast systems online
+        icon: local:galactic-senate
+
       - type: media-control
         entity: media_player.living_room
-        name: Living Room
+        name: Emperor's Throne Room
 
       - type: media-control
         entity: media_player.family_room
-        name: Family Room
+        name: Officers' Quarters
 
       - type: media-control
         entity: media_player.crafting_room
-        name: Crafting Room
+        name: Engineering Bay
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 4: CLIMATE — merges old Operations (thermostat) + Life Support (rooms)
+  # VIEW 4: IMPERIAL OPERATIONS
   # ═══════════════════════════════════════════════════════════════════════════
-  - title: Climate
+  - title: Operations
     path: operations
-    icon: mdi:thermostat
+    icon: local:sith
     panel: true
     badges: []
     cards:
       - type: vertical-stack
         cards:
+          - type: custom:imperial-header
+            title: Forward Command Post — Climate Control
+            subtitle: Atmospheric temperature regulation — Forward sector
+            icon: mdi:thermostat
+
           - type: horizontal-stack
             cards:
-              - type: entities
-                title: Climate Status — Front Room
+              - type: custom:imperial-panel
+                title: Climate Status
                 entities:
                   - entity: climate.t6_pro_z_wave_programmable_thermostat
                     name: System Mode
                     icon: mdi:thermostat
-                  - type: attribute
-                    entity: climate.t6_pro_z_wave_programmable_thermostat
+                  - entity: climate.t6_pro_z_wave_programmable_thermostat
                     name: System Action
                     icon: mdi:lightning-bolt
                     attribute: hvac_action
@@ -239,8 +235,8 @@ views:
                   - entity: sensor.t6_pro_z_wave_programmable_thermostat_humidity
                     name: Current Humidity
                     icon: mdi:water-percent
-                  - type: attribute
-                    entity: climate.t6_pro_z_wave_programmable_thermostat
+                    round: true
+                  - entity: climate.t6_pro_z_wave_programmable_thermostat
                     name: Fan Mode
                     icon: mdi:fan
                     attribute: fan_mode
@@ -261,273 +257,83 @@ views:
                     columns: 2
                     square: false
                     cards:
-                      - type: tile
-                        entity: climate.t6_pro_z_wave_programmable_thermostat
+                      - type: custom:imperial-button
                         name: "Off"
                         icon: mdi:power-off
-                        tap_action:
-                          action: call-service
-                          service: climate.set_hvac_mode
-                          service_data:
-                            entity_id: climate.t6_pro_z_wave_programmable_thermostat
-                            hvac_mode: "off"
-                      - type: tile
-                        entity: climate.t6_pro_z_wave_programmable_thermostat
+                        service: climate.set_hvac_mode
+                        service_data:
+                          entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                          hvac_mode: "off"
+                        color: red
+                      - type: custom:imperial-button
                         name: Heat
                         icon: mdi:fire
-                        tap_action:
-                          action: call-service
-                          service: climate.set_hvac_mode
-                          service_data:
-                            entity_id: climate.t6_pro_z_wave_programmable_thermostat
-                            hvac_mode: heat
-                      - type: tile
-                        entity: climate.t6_pro_z_wave_programmable_thermostat
+                        service: climate.set_hvac_mode
+                        service_data:
+                          entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                          hvac_mode: heat
+                        color: red
+                      - type: custom:imperial-button
                         name: Cool
                         icon: mdi:snowflake
-                        tap_action:
-                          action: call-service
-                          service: climate.set_hvac_mode
-                          service_data:
-                            entity_id: climate.t6_pro_z_wave_programmable_thermostat
-                            hvac_mode: cool
-                      - type: tile
-                        entity: climate.t6_pro_z_wave_programmable_thermostat
+                        service: climate.set_hvac_mode
+                        service_data:
+                          entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                          hvac_mode: cool
+                        color: amber
+                      - type: custom:imperial-button
                         name: Heat + Cool
                         icon: mdi:thermostat-auto
-                        tap_action:
-                          action: call-service
-                          service: climate.set_hvac_mode
-                          service_data:
-                            entity_id: climate.t6_pro_z_wave_programmable_thermostat
-                            hvac_mode: heat_cool
+                        service: climate.set_hvac_mode
+                        service_data:
+                          entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                          hvac_mode: heat_cool
+                        color: amber
 
                   - type: grid
                     columns: 3
                     square: false
                     cards:
-                      - type: tile
-                        entity: climate.t6_pro_z_wave_programmable_thermostat
+                      - type: custom:imperial-button
                         name: Fan Auto
                         icon: mdi:fan-auto
-                        tap_action:
-                          action: call-service
-                          service: climate.set_fan_mode
-                          service_data:
-                            entity_id: climate.t6_pro_z_wave_programmable_thermostat
-                            fan_mode: "Auto low"
-                      - type: tile
-                        entity: climate.t6_pro_z_wave_programmable_thermostat
+                        service: climate.set_fan_mode
+                        service_data:
+                          entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                          fan_mode: "Auto low"
+                        color: amber
+                      - type: custom:imperial-button
                         name: Fan Low
                         icon: mdi:fan-speed-1
-                        tap_action:
-                          action: call-service
-                          service: climate.set_fan_mode
-                          service_data:
-                            entity_id: climate.t6_pro_z_wave_programmable_thermostat
-                            fan_mode: Low
-                      - type: tile
-                        entity: climate.t6_pro_z_wave_programmable_thermostat
+                        service: climate.set_fan_mode
+                        service_data:
+                          entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                          fan_mode: Low
+                        color: amber
+                      - type: custom:imperial-button
                         name: Fan Circ
                         icon: mdi:fan-chevron-up
-                        tap_action:
-                          action: call-service
-                          service: climate.set_fan_mode
-                          service_data:
-                            entity_id: climate.t6_pro_z_wave_programmable_thermostat
-                            fan_mode: Circulation
-
-          - type: horizontal-stack
-            cards:
-              - type: entities
-                title: Master Bedroom
-                entities:
-                  - entity: sensor.master_bedroom_primary_suite_temp_humidity_temperature
-                    name: Temperature
-                    icon: mdi:thermometer
-                  - entity: sensor.master_bedroom_primary_suite_temp_humidity_humidity
-                    name: Humidity
-                    icon: mdi:water-percent
-
-              - type: entities
-                title: Basement Office
-                entities:
-                  - entity: sensor.timmerflotte_temp_hmd_sensor_temperature
-                    name: Temperature
-                    icon: mdi:thermometer
-                  - entity: sensor.timmerflotte_temp_hmd_sensor_humidity
-                    name: Humidity
-                    icon: mdi:water-percent
-
-              - type: entities
-                title: Garage Freezer
-                entities:
-                  # NOTE: device not plugged in yet per user — state may show unavailable
-                  - entity: sensor.temperature_and_humidity_sensor_air_temperature
-                    name: Temperature
-                    icon: mdi:thermometer
-                  - entity: sensor.temperature_and_humidity_sensor_humidity
-                    name: Humidity
-                    icon: mdi:water-percent
-
-              - type: entities
-                title: Front Room
-                entities:
-                  - entity: sensor.t6_pro_z_wave_programmable_thermostat_air_temperature
-                    name: Temperature
-                    icon: mdi:thermometer
-                  - entity: sensor.t6_pro_z_wave_programmable_thermostat_humidity
-                    name: Humidity
-                    icon: mdi:water-percent
-
-          - type: horizontal-stack
-            cards:
-              - type: entities
-                title: Office
-                entities:
-                  - entity: sensor.ewelink_snzb_02p_temperature
-                    name: Temperature
-                    icon: mdi:thermometer
-                  - entity: sensor.ewelink_snzb_02p_humidity
-                    name: Humidity
-                    icon: mdi:water-percent
-
-              - type: entities
-                title: Cat's Room
-                entities:
-                  - entity: sensor.cats_room_temp_humidity_sensor_temperature
-                    name: Temperature
-                    icon: mdi:thermometer
-                  - entity: sensor.cats_room_temp_humidity_sensor_humidity
-                    name: Humidity
-                    icon: mdi:water-percent
-
-              - type: entities
-                title: Spare Bedroom
-                entities:
-                  - entity: sensor.spare_bedroom_temp_humidity_sensor_temperature
-                    name: Temperature
-                    icon: mdi:thermometer
-                  - entity: sensor.spare_bedroom_temp_humidity_sensor_humidity
-                    name: Humidity
-                    icon: mdi:water-percent
-
-              - type: entities
-                title: Maker Space
-                entities:
-                  - entity: sensor.timmerflotte_temp_hmd_sensor_temperature_2
-                    name: Temperature
-                    icon: mdi:thermometer
-                  - entity: sensor.timmerflotte_temp_hmd_sensor_humidity_2
-                    name: Humidity
-                    icon: mdi:water-percent
-
-          - type: horizontal-stack
-            cards:
-              - type: entities
-                title: House Average
-                entities:
-                  - entity: sensor.house_average_temperature
-                    name: Avg Temperature
-                    icon: mdi:thermometer
-                  - entity: sensor.house_average_humidity
-                    name: Avg Humidity
-                    icon: mdi:water-percent
-
-          - type: markdown
-            content: "## Dehumidifier"
-
-          - type: horizontal-stack
-            cards:
-              - type: entities
-                title: Dehumidifier
-                entities:
-                  - entity: humidifier.150633095484711_humidifier
-                    name: System Power
-                    icon: mdi:power
-                  - type: attribute
-                    entity: humidifier.150633095484711_humidifier
-                    name: Current Humidity
-                    icon: mdi:water-percent
-                    attribute: current_humidity
-                    suffix: "%"
-                  - type: attribute
-                    entity: humidifier.150633095484711_humidifier
-                    name: Target Humidity
-                    icon: mdi:target
-                    attribute: humidity
-                    suffix: "%"
-                  - type: attribute
-                    entity: humidifier.150633095484711_humidifier
-                    name: Active Mode
-                    icon: mdi:cog
-                    attribute: mode
-
-              - type: grid
-                columns: 3
-                square: false
-                cards:
-                  - type: tile
-                    entity: humidifier.150633095484711_humidifier
-                    name: Manual
-                    icon: mdi:hand-back-right
-                    tap_action:
-                      action: call-service
-                      service: humidifier.set_mode
-                      service_data:
-                        entity_id: humidifier.150633095484711_humidifier
-                        mode: Manual
-                  - type: tile
-                    entity: humidifier.150633095484711_humidifier
-                    name: Auto
-                    icon: mdi:auto-fix
-                    tap_action:
-                      action: call-service
-                      service: humidifier.set_mode
-                      service_data:
-                        entity_id: humidifier.150633095484711_humidifier
-                        mode: Auto
-                  - type: tile
-                    entity: humidifier.150633095484711_humidifier
-                    name: Continuous
-                    icon: mdi:infinity
-                    tap_action:
-                      action: call-service
-                      service: humidifier.set_mode
-                      service_data:
-                        entity_id: humidifier.150633095484711_humidifier
-                        mode: Continuous
-                  - type: tile
-                    entity: humidifier.150633095484711_humidifier
-                    name: Clothes-Dry
-                    icon: mdi:tshirt-crew
-                    tap_action:
-                      action: call-service
-                      service: humidifier.set_mode
-                      service_data:
-                        entity_id: humidifier.150633095484711_humidifier
-                        mode: Clothes-Dry
-                  - type: tile
-                    entity: humidifier.150633095484711_humidifier
-                    name: Shoes-Dry
-                    icon: mdi:shoe-sneaker
-                    tap_action:
-                      action: call-service
-                      service: humidifier.set_mode
-                      service_data:
-                        entity_id: humidifier.150633095484711_humidifier
-                        mode: Shoes-Dry
+                        service: climate.set_fan_mode
+                        service_data:
+                          entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                          fan_mode: Circulation
+                        color: amber
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 5: MEALS
+  # VIEW 5: IMPERIAL GALLEY
   # ═══════════════════════════════════════════════════════════════════════════
-  - title: Meals
+  - title: Imperial Galley
     path: galley
     icon: mdi:silverware-fork-knife
     badges: []
     cards:
+      - type: custom:imperial-header
+        title: Imperial Galley
+        subtitle: Ration distribution and supply requisitions — all personnel report
+        icon: mdi:silverware-fork-knife
+
       - type: custom:mealie-mealplan-card
-        title: "Today"
+        title: "Today's Rations"
         config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
         day_offset: 0
         show_image: true
@@ -622,9 +428,212 @@ views:
             layout: vertical
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 6: VACUUMS
+  # VIEW 6: IMPERIAL LIFE SUPPORT
   # ═══════════════════════════════════════════════════════════════════════════
-  - title: Vacuums
+  - title: Life Support
+    path: life-support
+    icon: mdi:air-filter
+    panel: true
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:imperial-header
+            title: Imperial Life Support Systems
+            subtitle: Atmospheric monitoring across all sectors — crew safety nominal
+            icon: mdi:air-filter
+
+          - type: horizontal-stack
+            cards:
+              - type: custom:imperial-panel
+                title: Admiral's Quarters
+                entities:
+                  - entity: sensor.master_bedroom_primary_suite_temp_humidity_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.master_bedroom_primary_suite_temp_humidity_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+                    round: true
+
+              - type: custom:imperial-panel
+                title: Lower Deck
+                entities:
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+                    round: true
+
+              - type: custom:imperial-panel
+                title: Carbonite Vault
+                entities:
+                  - entity: sensor.temperature_and_humidity_sensor_air_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.temperature_and_humidity_sensor_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+                    round: true
+
+              - type: custom:imperial-panel
+                title: Forward Command Post
+                entities:
+                  - entity: sensor.t6_pro_z_wave_programmable_thermostat_air_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.t6_pro_z_wave_programmable_thermostat_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+                    round: true
+
+          - type: horizontal-stack
+            cards:
+              - type: custom:imperial-panel
+                title: Tactical Operations
+                entities:
+                  - entity: sensor.ewelink_snzb_02p_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.ewelink_snzb_02p_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+                    round: true
+
+              - type: custom:imperial-panel
+                title: Cadet's Quarters
+                entities:
+                  - entity: sensor.cats_room_temp_humidity_sensor_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.cats_room_temp_humidity_sensor_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+                    round: true
+
+              - type: custom:imperial-panel
+                title: Reserve Barracks
+                entities:
+                  - entity: sensor.spare_bedroom_temp_humidity_sensor_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.spare_bedroom_temp_humidity_sensor_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+                    round: true
+
+              - type: custom:imperial-panel
+                title: Fabrication Bay
+                entities:
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_temperature_2
+                    name: Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_humidity_2
+                    name: Humidity
+                    icon: mdi:water-percent
+                    round: true
+
+          - type: horizontal-stack
+            cards:
+              - type: custom:imperial-panel
+                title: Fleet Average
+                entities:
+                  - entity: sensor.house_average_temperature
+                    name: Avg Temperature
+                    icon: mdi:thermometer
+                    round: true
+                  - entity: sensor.house_average_humidity
+                    name: Avg Humidity
+                    icon: mdi:water-percent
+                    round: true
+
+          - type: custom:imperial-header
+            title: Atmospheric Moisture Control
+            subtitle: Moisture extraction systems — maintaining optimal cabin humidity
+            icon: mdi:water-percent
+
+          - type: horizontal-stack
+            cards:
+              - type: custom:imperial-panel
+                title: Moisture Extractor MX-50
+                entities:
+                  - entity: humidifier.150633095484711_humidifier
+                    name: System Power
+                    icon: mdi:power
+                  - entity: humidifier.150633095484711_humidifier
+                    name: Current Humidity
+                    icon: mdi:water-percent
+                    attribute: current_humidity
+                    unit: "%"
+                  - entity: humidifier.150633095484711_humidifier
+                    name: Target Humidity
+                    icon: mdi:target
+                    attribute: humidity
+                    unit: "%"
+                  - entity: humidifier.150633095484711_humidifier
+                    name: Active Mode
+                    icon: mdi:cog
+                    attribute: mode
+
+              - type: grid
+                columns: 3
+                square: false
+                cards:
+                  - type: custom:imperial-button
+                    name: Manual
+                    icon: mdi:hand-back-right
+                    service: humidifier.set_mode
+                    service_data:
+                      entity_id: humidifier.150633095484711_humidifier
+                      mode: Manual
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Auto
+                    icon: mdi:auto-fix
+                    service: humidifier.set_mode
+                    service_data:
+                      entity_id: humidifier.150633095484711_humidifier
+                      mode: Auto
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Continuous
+                    icon: mdi:infinity
+                    service: humidifier.set_mode
+                    service_data:
+                      entity_id: humidifier.150633095484711_humidifier
+                      mode: Continuous
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Clothes-Dry
+                    icon: mdi:tshirt-crew
+                    service: humidifier.set_mode
+                    service_data:
+                      entity_id: humidifier.150633095484711_humidifier
+                      mode: Clothes-Dry
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Shoes-Dry
+                    icon: mdi:shoe-sneaker
+                    service: humidifier.set_mode
+                    service_data:
+                      entity_id: humidifier.150633095484711_humidifier
+                      mode: Shoes-Dry
+                    color: amber
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # VIEW 7: MSE-6 DROID BAY
+  # ═══════════════════════════════════════════════════════════════════════════
+  - title: Droid Bay
     path: droid-bay
     icon: mdi:robot-vacuum
     panel: true
@@ -632,65 +641,64 @@ views:
     cards:
       - type: vertical-stack
         cards:
-          - type: markdown
-            content: "## Roborock Qrevo Curv"
+          - type: custom:imperial-header
+            title: MSE-6 Droid Bay
+            subtitle: Unit MSE-6-G735Y — autonomous sanitation droid — sector patrol active
+            icon: mdi:robot-vacuum
+
+          - type: custom:imperial-header
+            title: Unit Alpha — Qrevo Curv Series
+            subtitle: Primary sector patrol droid
+            icon: mdi:robot-vacuum
 
           - type: grid
             columns: 4
             square: false
             cards:
-              - type: tile
-                entity: vacuum.roborock_qrevo_curv_series
-                name: Start
+              - type: custom:imperial-button
+                name: Deploy
                 icon: mdi:play
-                tap_action:
-                  action: call-service
-                  service: vacuum.start
-                  service_data:
-                    entity_id: vacuum.roborock_qrevo_curv_series
-              - type: tile
-                entity: vacuum.roborock_qrevo_curv_series
-                name: Pause
+                service: vacuum.start
+                service_data:
+                  entity_id: vacuum.roborock_qrevo_curv_series
+                color: green
+              - type: custom:imperial-button
+                name: Halt
                 icon: mdi:pause
-                tap_action:
-                  action: call-service
-                  service: vacuum.pause
-                  service_data:
-                    entity_id: vacuum.roborock_qrevo_curv_series
-              - type: tile
-                entity: vacuum.roborock_qrevo_curv_series
-                name: Stop
+                service: vacuum.pause
+                service_data:
+                  entity_id: vacuum.roborock_qrevo_curv_series
+                color: amber
+              - type: custom:imperial-button
+                name: Stand Down
                 icon: mdi:stop
-                tap_action:
-                  action: call-service
-                  service: vacuum.stop
-                  service_data:
-                    entity_id: vacuum.roborock_qrevo_curv_series
-              - type: tile
-                entity: vacuum.roborock_qrevo_curv_series
+                service: vacuum.stop
+                service_data:
+                  entity_id: vacuum.roborock_qrevo_curv_series
+                color: red
+              - type: custom:imperial-button
                 name: Return to Base
                 icon: mdi:home-import-outline
-                tap_action:
-                  action: call-service
-                  service: vacuum.return_to_base
-                  service_data:
-                    entity_id: vacuum.roborock_qrevo_curv_series
+                service: vacuum.return_to_base
+                service_data:
+                  entity_id: vacuum.roborock_qrevo_curv_series
+                color: amber
 
           - type: horizontal-stack
             cards:
               - type: vertical-stack
                 cards:
-                  - type: entities
-                    title: Status
+                  - type: custom:imperial-panel
+                    title: Droid Status
                     entities:
                       - entity: sensor.roborock_qrevo_curv_series_status
                         name: Status
                         icon: mdi:information-outline
                       - entity: sensor.roborock_qrevo_curv_series_battery
-                        name: Battery
+                        name: Power Cell
                         icon: mdi:battery
                       - entity: sensor.roborock_qrevo_curv_series_current_room
-                        name: Current Room
+                        name: Current Sector
                         icon: mdi:map-marker
                       - entity: binary_sensor.roborock_qrevo_curv_series_cleaning
                         name: Cleaning
@@ -699,8 +707,8 @@ views:
                         name: Charging
                         icon: mdi:lightning-bolt
 
-                  - type: entities
-                    title: Active Cleaning
+                  - type: custom:imperial-panel
+                    title: Active Mission
                     entities:
                       - entity: sensor.roborock_qrevo_curv_series_cleaning_area
                         name: Area Covered
@@ -709,25 +717,25 @@ views:
                         name: Progress
                         icon: mdi:progress-check
                       - entity: sensor.roborock_qrevo_curv_series_cleaning_time
-                        name: Cleaning Time
+                        name: Mission Time
                         icon: mdi:timer
                       - entity: sensor.roborock_qrevo_curv_series_last_clean_begin
-                        name: Last Started
+                        name: Last Deployed
                         icon: mdi:clock-start
                       - entity: sensor.roborock_qrevo_curv_series_last_clean_end
-                        name: Last Finished
+                        name: Last Recalled
                         icon: mdi:clock-end
 
               - type: vertical-stack
                 cards:
-                  - type: entities
-                    title: Dock
+                  - type: custom:imperial-panel
+                    title: Dock Systems
                     entities:
                       - entity: binary_sensor.roborock_qrevo_curv_series_dock_clean_water_box
                         name: Clean Water Supply
                         icon: mdi:water
                       - entity: binary_sensor.roborock_qrevo_curv_series_dock_dirty_water_box
-                        name: Waste Container
+                        name: Waste Containment
                         icon: mdi:water-off
                       - entity: binary_sensor.roborock_qrevo_curv_series_water_shortage
                         name: Water Shortage
@@ -742,8 +750,8 @@ views:
                         name: Drying Time Left
                         icon: mdi:timer-sand
 
-                  - type: entities
-                    title: Maintenance
+                  - type: custom:imperial-panel
+                    title: Maintenance Schedule
                     entities:
                       - entity: sensor.roborock_qrevo_curv_series_main_brush_time_left
                         name: Main Brush
@@ -765,82 +773,76 @@ views:
                 cards:
                   - type: picture-entity
                     entity: image.roborock_qrevo_curv_series_map_0
-                    name: Map
+                    name: Sector Map
                     show_name: false
                     show_state: false
 
-                  - type: entities
-                    title: Lifetime Stats
+                  - type: custom:imperial-panel
+                    title: Fleet Statistics
                     entities:
                       - entity: sensor.roborock_qrevo_curv_series_total_cleaning_area
                         name: Total Area
                         icon: mdi:texture-box
                       - entity: sensor.roborock_qrevo_curv_series_total_cleaning_time
-                        name: Total Time
+                        name: Total Duty Time
                         icon: mdi:timer
                       - entity: sensor.roborock_qrevo_curv_series_total_cleaning_count
-                        name: Total Cleans
+                        name: Missions Complete
                         icon: mdi:counter
 
-          - type: markdown
-            content: "## Roborock QR 798"
+          - type: custom:imperial-header
+            title: Unit Beta — QR 798
+            subtitle: Secondary sector patrol droid
+            icon: mdi:robot-vacuum
 
           - type: grid
             columns: 4
             square: false
             cards:
-              - type: tile
-                entity: vacuum.roborock_qr_798
-                name: Start
+              - type: custom:imperial-button
+                name: Deploy
                 icon: mdi:play
-                tap_action:
-                  action: call-service
-                  service: vacuum.start
-                  service_data:
-                    entity_id: vacuum.roborock_qr_798
-              - type: tile
-                entity: vacuum.roborock_qr_798
-                name: Pause
+                service: vacuum.start
+                service_data:
+                  entity_id: vacuum.roborock_qr_798
+                color: green
+              - type: custom:imperial-button
+                name: Halt
                 icon: mdi:pause
-                tap_action:
-                  action: call-service
-                  service: vacuum.pause
-                  service_data:
-                    entity_id: vacuum.roborock_qr_798
-              - type: tile
-                entity: vacuum.roborock_qr_798
-                name: Stop
+                service: vacuum.pause
+                service_data:
+                  entity_id: vacuum.roborock_qr_798
+                color: amber
+              - type: custom:imperial-button
+                name: Stand Down
                 icon: mdi:stop
-                tap_action:
-                  action: call-service
-                  service: vacuum.stop
-                  service_data:
-                    entity_id: vacuum.roborock_qr_798
-              - type: tile
-                entity: vacuum.roborock_qr_798
+                service: vacuum.stop
+                service_data:
+                  entity_id: vacuum.roborock_qr_798
+                color: red
+              - type: custom:imperial-button
                 name: Return to Base
                 icon: mdi:home-import-outline
-                tap_action:
-                  action: call-service
-                  service: vacuum.return_to_base
-                  service_data:
-                    entity_id: vacuum.roborock_qr_798
+                service: vacuum.return_to_base
+                service_data:
+                  entity_id: vacuum.roborock_qr_798
+                color: amber
 
           - type: horizontal-stack
             cards:
               - type: vertical-stack
                 cards:
-                  - type: entities
-                    title: Status
+                  - type: custom:imperial-panel
+                    title: Droid Status
                     entities:
                       - entity: sensor.roborock_qr_798_status
                         name: Status
                         icon: mdi:information-outline
                       - entity: sensor.roborock_qr_798_battery
-                        name: Battery
+                        name: Power Cell
                         icon: mdi:battery
                       - entity: sensor.roborock_qr_798_current_room
-                        name: Current Room
+                        name: Current Sector
                         icon: mdi:map-marker
                       - entity: binary_sensor.roborock_qr_798_cleaning
                         name: Cleaning
@@ -849,8 +851,8 @@ views:
                         name: Charging
                         icon: mdi:lightning-bolt
 
-                  - type: entities
-                    title: Active Cleaning
+                  - type: custom:imperial-panel
+                    title: Active Mission
                     entities:
                       - entity: sensor.roborock_qr_798_cleaning_area
                         name: Area Covered
@@ -859,19 +861,19 @@ views:
                         name: Progress
                         icon: mdi:progress-check
                       - entity: sensor.roborock_qr_798_cleaning_time
-                        name: Cleaning Time
+                        name: Mission Time
                         icon: mdi:timer
 
               - type: vertical-stack
                 cards:
-                  - type: entities
-                    title: Dock
+                  - type: custom:imperial-panel
+                    title: Dock Systems
                     entities:
                       - entity: binary_sensor.roborock_qr_798_dock_clean_water_box
                         name: Clean Water Supply
                         icon: mdi:water
                       - entity: binary_sensor.roborock_qr_798_dock_dirty_water_box
-                        name: Waste Container
+                        name: Waste Containment
                         icon: mdi:water-off
                       - entity: binary_sensor.roborock_qr_798_water_shortage
                         name: Water Shortage
@@ -886,8 +888,8 @@ views:
                         name: Drying Time Left
                         icon: mdi:timer-sand
 
-                  - type: entities
-                    title: Maintenance
+                  - type: custom:imperial-panel
+                    title: Maintenance Schedule
                     entities:
                       - entity: sensor.roborock_qr_798_main_brush_time_left
                         name: Main Brush
@@ -909,27 +911,28 @@ views:
                 cards:
                   - type: picture-entity
                     entity: image.roborock_qr_798_map_0
-                    name: Map
+                    name: Sector Map
                     show_name: false
                     show_state: false
 
-                  - type: entities
-                    title: Lifetime Stats
+                  - type: custom:imperial-panel
+                    title: Fleet Statistics
                     entities:
                       - entity: sensor.roborock_qr_798_total_cleaning_area
                         name: Total Area
                         icon: mdi:texture-box
                       - entity: sensor.roborock_qr_798_total_cleaning_time
-                        name: Total Time
+                        name: Total Duty Time
                         icon: mdi:timer
                       - entity: sensor.roborock_qr_798_total_cleaning_count
-                        name: Total Cleans
+                        name: Missions Complete
                         icon: mdi:counter
 
+
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 7: LAWN & POOL — merges lawn mower controls + pool robot controls
+  # TERRAIN OPERATIONS — Exterior grounds control (Chopper / LUBA VA624UNR)
   # ═══════════════════════════════════════════════════════════════════════════
-  - title: Lawn & Pool
+  - title: Terrain Operations
     path: terrain-ops
     icon: mdi:robot-mower
     panel: true
@@ -937,77 +940,69 @@ views:
     cards:
       - type: vertical-stack
         cards:
-          - type: markdown
-            content: "## Garden — LUBA VA624UNR"
+          - type: custom:imperial-header
+            title: Terrain Operations Command
+            subtitle: Unit Chopper — LUBA VA624UNR — surface patrol active
+            icon: mdi:robot-mower
 
           - type: grid
             columns: 5
             square: false
             cards:
-              - type: tile
-                entity: lawn_mower.garden_luba_va624unr
-                name: Start
+              - type: custom:imperial-button
+                name: Deploy
                 icon: mdi:play
-                tap_action:
-                  action: call-service
-                  service: lawn_mower.start_mowing
-                  service_data:
-                    entity_id: lawn_mower.garden_luba_va624unr
-              - type: tile
-                entity: lawn_mower.garden_luba_va624unr
+                service: lawn_mower.start_mowing
+                service_data:
+                  entity_id: lawn_mower.garden_luba_va624unr
+                color: green
+              - type: custom:imperial-button
                 name: Pause
                 icon: mdi:pause
-                tap_action:
-                  action: call-service
-                  service: lawn_mower.pause
-                  service_data:
-                    entity_id: lawn_mower.garden_luba_va624unr
-              - type: tile
-                entity: lawn_mower.garden_luba_va624unr
+                service: lawn_mower.pause
+                service_data:
+                  entity_id: lawn_mower.garden_luba_va624unr
+                color: amber
+              - type: custom:imperial-button
                 name: Return to Base
                 icon: mdi:home-import-outline
-                tap_action:
-                  action: call-service
-                  service: lawn_mower.dock
-                  service_data:
-                    entity_id: lawn_mower.garden_luba_va624unr
-              - type: tile
-                entity: button.garden_luba_va624unr_cancel_current_task
+                service: lawn_mower.dock
+                service_data:
+                  entity_id: lawn_mower.garden_luba_va624unr
+                color: amber
+              - type: custom:imperial-button
                 name: Cancel Task
                 icon: mdi:cancel
-                tap_action:
-                  action: call-service
-                  service: button.press
-                  service_data:
-                    entity_id: button.garden_luba_va624unr_cancel_current_task
-              - type: tile
-                entity: button.garden_luba_va624unr_restart_mower
+                service: button.press
+                service_data:
+                  entity_id: button.garden_luba_va624unr_cancel_current_task
+                color: red
+              - type: custom:imperial-button
                 name: Restart
                 icon: mdi:restart
-                tap_action:
-                  action: call-service
-                  service: button.press
-                  service_data:
-                    entity_id: button.garden_luba_va624unr_restart_mower
+                service: button.press
+                service_data:
+                  entity_id: button.garden_luba_va624unr_restart_mower
+                color: red
 
           - type: horizontal-stack
             cards:
               - type: vertical-stack
                 cards:
-                  - type: entities
-                    title: Status
+                  - type: custom:imperial-panel
+                    title: Unit Status
                     entities:
                       - entity: lawn_mower.garden_luba_va624unr
                         name: State
                         icon: mdi:robot-mower
                       - entity: sensor.garden_luba_va624unr_battery
-                        name: Battery
+                        name: Power Cell
                         icon: mdi:battery
                       - entity: sensor.garden_luba_va624unr_activity_mode
                         name: Activity
                         icon: mdi:information-outline
                       - entity: sensor.garden_luba_va624unr_connection
-                        name: Connection
+                        name: Uplink
                         icon: mdi:wifi
                       - entity: binary_sensor.garden_luba_va624unr_charging
                         name: Charging
@@ -1019,8 +1014,8 @@ views:
                         name: Satellites
                         icon: mdi:satellite-variant
 
-                  - type: entities
-                    title: Active Mowing
+                  - type: custom:imperial-panel
+                    title: Active Mission
                     entities:
                       - entity: sensor.garden_luba_va624unr_progress
                         name: Progress
@@ -1040,46 +1035,42 @@ views:
 
               - type: vertical-stack
                 cards:
-                  - type: entities
-                    title: Zones
+                  - type: custom:imperial-panel
+                    title: Terrain Zones
                     entities:
                       - entity: switch.garden_luba_va624unr_area_area_1
-                        name: Zone 1
+                        name: Zone Alpha
                         icon: mdi:map-marker-outline
                       - entity: switch.garden_luba_va624unr_area_area_2
-                        name: Zone 2
+                        name: Zone Bravo
                         icon: mdi:map-marker-outline
                       - entity: switch.garden_luba_va624unr_area_area_3
-                        name: Zone 3
+                        name: Zone Charlie
                         icon: mdi:map-marker-outline
                       - entity: switch.garden_luba_va624unr_area_area_4
-                        name: Zone 4
+                        name: Zone Delta
                         icon: mdi:map-marker-outline
 
                   - type: grid
                     columns: 2
                     square: false
                     cards:
-                      - type: tile
-                        entity: button.garden_luba_va624unr_task_1
-                        name: Task 1
+                      - type: custom:imperial-button
+                        name: Task Alpha
                         icon: mdi:play-circle-outline
-                        tap_action:
-                          action: call-service
-                          service: button.press
-                          service_data:
-                            entity_id: button.garden_luba_va624unr_task_1
-                      - type: tile
-                        entity: button.garden_luba_va624unr_task_2
-                        name: Task 2
+                        service: button.press
+                        service_data:
+                          entity_id: button.garden_luba_va624unr_task_1
+                        color: green
+                      - type: custom:imperial-button
+                        name: Task Bravo
                         icon: mdi:play-circle-outline
-                        tap_action:
-                          action: call-service
-                          service: button.press
-                          service_data:
-                            entity_id: button.garden_luba_va624unr_task_2
+                        service: button.press
+                        service_data:
+                          entity_id: button.garden_luba_va624unr_task_2
+                        color: green
 
-                  - type: entities
+                  - type: custom:imperial-panel
                     title: Field Settings
                     entities:
                       - entity: switch.garden_luba_va624unr_rain_detection_mower_on_off
@@ -1106,12 +1097,12 @@ views:
                   - type: map
                     entities:
                       - entity: device_tracker.garden_luba_va624unr_luba_va624unr
-                        label: Garden Mower
+                        label: Chopper
                     hours_to_show: 1
                     default_zoom: 18
                     aspect_ratio: "16:9"
 
-                  - type: entities
+                  - type: custom:imperial-panel
                     title: Maintenance
                     entities:
                       - entity: sensor.garden_luba_va624unr_blade_used_time
@@ -1130,41 +1121,49 @@ views:
                         name: Battery Cycles
                         icon: mdi:battery-sync
 
-          # ── Pool — Mammotion Spino E1 ──────────────────────────────────────
-          # Entity prefix: pool_spino_e13d6btg_  |  vacuum: vacuum.pool_spino_e13d6btg
-          - type: markdown
-            content: "## Pool — Spino E1"
+  # ═══════════════════════════════════════════════════════════════════════════
+  # KAMINO STATION — Pool operations (Mammotion Spino E1 / R2-D2)
+  # Entity prefix: pool_spino_e13d6btg_  |  vacuum: vacuum.pool_spino_e13d6btg
+  # ═══════════════════════════════════════════════════════════════════════════
+  - title: Kamino Station
+    path: kamino
+    icon: mdi:pool
+    panel: true
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:imperial-header
+            title: Kamino Station
+            subtitle: Unit R2-D2 — Spino E1 — aquatic sanitation protocol active
+            icon: mdi:pool
 
           - type: grid
             columns: 2
             square: false
             cards:
-              - type: tile
-                entity: vacuum.pool_spino_e13d6btg
-                name: Start
+              - type: custom:imperial-button
+                name: Deploy
                 icon: mdi:play
-                tap_action:
-                  action: call-service
-                  service: vacuum.start
-                  service_data:
-                    entity_id: vacuum.pool_spino_e13d6btg
-              - type: tile
-                entity: vacuum.pool_spino_e13d6btg
+                color: green
+                service: vacuum.start
+                service_data:
+                  entity_id: vacuum.pool_spino_e13d6btg
+              - type: custom:imperial-button
                 name: Return to Base
                 icon: mdi:home-import-outline
-                tap_action:
-                  action: call-service
-                  service: vacuum.return_to_base
-                  service_data:
-                    entity_id: vacuum.pool_spino_e13d6btg
+                color: amber
+                service: vacuum.return_to_base
+                service_data:
+                  entity_id: vacuum.pool_spino_e13d6btg
 
           - type: horizontal-stack
             cards:
-              - type: entities
-                title: Status
+              - type: custom:imperial-panel
+                title: Unit Status
                 entities:
                   - entity: sensor.pool_spino_e13d6btg_battery
-                    name: Battery
+                    name: Power Cell
                     icon: mdi:battery
                   - entity: vacuum.pool_spino_e13d6btg
                     name: State
@@ -1176,7 +1175,7 @@ views:
                     name: Mode
                     icon: mdi:washing-machine
 
-              - type: entities
+              - type: custom:imperial-panel
                 title: Operations
                 entities:
                   - entity: switch.pool_spino_e13d6btg_turbo_cleaning
@@ -1192,13 +1191,13 @@ views:
                     name: Buzzer
                     icon: mdi:volume-high
 
-              - type: picture-entity
+              - type: custom:imperial-camera
                 entity: camera.pool_live_view
-                name: Pool Camera — Ring
+                title: Pool Perimeter — Ring
 
           - type: horizontal-stack
             cards:
-              - type: entities
+              - type: custom:imperial-panel
                 title: Configuration
                 entities:
                   - entity: select.pool_spino_e13d6btg_cleaning_mode
@@ -1218,50 +1217,45 @@ views:
                 columns: 3
                 square: false
                 cards:
-                  - type: tile
-                    entity: button.pool_spino_e13d6btg_refresh_status
+                  - type: custom:imperial-button
                     name: Refresh Status
                     icon: mdi:refresh
-                    tap_action:
-                      action: call-service
-                      service: button.press
-                      service_data:
-                        entity_id: button.pool_spino_e13d6btg_refresh_status
-                  - type: tile
-                    entity: button.pool_spino_e13d6btg_fetch_pool_map
+                    service: button.press
+                    service_data:
+                      entity_id: button.pool_spino_e13d6btg_refresh_status
+                  - type: custom:imperial-button
                     name: Fetch Pool Map
                     icon: mdi:map
-                    tap_action:
-                      action: call-service
-                      service: button.press
-                      service_data:
-                        entity_id: button.pool_spino_e13d6btg_fetch_pool_map
-                  - type: tile
-                    entity: button.pool_spino_e13d6btg_fetch_cleaning_route
+                    service: button.press
+                    service_data:
+                      entity_id: button.pool_spino_e13d6btg_fetch_pool_map
+                  - type: custom:imperial-button
                     name: Fetch Route
                     icon: mdi:routes
-                    tap_action:
-                      action: call-service
-                      service: button.press
-                      service_data:
-                        entity_id: button.pool_spino_e13d6btg_fetch_cleaning_route
+                    service: button.press
+                    service_data:
+                      entity_id: button.pool_spino_e13d6btg_fetch_cleaning_route
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 8: GROW ROOM
-  # Entity IDs are contract-shared with the grow_sre repo — relabel only, do
-  # not rename sensor.grow_tent_*, fan.ac_infinity_cloudline, switch.grow_lights.
+  # BOTANICAL BAY — Grow Room Operations
+  # Entity IDs below match grow_sre config defaults — verify against your HA.
   # ═══════════════════════════════════════════════════════════════════════════
-  - title: Grow Room
+  - title: Botanical Bay
     path: botanical-bay
-    icon: mdi:sprout
+    icon: mdi:greenhouse
     panel: true
     badges: []
     cards:
       - type: vertical-stack
         cards:
+          - type: custom:imperial-header
+            title: Botanical Bay — Grow Room Systems
+            subtitle: Atmospheric control · VPD · DLI · Canopy health
+            icon: mdi:greenhouse
+
           - type: horizontal-stack
             cards:
-              - type: entities
+              - type: custom:imperial-panel
                 title: Atmospheric Conditions
                 entities:
                   - entity: sensor.grow_tent_vpd
@@ -1270,21 +1264,22 @@ views:
                   - entity: sensor.grow_tent_temp
                     name: Temperature
                     icon: mdi:thermometer
+                    round: true
                   - entity: sensor.grow_tent_rh
                     name: Humidity
                     icon: mdi:water-percent
+                    round: true
                   - entity: sensor.grow_tent_co2
                     name: CO₂
                     icon: mdi:molecule-co2
 
-              - type: entities
+              - type: custom:imperial-panel
                 title: Light & Fan Systems
                 entities:
                   - entity: fan.ac_infinity_cloudline
                     name: Exhaust Fan
                     icon: mdi:fan
-                  - type: attribute
-                    entity: fan.ac_infinity_cloudline
+                  - entity: fan.ac_infinity_cloudline
                     name: Fan Speed
                     icon: mdi:speedometer
                     attribute: percentage
@@ -1340,57 +1335,42 @@ views:
                 columns: 3
                 square: false
                 cards:
-                  - type: tile
-                    entity: fan.ac_infinity_cloudline
+                  - type: custom:imperial-button
                     name: Fan Off
                     icon: mdi:fan-off
-                    tap_action:
-                      action: call-service
-                      service: fan.turn_off
-                      service_data:
-                        entity_id: fan.ac_infinity_cloudline
+                    service: fan.turn_off
+                    service_data:
+                      entity_id: fan.ac_infinity_cloudline
 
-                  - type: tile
-                    entity: fan.ac_infinity_cloudline
+                  - type: custom:imperial-button
                     name: Fan 50%
                     icon: mdi:fan
-                    tap_action:
-                      action: call-service
-                      service: fan.set_percentage
-                      service_data:
-                        entity_id: fan.ac_infinity_cloudline
-                        percentage: 50
+                    service: fan.set_percentage
+                    service_data:
+                      entity_id: fan.ac_infinity_cloudline
+                      percentage: 50
 
-                  - type: tile
-                    entity: fan.ac_infinity_cloudline
+                  - type: custom:imperial-button
                     name: Fan 100%
                     icon: mdi:fan-alert
-                    tap_action:
-                      action: call-service
-                      service: fan.set_percentage
-                      service_data:
-                        entity_id: fan.ac_infinity_cloudline
-                        percentage: 100
+                    service: fan.set_percentage
+                    service_data:
+                      entity_id: fan.ac_infinity_cloudline
+                      percentage: 100
 
-                  - type: tile
-                    entity: switch.grow_lights
+                  - type: custom:imperial-button
                     name: Lights On
                     icon: mdi:lightbulb-on
-                    tap_action:
-                      action: call-service
-                      service: switch.turn_on
-                      service_data:
-                        entity_id: switch.grow_lights
+                    service: switch.turn_on
+                    service_data:
+                      entity_id: switch.grow_lights
 
-                  - type: tile
-                    entity: switch.grow_lights
+                  - type: custom:imperial-button
                     name: Lights Off
                     icon: mdi:lightbulb-off
-                    tap_action:
-                      action: call-service
-                      service: switch.turn_off
-                      service_data:
-                        entity_id: switch.grow_lights
+                    service: switch.turn_off
+                    service_data:
+                      entity_id: switch.grow_lights
 
               - type: history-graph
                 title: VPD History
@@ -1398,3 +1378,4 @@ views:
                 entities:
                   - entity: sensor.grow_tent_vpd
                     name: VPD (kPa)
+
