@@ -34,6 +34,8 @@ views:
                 name: Magneto X
               - prefix: prusa_mk4
                 name: Prusa MK4S
+              - prefix: maker_space_x1c_5
+                name: X1C 5
 
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 2: BAMBU P1P — UNIT ALPHA
@@ -785,5 +787,170 @@ views:
                     name: Overheat Alert
                     icon: mdi:thermometer-alert
                   - entity: binary_sensor.prusa_mk4s_plug_overloaded
+                    name: Overload Alert
+                    icon: mdi:alert-circle
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # VIEW 8: BAMBU X1C 5
+  # ═══════════════════════════════════════════════════════════════════════════
+  - title: X1C 5
+    path: x1c-5
+    panel: true
+    icon: mdi:printer-3d-nozzle
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:imperial-header
+            title: Bambu X1C — Unit 5
+            subtitle: Bambu Lab X1 Carbon fabrication unit — Maker Space
+            icon: mdi:printer-3d-nozzle
+
+          - type: custom:imperial-responsive-columns
+            left:
+              - type: horizontal-stack
+                cards:
+                  - type: custom:imperial-readout
+                    entity: sensor.maker_space_x1c_5_print_progress
+                    name: Print Progress
+                    color: green
+                    unit: "%"
+                    round: true
+                  - type: custom:imperial-readout
+                    entity: sensor.maker_space_x1c_5_current_layer
+                    name: Current Layer
+                    color: amber
+                  - type: custom:imperial-readout
+                    entity: sensor.maker_space_x1c_5_total_layer_count
+                    name: Total Layers
+                    color: red
+
+              - type: picture-entity
+                entity: image.maker_space_x1c_5_cover_image
+                name: Job Preview
+                show_name: false
+                show_state: false
+
+              - type: grid
+                columns: 3
+                square: false
+                cards:
+                  - type: custom:imperial-button
+                    name: Pause
+                    icon: mdi:pause-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.maker_space_x1c_5_pause
+                    entity: button.maker_space_x1c_5_pause
+                    color: amber
+                  - type: custom:imperial-button
+                    name: Resume
+                    icon: mdi:play-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.maker_space_x1c_5_resume
+                    entity: button.maker_space_x1c_5_resume
+                    color: green
+                  - type: custom:imperial-button
+                    name: Stop Print
+                    icon: mdi:stop-circle
+                    service: button.press
+                    service_data:
+                      entity_id: button.maker_space_x1c_5_stop
+                    entity: button.maker_space_x1c_5_stop
+                    color: red
+
+              - type: grid
+                columns: 2
+                square: false
+                cards:
+                  - type: custom:imperial-button
+                    name: Power On
+                    icon: mdi:power-plug
+                    service: switch.turn_on
+                    service_data:
+                      entity_id: switch.maker_space_x1c_5_smart_plug
+                    active_entity: switch.maker_space_x1c_5_smart_plug
+                    active_value: "on"
+                    color: green
+                  - type: custom:imperial-button
+                    name: Power Off
+                    icon: mdi:power-plug-off
+                    service: switch.turn_off
+                    service_data:
+                      entity_id: switch.maker_space_x1c_5_smart_plug
+                    active_entity: switch.maker_space_x1c_5_smart_plug
+                    active_value: "off"
+                    color: red
+
+            right:
+              - type: custom:imperial-panel
+                title: Fabrication Status
+                entities:
+                  - entity: sensor.maker_space_x1c_5_task_name
+                    name: Job Name
+                    icon: mdi:file-document-outline
+                  - entity: sensor.maker_space_x1c_5_print_status
+                    name: Print Status
+                    icon: mdi:printer-3d
+                  - entity: sensor.maker_space_x1c_5_current_stage
+                    name: Current Stage
+                    icon: mdi:state-machine
+                  - entity: sensor.maker_space_x1c_5_remaining_time
+                    name: Time Remaining
+                    icon: mdi:timer-outline
+                  - entity: sensor.maker_space_x1c_5_end_time
+                    name: Est. Completion
+                    icon: mdi:clock-end
+                  - entity: sensor.maker_space_x1c_5_print_weight
+                    name: Filament Weight
+                    icon: mdi:weight-gram
+                  - entity: sensor.maker_space_x1c_5_print_length
+                    name: Filament Length
+                    icon: mdi:ruler
+                  - entity: sensor.maker_space_x1c_5_active_tray
+                    name: Active Tray
+                    icon: mdi:tray
+
+              - type: custom:imperial-panel
+                title: Thermal Systems
+                entities:
+                  - entity: sensor.maker_space_x1c_5_nozzle_temperature
+                    name: Nozzle Temp
+                    icon: mdi:printer-3d-nozzle-heat
+                    round: true
+                  - entity: sensor.maker_space_x1c_5_nozzle_target_temperature
+                    name: Nozzle Target
+                    icon: mdi:printer-3d-nozzle-heat-outline
+                    round: true
+                  - entity: sensor.maker_space_x1c_5_bed_temperature
+                    name: Bed Temp
+                    icon: mdi:radiator
+                    round: true
+                  - entity: sensor.maker_space_x1c_5_bed_target_temperature
+                    name: Bed Target
+                    icon: mdi:radiator
+                    round: true
+                  - entity: sensor.maker_space_x1c_5_chamber_temperature
+                    name: Chamber Temp
+                    icon: mdi:cube-outline
+                    round: true
+
+              - type: custom:imperial-panel
+                title: Power — Smart Plug
+                entities:
+                  - entity: sensor.maker_space_x1c_5_smart_plug_kp125m_current_consumption
+                    name: Power Draw
+                    icon: mdi:lightning-bolt
+                  - entity: sensor.maker_space_x1c_5_smart_plug_kp125m_today_s_consumption
+                    name: Today
+                    icon: mdi:calendar-today
+                  - entity: sensor.maker_space_x1c_5_smart_plug_kp125m_this_month_s_consumption
+                    name: This Month
+                    icon: mdi:calendar-month
+                  - entity: binary_sensor.maker_space_x1c_5_smart_plug_kp125m_overheated
+                    name: Overheat Alert
+                    icon: mdi:thermometer-alert
+                  - entity: binary_sensor.maker_space_x1c_5_smart_plug_kp125m_overloaded
                     name: Overload Alert
                     icon: mdi:alert-circle
