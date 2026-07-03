@@ -1,9 +1,21 @@
-title: Cadet's Barracks
-resources:
-  - url: /local/imperial-cards.js?v=39
-    type: module
+# ─────────────────────────────────────────────────────────────────────────────
+# ui-cadets-barracks.yaml  —  Cat's Room dashboard (standard card redesign)
+# ─────────────────────────────────────────────────────────────────────────────
+# Single-view dashboard for the household cat room (ceiling fan, lights, temp/
+# humidity monitoring). Redesigned 2026-07-02 to replace all custom imperial-*
+# cards (imperial-header, imperial-button, imperial-panel) with standard Lovelace
+# card types (markdown, tile, entities, grid). Zero custom card dependencies —
+# imperial-cards.js resource block removed.
+#
+# Entity IDs unchanged (fan.cats_ceiling_fan_fan, light.cats_ceiling_fan_light,
+# sensor.cats_room_temp_humidity_sensor_*).
+#
+# See ui-cadets-barracks.imperial.yaml.bak for the pre-redesign version.
+# ─────────────────────────────────────────────────────────────────────────────
+
+title: Cat's Room
 views:
-  - title: Cadet's Barracks
+  - title: Cat's Room
     path: cadets-barracks
     icon: mdi:ceiling-fan
     panel: true
@@ -11,92 +23,84 @@ views:
     cards:
       - type: vertical-stack
         cards:
-          - type: custom:imperial-header
-            title: Cadet's Barracks
-            subtitle: Environmental control — Sector BB-4 — Hampton Bay unit active
-            icon: mdi:ceiling-fan
+          - type: markdown
+            content: "## Cat's Room"
 
           - type: grid
             columns: 2
             square: false
             cards:
-              - type: custom:imperial-button
+              - type: tile
+                entity: fan.cats_ceiling_fan_fan
                 name: Fan On — Low
                 icon: mdi:fan-speed-1
-                color: grey
-                service: fan.set_percentage
-                service_data:
-                  entity_id: fan.cats_ceiling_fan_fan
-                  percentage: 25
-                active_entity: fan.cats_ceiling_fan_fan
-                active_attribute: percentage
-                active_value: 25
-              - type: custom:imperial-button
+                tap_action:
+                  action: call-service
+                  service: fan.set_percentage
+                  service_data:
+                    entity_id: fan.cats_ceiling_fan_fan
+                    percentage: 25
+              - type: tile
+                entity: fan.cats_ceiling_fan_fan
                 name: Fan Off
                 icon: mdi:fan-off
-                color: red
-                service: fan.turn_off
-                service_data:
-                  entity_id: fan.cats_ceiling_fan_fan
-                active_entity: fan.cats_ceiling_fan_fan
-                active_value: "off"
+                tap_action:
+                  action: call-service
+                  service: fan.turn_off
+                  service_data:
+                    entity_id: fan.cats_ceiling_fan_fan
 
           - type: grid
             columns: 3
             square: false
             cards:
-              - type: custom:imperial-button
+              - type: tile
+                entity: fan.cats_ceiling_fan_fan
                 name: Medium
                 icon: mdi:fan-speed-2
-                color: amber
-                service: fan.set_percentage
-                service_data:
-                  entity_id: fan.cats_ceiling_fan_fan
-                  percentage: 50
-                active_entity: fan.cats_ceiling_fan_fan
-                active_attribute: percentage
-                active_value: 50
-              - type: custom:imperial-button
+                tap_action:
+                  action: call-service
+                  service: fan.set_percentage
+                  service_data:
+                    entity_id: fan.cats_ceiling_fan_fan
+                    percentage: 50
+              - type: tile
+                entity: fan.cats_ceiling_fan_fan
                 name: Medium High
                 icon: mdi:fan-speed-3
-                color: amber
-                service: fan.set_percentage
-                service_data:
-                  entity_id: fan.cats_ceiling_fan_fan
-                  percentage: 75
-                active_entity: fan.cats_ceiling_fan_fan
-                active_attribute: percentage
-                active_value: 75
-              - type: custom:imperial-button
+                tap_action:
+                  action: call-service
+                  service: fan.set_percentage
+                  service_data:
+                    entity_id: fan.cats_ceiling_fan_fan
+                    percentage: 75
+              - type: tile
+                entity: fan.cats_ceiling_fan_fan
                 name: High
                 icon: mdi:fan
-                color: green
-                service: fan.set_percentage
-                service_data:
-                  entity_id: fan.cats_ceiling_fan_fan
-                  percentage: 100
-                active_entity: fan.cats_ceiling_fan_fan
-                active_attribute: percentage
-                active_value: 100
+                tap_action:
+                  action: call-service
+                  service: fan.set_percentage
+                  service_data:
+                    entity_id: fan.cats_ceiling_fan_fan
+                    percentage: 100
 
           - type: horizontal-stack
             cards:
-              - type: custom:imperial-panel
-                title: Atmospheric Conditions
+              - type: entities
+                title: Environment
                 entities:
                   - entity: sensor.cats_room_temp_humidity_sensor_temperature
                     name: Temperature
                     icon: mdi:thermometer
-                    round: true
                   - entity: sensor.cats_room_temp_humidity_sensor_humidity
                     name: Humidity
                     icon: mdi:water-percent
-                    round: true
                   - entity: sensor.cats_room_temp_humidity_sensor_battery
                     name: Sensor Battery
                     icon: mdi:battery
 
-              - type: custom:imperial-panel
+              - type: entities
                 title: Fan Status
                 entities:
                   - entity: fan.cats_ceiling_fan_fan

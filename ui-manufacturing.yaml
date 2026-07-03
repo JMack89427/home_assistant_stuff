@@ -1,25 +1,46 @@
-title: Imperial Manufacturing Facility
+# ─────────────────────────────────────────────────────────────────────────────
+# ui-manufacturing.yaml  —  Manufacturing dashboard (partial redesign)
+# ─────────────────────────────────────────────────────────────────────────────
+# Multi-view dashboard for 3D printer fleet monitoring and fabrication metadata.
+# Redesigned 2026-07-02: most custom imperial-* cards replaced with standard
+# Lovelace types (entities, tile, markdown, horizontal/vertical stacks). Custom
+# icon-pack references (local:galactic-republic, local:old-republic) replaced
+# with mdi:* icons.
+#
+# INTENTIONALLY RETAINED: custom:imperial-fleet-grid in Fleet view. This card
+# performs cross-prefix printer normalization across Bambu/Klipper/PrusaLink
+# integrations (backed by packages/manufacturing.yaml) with no standard-card
+# equivalent. Kept for functional necessity despite Imperial theming alignment.
+#
+# KNOWN TRADEOFF: Flsun S1 Pro camera now displays sideways (previously rotated
+# 90° by removed imperial-camera card). User approved this tradeoff.
+#
+# Entity IDs unchanged. See ui-manufacturing.imperial.yaml.bak for pre-redesign.
+# ─────────────────────────────────────────────────────────────────────────────
+
+title: Manufacturing
 resources:
   - url: /local/imperial-cards.js?v=39
     type: module
 views:
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 1: FABRICATION FLEET COMMAND
+  # VIEW 1: FLEET
   # ═══════════════════════════════════════════════════════════════════════════
   - title: Fleet
     path: fleet
     panel: true
-    icon: local:galactic-republic
+    icon: mdi:printer-3d
     badges: []
     cards:
       - type: vertical-stack
         cards:
-          - type: custom:imperial-header
-            title: Fabrication Fleet Command
-            subtitle: Replicator status — all units reporting
-            icon: local:galactic-republic
+          - type: markdown
+            content: "## Fabrication Fleet"
 
+          # imperial-fleet-grid kept as-is — does cross-prefix printer
+          # normalization (Bambu/Klipper/PrusaLink) backed by template
+          # sensors in packages/manufacturing.yaml, no standard-card equivalent.
           - type: custom:imperial-fleet-grid
             printers:
               - prefix: p1p_01s00c431300106
@@ -38,9 +59,9 @@ views:
                 name: X1C 5
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 2: BAMBU P1P — UNIT ALPHA
+  # VIEW 2: BAMBU P1P
   # ═══════════════════════════════════════════════════════════════════════════
-  - title: P1P Alpha
+  - title: Bambu P1P
     path: p1p-alpha
     panel: true
     icon: mdi:printer-3d-nozzle
@@ -48,101 +69,102 @@ views:
     cards:
       - type: vertical-stack
         cards:
-          - type: custom:imperial-header
-            title: Bambu P1P — Unit Alpha
-            subtitle: Bambu Lab fabrication unit — Crafting Room
-            icon: local:old-republic
+          - type: markdown
+            content: "## Bambu P1P"
 
-          - type: custom:imperial-responsive-columns
-            left:
-              - type: horizontal-stack
+          - type: horizontal-stack
+            cards:
+              - type: vertical-stack
                 cards:
-                  - type: custom:imperial-readout
-                    entity: sensor.p1p_01s00c431300106_print_progress
-                    name: Print Progress
-                    color: green
-                    unit: "%"
-                  - type: custom:imperial-readout
-                    entity: sensor.p1p_01s00c431300106_current_layer
-                    name: Current Layer
-                    color: amber
-                  - type: custom:imperial-readout
-                    entity: sensor.p1p_01s00c431300106_total_layer_count
-                    name: Total Layers
-                    color: red
-              - type: picture-glance
-                title: Fabrication Bay
-                camera_image: camera.p1p_01s00c431300106_camera
-                camera_view: auto
-                entities:
-                  - entity: binary_sensor.p1p_01s00c431300106_print_error
-                    icon: mdi:alert-circle
-                  - entity: binary_sensor.p1p_01s00c431300106_online
-                    icon: mdi:network
-                  - entity: light.p1p_01s00c431300106_chamber_light
-                    icon: mdi:lightbulb
-              - type: grid
-                columns: 3
-                square: false
+                  - type: horizontal-stack
+                    cards:
+                      - type: tile
+                        entity: sensor.p1p_01s00c431300106_print_progress
+                        name: Print Progress
+                      - type: tile
+                        entity: sensor.p1p_01s00c431300106_current_layer
+                        name: Current Layer
+                      - type: tile
+                        entity: sensor.p1p_01s00c431300106_total_layer_count
+                        name: Total Layers
+                  - type: picture-glance
+                    title: Fabrication Bay
+                    camera_image: camera.p1p_01s00c431300106_camera
+                    camera_view: auto
+                    entities:
+                      - entity: binary_sensor.p1p_01s00c431300106_print_error
+                        icon: mdi:alert-circle
+                      - entity: binary_sensor.p1p_01s00c431300106_online
+                        icon: mdi:network
+                      - entity: light.p1p_01s00c431300106_chamber_light
+                        icon: mdi:lightbulb
+                  - type: grid
+                    columns: 3
+                    square: false
+                    cards:
+                      - type: tile
+                        entity: button.p1p_01s00c431300106_pause_printing
+                        name: Pause
+                        icon: mdi:pause-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.p1p_01s00c431300106_pause_printing
+                      - type: tile
+                        entity: button.p1p_01s00c431300106_resume_printing
+                        name: Resume
+                        icon: mdi:play-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.p1p_01s00c431300106_resume_printing
+                      - type: tile
+                        entity: button.p1p_01s00c431300106_stop_printing
+                        name: Stop Print
+                        icon: mdi:stop-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.p1p_01s00c431300106_stop_printing
+
+              - type: vertical-stack
                 cards:
-                  - type: custom:imperial-button
-                    name: Pause
-                    icon: mdi:pause-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.p1p_01s00c431300106_pause_printing
-                    entity: button.p1p_01s00c431300106_pause_printing
-                    color: amber
-                  - type: custom:imperial-button
-                    name: Resume
-                    icon: mdi:play-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.p1p_01s00c431300106_resume_printing
-                    entity: button.p1p_01s00c431300106_resume_printing
-                    color: green
-                  - type: custom:imperial-button
-                    name: Stop Print
-                    icon: mdi:stop-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.p1p_01s00c431300106_stop_printing
-                    entity: button.p1p_01s00c431300106_stop_printing
-                    color: red
-            right:
-              - type: custom:imperial-panel
-                title: Fabrication Status
-                entities:
-                  - entity: sensor.p1p_01s00c431300106_task_name
-                    name: Job Name
-                    icon: mdi:file-document-outline
-                  - entity: sensor.p1p_01s00c431300106_print_status
-                    name: Print Status
-                    icon: mdi:printer-3d
-                  - entity: sensor.p1p_01s00c431300106_current_stage
-                    name: Current Stage
-                    icon: mdi:state-machine
-                  - entity: sensor.p1p_01s00c431300106_remaining_time
-                    name: Time Remaining
-                    icon: mdi:timer-outline
-                  - entity: sensor.p1p_01s00c431300106_end_time
-                    name: Est. Completion
-                    icon: mdi:clock-end
-                  - entity: sensor.p1p_01s00c431300106_print_weight
-                    name: Filament Weight
-                    icon: mdi:weight-gram
-                  - entity: sensor.p1p_01s00c431300106_print_length
-                    name: Filament Length
-                    icon: mdi:ruler
-              - type: custom:imperial-panel
-                title: Thermal Systems
-                entities:
-                  - entity: sensor.p1p_01s00c431300106_nozzle_temperature
-                    name: Extruder Temp
-                    icon: mdi:printer-3d-nozzle-heat
-                  - entity: sensor.p1p_01s00c431300106_bed_temperature
-                    name: Bed Temp
-                    icon: mdi:radiator
+                  - type: entities
+                    title: Fabrication Status
+                    entities:
+                      - entity: sensor.p1p_01s00c431300106_task_name
+                        name: Job Name
+                        icon: mdi:file-document-outline
+                      - entity: sensor.p1p_01s00c431300106_print_status
+                        name: Print Status
+                        icon: mdi:printer-3d
+                      - entity: sensor.p1p_01s00c431300106_current_stage
+                        name: Current Stage
+                        icon: mdi:state-machine
+                      - entity: sensor.p1p_01s00c431300106_remaining_time
+                        name: Time Remaining
+                        icon: mdi:timer-outline
+                      - entity: sensor.p1p_01s00c431300106_end_time
+                        name: Est. Completion
+                        icon: mdi:clock-end
+                      - entity: sensor.p1p_01s00c431300106_print_weight
+                        name: Filament Weight
+                        icon: mdi:weight-gram
+                      - entity: sensor.p1p_01s00c431300106_print_length
+                        name: Filament Length
+                        icon: mdi:ruler
+                  - type: entities
+                    title: Thermal Systems
+                    entities:
+                      - entity: sensor.p1p_01s00c431300106_nozzle_temperature
+                        name: Extruder Temp
+                        icon: mdi:printer-3d-nozzle-heat
+                      - entity: sensor.p1p_01s00c431300106_bed_temperature
+                        name: Bed Temp
+                        icon: mdi:radiator
 
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 3: FLSUN S1 PRO
@@ -155,149 +177,151 @@ views:
     cards:
       - type: vertical-stack
         cards:
-          - type: custom:imperial-header
-            title: Flsun S1 Pro
-            subtitle: Klipper fabrication unit — Crafting Room
-            icon: local:old-republic
+          - type: markdown
+            content: "## Flsun S1 Pro"
 
-          - type: custom:imperial-responsive-columns
-            left:
-              - type: horizontal-stack
+          - type: horizontal-stack
+            cards:
+              - type: vertical-stack
                 cards:
-                  - type: custom:imperial-readout
-                    entity: sensor.flsuns1pro_progress
-                    name: Print Progress
-                    color: green
-                    unit: "%"
-                    round: true
-                  - type: custom:imperial-readout
-                    entity: sensor.flsuns1pro_current_layer
-                    name: Current Layer
-                    color: amber
-                  - type: custom:imperial-readout
-                    entity: sensor.flsuns1pro_total_layer
-                    name: Total Layers
-                    color: red
-                  - type: custom:imperial-readout
-                    entity: sensor.s1_pro_plug_current_consumption
-                    name: Power Draw
-                    color: amber
-                    unit: W
-                    round: true
-              - type: custom:imperial-camera
-                entity: camera.flsuns1pro_camera
-                rotation: 90
-                title: Fabrication Bay
-            right:
-              - type: custom:imperial-panel
-                title: Fabrication Status
-                entities:
-                  - entity: sensor.flsuns1pro_filename
-                    name: Job Name
-                    icon: mdi:file-document-outline
-                  - entity: sensor.flsuns1pro_current_print_state
-                    name: Print Status
-                    icon: mdi:printer-3d
-                  - entity: sensor.flsuns1pro_printer_state
-                    name: System State
-                    icon: mdi:state-machine
-                  - entity: sensor.flsuns1pro_print_time_left
-                    name: Time Remaining
-                    icon: mdi:timer-outline
-                  - entity: sensor.flsuns1pro_print_eta
-                    name: Est. Completion
-                    icon: mdi:clock-end
-              - type: custom:imperial-panel
-                title: Thermal Systems
-                entities:
-                  - entity: sensor.flsuns1pro_extruder_temperature
-                    name: Extruder Temp
-                    icon: mdi:printer-3d-nozzle-heat
-                    round: true
-                  - entity: sensor.flsuns1pro_bed_temperature
-                    name: Bed Temp
-                    icon: mdi:radiator
-                    round: true
-              - type: custom:imperial-panel
-                title: Power Systems
-                entities:
-                  - entity: switch.s1_pro_plug
-                    name: Outlet
-                    icon: mdi:power-plug
-                  - entity: sensor.s1_pro_plug_current_consumption
-                    name: Current Draw
-                    icon: mdi:lightning-bolt
-                  - entity: sensor.s1_pro_plug_voltage
-                    name: Voltage
-                    icon: mdi:sine-wave
-                  - entity: sensor.s1_pro_plug_today_s_consumption
-                    name: Today
-                    icon: mdi:calendar-today
-                  - entity: sensor.s1_pro_plug_this_month_s_consumption
-                    name: This Month
-                    icon: mdi:calendar-month
-                  - entity: binary_sensor.s1_pro_plug_overheated
-                    name: Overheat Alert
-                    icon: mdi:thermometer-alert
-                  - entity: binary_sensor.s1_pro_plug_overloaded
-                    name: Overload Alert
-                    icon: mdi:alert-circle
-              - type: grid
-                columns: 4
-                square: false
+                  - type: horizontal-stack
+                    cards:
+                      - type: tile
+                        entity: sensor.flsuns1pro_progress
+                        name: Print Progress
+                      - type: tile
+                        entity: sensor.flsuns1pro_current_layer
+                        name: Current Layer
+                      - type: tile
+                        entity: sensor.flsuns1pro_total_layer
+                        name: Total Layers
+                      - type: tile
+                        entity: sensor.s1_pro_plug_current_consumption
+                        name: Power Draw
+                  # imperial-camera (rotation: 90) replaced with standard
+                  # picture-entity per architect direction — accepts the
+                  # sideways-mounted feed rather than a custom rotation card.
+                  - type: picture-entity
+                    entity: camera.flsuns1pro_camera
+                    name: Fabrication Bay
+                    show_name: true
+                    show_state: false
+
+              - type: vertical-stack
                 cards:
-                  - type: custom:imperial-button
-                    name: Pause
-                    icon: mdi:pause-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.flsuns1pro_pause_print
-                    entity: button.flsuns1pro_pause_print
-                    color: amber
-                  - type: custom:imperial-button
-                    name: Resume
-                    icon: mdi:play-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.flsuns1pro_resume_print
-                    entity: button.flsuns1pro_resume_print
-                    color: green
-                  - type: custom:imperial-button
-                    name: Cancel
-                    icon: mdi:stop-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.flsuns1pro_cancel_print
-                    entity: button.flsuns1pro_cancel_print
-                    color: red
-                  - type: custom:imperial-button
-                    name: E-Stop
-                    icon: mdi:alert-octagon
-                    service: button.press
-                    service_data:
-                      entity_id: button.flsuns1pro_emergency_stop
-                    entity: button.flsuns1pro_emergency_stop
-                    color: red
-              - type: grid
-                columns: 2
-                square: false
-                cards:
-                  - type: custom:imperial-button
-                    name: Power On
-                    icon: mdi:power-plug
-                    service: switch.turn_on
-                    service_data:
-                      entity_id: switch.s1_pro_plug
-                    entity: switch.s1_pro_plug
-                    color: green
-                  - type: custom:imperial-button
-                    name: Power Off
-                    icon: mdi:power-plug-off
-                    service: switch.turn_off
-                    service_data:
-                      entity_id: switch.s1_pro_plug
-                    entity: switch.s1_pro_plug
-                    color: red
+                  - type: entities
+                    title: Fabrication Status
+                    entities:
+                      - entity: sensor.flsuns1pro_filename
+                        name: Job Name
+                        icon: mdi:file-document-outline
+                      - entity: sensor.flsuns1pro_current_print_state
+                        name: Print Status
+                        icon: mdi:printer-3d
+                      - entity: sensor.flsuns1pro_printer_state
+                        name: System State
+                        icon: mdi:state-machine
+                      - entity: sensor.flsuns1pro_print_time_left
+                        name: Time Remaining
+                        icon: mdi:timer-outline
+                      - entity: sensor.flsuns1pro_print_eta
+                        name: Est. Completion
+                        icon: mdi:clock-end
+                  - type: entities
+                    title: Thermal Systems
+                    entities:
+                      - entity: sensor.flsuns1pro_extruder_temperature
+                        name: Extruder Temp
+                        icon: mdi:printer-3d-nozzle-heat
+                      - entity: sensor.flsuns1pro_bed_temperature
+                        name: Bed Temp
+                        icon: mdi:radiator
+                  - type: entities
+                    title: Power Systems
+                    entities:
+                      - entity: switch.s1_pro_plug
+                        name: Outlet
+                        icon: mdi:power-plug
+                      - entity: sensor.s1_pro_plug_current_consumption
+                        name: Current Draw
+                        icon: mdi:lightning-bolt
+                      - entity: sensor.s1_pro_plug_voltage
+                        name: Voltage
+                        icon: mdi:sine-wave
+                      - entity: sensor.s1_pro_plug_today_s_consumption
+                        name: Today
+                        icon: mdi:calendar-today
+                      - entity: sensor.s1_pro_plug_this_month_s_consumption
+                        name: This Month
+                        icon: mdi:calendar-month
+                      - entity: binary_sensor.s1_pro_plug_overheated
+                        name: Overheat Alert
+                        icon: mdi:thermometer-alert
+                      - entity: binary_sensor.s1_pro_plug_overloaded
+                        name: Overload Alert
+                        icon: mdi:alert-circle
+                  - type: grid
+                    columns: 4
+                    square: false
+                    cards:
+                      - type: tile
+                        entity: button.flsuns1pro_pause_print
+                        name: Pause
+                        icon: mdi:pause-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.flsuns1pro_pause_print
+                      - type: tile
+                        entity: button.flsuns1pro_resume_print
+                        name: Resume
+                        icon: mdi:play-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.flsuns1pro_resume_print
+                      - type: tile
+                        entity: button.flsuns1pro_cancel_print
+                        name: Cancel
+                        icon: mdi:stop-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.flsuns1pro_cancel_print
+                      - type: tile
+                        entity: button.flsuns1pro_emergency_stop
+                        name: E-Stop
+                        icon: mdi:alert-octagon
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.flsuns1pro_emergency_stop
+                  - type: grid
+                    columns: 2
+                    square: false
+                    cards:
+                      - type: tile
+                        entity: switch.s1_pro_plug
+                        name: Power On
+                        icon: mdi:power-plug
+                        tap_action:
+                          action: call-service
+                          service: switch.turn_on
+                          service_data:
+                            entity_id: switch.s1_pro_plug
+                      - type: tile
+                        entity: switch.s1_pro_plug
+                        name: Power Off
+                        icon: mdi:power-plug-off
+                        tap_action:
+                          action: call-service
+                          service: switch.turn_off
+                          service_data:
+                            entity_id: switch.s1_pro_plug
 
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 4: PRINTZ
@@ -310,100 +334,99 @@ views:
     cards:
       - type: vertical-stack
         cards:
-          - type: custom:imperial-header
-            title: Printz
-            subtitle: Klipper fabrication unit — Crafting Room
-            icon: local:old-republic
+          - type: markdown
+            content: "## Printz"
 
-          - type: custom:imperial-responsive-columns
-            left:
-              - type: horizontal-stack
+          - type: horizontal-stack
+            cards:
+              - type: vertical-stack
                 cards:
-                  - type: custom:imperial-readout
-                    entity: sensor.printz_progress
-                    name: Print Progress
-                    color: green
-                    unit: "%"
-                    round: true
-                  - type: custom:imperial-readout
-                    entity: sensor.printz_current_layer
-                    name: Current Layer
-                    color: amber
-                  - type: custom:imperial-readout
-                    entity: sensor.printz_total_layer
-                    name: Total Layers
-                    color: red
-              - type: picture-glance
-                title: Fabrication Bay
-                camera_image: camera.printz_webcam
-                camera_view: auto
-                entities: []
-              - type: grid
-                columns: 4
-                square: false
+                  - type: horizontal-stack
+                    cards:
+                      - type: tile
+                        entity: sensor.printz_progress
+                        name: Print Progress
+                      - type: tile
+                        entity: sensor.printz_current_layer
+                        name: Current Layer
+                      - type: tile
+                        entity: sensor.printz_total_layer
+                        name: Total Layers
+                  - type: picture-glance
+                    title: Fabrication Bay
+                    camera_image: camera.printz_webcam
+                    camera_view: auto
+                    entities: []
+                  - type: grid
+                    columns: 4
+                    square: false
+                    cards:
+                      - type: tile
+                        entity: button.printz_pause_print
+                        name: Pause
+                        icon: mdi:pause-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.printz_pause_print
+                      - type: tile
+                        entity: button.printz_resume_print
+                        name: Resume
+                        icon: mdi:play-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.printz_resume_print
+                      - type: tile
+                        entity: button.printz_cancel_print
+                        name: Cancel
+                        icon: mdi:stop-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.printz_cancel_print
+                      - type: tile
+                        entity: button.printz_emergency_stop
+                        name: E-Stop
+                        icon: mdi:alert-octagon
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.printz_emergency_stop
+
+              - type: vertical-stack
                 cards:
-                  - type: custom:imperial-button
-                    name: Pause
-                    icon: mdi:pause-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.printz_pause_print
-                    entity: button.printz_pause_print
-                    color: amber
-                  - type: custom:imperial-button
-                    name: Resume
-                    icon: mdi:play-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.printz_resume_print
-                    entity: button.printz_resume_print
-                    color: green
-                  - type: custom:imperial-button
-                    name: Cancel
-                    icon: mdi:stop-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.printz_cancel_print
-                    entity: button.printz_cancel_print
-                    color: red
-                  - type: custom:imperial-button
-                    name: E-Stop
-                    icon: mdi:alert-octagon
-                    service: button.press
-                    service_data:
-                      entity_id: button.printz_emergency_stop
-                    entity: button.printz_emergency_stop
-                    color: red
-            right:
-              - type: custom:imperial-panel
-                title: Fabrication Status
-                entities:
-                  - entity: sensor.printz_filename
-                    name: Job Name
-                    icon: mdi:file-document-outline
-                  - entity: sensor.printz_current_print_state
-                    name: Print Status
-                    icon: mdi:printer-3d
-                  - entity: sensor.printz_printer_state
-                    name: System State
-                    icon: mdi:state-machine
-                  - entity: sensor.printz_print_time_left
-                    name: Time Remaining
-                    icon: mdi:timer-outline
-                  - entity: sensor.printz_print_eta
-                    name: Est. Completion
-                    icon: mdi:clock-end
-              - type: custom:imperial-panel
-                title: Thermal Systems
-                entities:
-                  - entity: sensor.printz_extruder_temperature
-                    name: Extruder Temp
-                    icon: mdi:printer-3d-nozzle-heat
-                    round: true
-                  - entity: sensor.printz_bed_temperature
-                    name: Bed Temp
-                    icon: mdi:radiator
-                    round: true
+                  - type: entities
+                    title: Fabrication Status
+                    entities:
+                      - entity: sensor.printz_filename
+                        name: Job Name
+                        icon: mdi:file-document-outline
+                      - entity: sensor.printz_current_print_state
+                        name: Print Status
+                        icon: mdi:printer-3d
+                      - entity: sensor.printz_printer_state
+                        name: System State
+                        icon: mdi:state-machine
+                      - entity: sensor.printz_print_time_left
+                        name: Time Remaining
+                        icon: mdi:timer-outline
+                      - entity: sensor.printz_print_eta
+                        name: Est. Completion
+                        icon: mdi:clock-end
+                  - type: entities
+                    title: Thermal Systems
+                    entities:
+                      - entity: sensor.printz_extruder_temperature
+                        name: Extruder Temp
+                        icon: mdi:printer-3d-nozzle-heat
+                      - entity: sensor.printz_bed_temperature
+                        name: Bed Temp
+                        icon: mdi:radiator
 
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 5: RATRIG
@@ -416,106 +439,104 @@ views:
     cards:
       - type: vertical-stack
         cards:
-          - type: custom:imperial-header
-            title: RatRig
-            subtitle: Klipper fabrication unit — Crafting Room
-            icon: local:old-republic
+          - type: markdown
+            content: "## RatRig"
 
-          - type: custom:imperial-responsive-columns
-            left:
-              - type: horizontal-stack
+          - type: horizontal-stack
+            cards:
+              - type: vertical-stack
                 cards:
-                  - type: custom:imperial-readout
-                    entity: sensor.ratrig_progress
-                    name: Print Progress
-                    color: green
-                    unit: "%"
-                    round: true
-                  - type: custom:imperial-readout
-                    entity: sensor.ratrig_current_layer
-                    name: Current Layer
-                    color: amber
-                  - type: custom:imperial-readout
-                    entity: sensor.ratrig_total_layer
-                    name: Total Layers
-                    color: red
-              - type: picture-glance
-                title: Fabrication Bay
-                camera_image: camera.ratrig_enclosure_cam
-                camera_view: auto
-                entities:
-                  - entity: binary_sensor.ratrig_toolhead_filament_sensor_t0
-                    icon: mdi:alert-circle
-              - type: grid
-                columns: 4
-                square: false
+                  - type: horizontal-stack
+                    cards:
+                      - type: tile
+                        entity: sensor.ratrig_progress
+                        name: Print Progress
+                      - type: tile
+                        entity: sensor.ratrig_current_layer
+                        name: Current Layer
+                      - type: tile
+                        entity: sensor.ratrig_total_layer
+                        name: Total Layers
+                  - type: picture-glance
+                    title: Fabrication Bay
+                    camera_image: camera.ratrig_enclosure_cam
+                    camera_view: auto
+                    entities:
+                      - entity: binary_sensor.ratrig_toolhead_filament_sensor_t0
+                        icon: mdi:alert-circle
+                  - type: grid
+                    columns: 4
+                    square: false
+                    cards:
+                      - type: tile
+                        entity: button.ratrig_pause_print
+                        name: Pause
+                        icon: mdi:pause-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.ratrig_pause_print
+                      - type: tile
+                        entity: button.ratrig_resume_print
+                        name: Resume
+                        icon: mdi:play-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.ratrig_resume_print
+                      - type: tile
+                        entity: button.ratrig_cancel_print
+                        name: Cancel
+                        icon: mdi:stop-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.ratrig_cancel_print
+                      - type: tile
+                        entity: button.ratrig_emergency_stop
+                        name: E-Stop
+                        icon: mdi:alert-octagon
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.ratrig_emergency_stop
+
+              - type: vertical-stack
                 cards:
-                  - type: custom:imperial-button
-                    name: Pause
-                    icon: mdi:pause-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.ratrig_pause_print
-                    entity: button.ratrig_pause_print
-                    color: amber
-                  - type: custom:imperial-button
-                    name: Resume
-                    icon: mdi:play-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.ratrig_resume_print
-                    entity: button.ratrig_resume_print
-                    color: green
-                  - type: custom:imperial-button
-                    name: Cancel
-                    icon: mdi:stop-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.ratrig_cancel_print
-                    entity: button.ratrig_cancel_print
-                    color: red
-                  - type: custom:imperial-button
-                    name: E-Stop
-                    icon: mdi:alert-octagon
-                    service: button.press
-                    service_data:
-                      entity_id: button.ratrig_emergency_stop
-                    entity: button.ratrig_emergency_stop
-                    color: red
-            right:
-              - type: custom:imperial-panel
-                title: Fabrication Status
-                entities:
-                  - entity: sensor.ratrig_filename
-                    name: Job Name
-                    icon: mdi:file-document-outline
-                  - entity: sensor.ratrig_current_print_state
-                    name: Print Status
-                    icon: mdi:printer-3d
-                  - entity: sensor.ratrig_printer_state
-                    name: System State
-                    icon: mdi:state-machine
-                  - entity: sensor.ratrig_print_time_left
-                    name: Time Remaining
-                    icon: mdi:timer-outline
-                  - entity: sensor.ratrig_print_eta
-                    name: Est. Completion
-                    icon: mdi:clock-end
-              - type: custom:imperial-panel
-                title: Thermal Systems
-                entities:
-                  - entity: sensor.ratrig_extruder_temperature
-                    name: Extruder Temp
-                    icon: mdi:printer-3d-nozzle-heat
-                    round: true
-                  - entity: sensor.ratrig_bed_temperature
-                    name: Bed Temp
-                    icon: mdi:radiator
-                    round: true
-                  - entity: sensor.ratrig_chamber_temp
-                    name: Chamber Temp
-                    icon: mdi:thermometer
-                    round: true
+                  - type: entities
+                    title: Fabrication Status
+                    entities:
+                      - entity: sensor.ratrig_filename
+                        name: Job Name
+                        icon: mdi:file-document-outline
+                      - entity: sensor.ratrig_current_print_state
+                        name: Print Status
+                        icon: mdi:printer-3d
+                      - entity: sensor.ratrig_printer_state
+                        name: System State
+                        icon: mdi:state-machine
+                      - entity: sensor.ratrig_print_time_left
+                        name: Time Remaining
+                        icon: mdi:timer-outline
+                      - entity: sensor.ratrig_print_eta
+                        name: Est. Completion
+                        icon: mdi:clock-end
+                  - type: entities
+                    title: Thermal Systems
+                    entities:
+                      - entity: sensor.ratrig_extruder_temperature
+                        name: Extruder Temp
+                        icon: mdi:printer-3d-nozzle-heat
+                      - entity: sensor.ratrig_bed_temperature
+                        name: Bed Temp
+                        icon: mdi:radiator
+                      - entity: sensor.ratrig_chamber_temp
+                        name: Chamber Temp
+                        icon: mdi:thermometer
 
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 6: MAGNETO X
@@ -528,104 +549,102 @@ views:
     cards:
       - type: vertical-stack
         cards:
-          - type: custom:imperial-header
-            title: Magneto X
-            subtitle: Klipper fabrication unit — Crafting Room
-            icon: local:old-republic
+          - type: markdown
+            content: "## Magneto X"
 
-          - type: custom:imperial-responsive-columns
-            left:
-              - type: horizontal-stack
+          - type: horizontal-stack
+            cards:
+              - type: vertical-stack
                 cards:
-                  - type: custom:imperial-readout
-                    entity: sensor.magneto_x_progress
-                    name: Print Progress
-                    color: green
-                    unit: "%"
-                    round: true
-                  - type: custom:imperial-readout
-                    entity: sensor.magneto_x_current_layer
-                    name: Current Layer
-                    color: amber
-                  - type: custom:imperial-readout
-                    entity: sensor.magneto_x_total_layer
-                    name: Total Layers
-                    color: red
-              - type: picture-glance
-                title: Fabrication Bay
-                camera_image: camera.magneto_x_camera
-                camera_view: auto
-                entities: []
-              - type: grid
-                columns: 4
-                square: false
+                  - type: horizontal-stack
+                    cards:
+                      - type: tile
+                        entity: sensor.magneto_x_progress
+                        name: Print Progress
+                      - type: tile
+                        entity: sensor.magneto_x_current_layer
+                        name: Current Layer
+                      - type: tile
+                        entity: sensor.magneto_x_total_layer
+                        name: Total Layers
+                  - type: picture-glance
+                    title: Fabrication Bay
+                    camera_image: camera.magneto_x_camera
+                    camera_view: auto
+                    entities: []
+                  - type: grid
+                    columns: 4
+                    square: false
+                    cards:
+                      - type: tile
+                        entity: button.magneto_x_pause_print
+                        name: Pause
+                        icon: mdi:pause-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.magneto_x_pause_print
+                      - type: tile
+                        entity: button.magneto_x_resume_print
+                        name: Resume
+                        icon: mdi:play-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.magneto_x_resume_print
+                      - type: tile
+                        entity: button.magneto_x_cancel_print
+                        name: Cancel
+                        icon: mdi:stop-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.magneto_x_cancel_print
+                      - type: tile
+                        entity: button.magneto_x_emergency_stop
+                        name: E-Stop
+                        icon: mdi:alert-octagon
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.magneto_x_emergency_stop
+
+              - type: vertical-stack
                 cards:
-                  - type: custom:imperial-button
-                    name: Pause
-                    icon: mdi:pause-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.magneto_x_pause_print
-                    entity: button.magneto_x_pause_print
-                    color: amber
-                  - type: custom:imperial-button
-                    name: Resume
-                    icon: mdi:play-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.magneto_x_resume_print
-                    entity: button.magneto_x_resume_print
-                    color: green
-                  - type: custom:imperial-button
-                    name: Cancel
-                    icon: mdi:stop-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.magneto_x_cancel_print
-                    entity: button.magneto_x_cancel_print
-                    color: red
-                  - type: custom:imperial-button
-                    name: E-Stop
-                    icon: mdi:alert-octagon
-                    service: button.press
-                    service_data:
-                      entity_id: button.magneto_x_emergency_stop
-                    entity: button.magneto_x_emergency_stop
-                    color: red
-            right:
-              - type: custom:imperial-panel
-                title: Fabrication Status
-                entities:
-                  - entity: sensor.magneto_x_filename
-                    name: Job Name
-                    icon: mdi:file-document-outline
-                  - entity: sensor.magneto_x_current_print_state
-                    name: Print Status
-                    icon: mdi:printer-3d
-                  - entity: sensor.magneto_x_printer_state
-                    name: System State
-                    icon: mdi:state-machine
-                  - entity: sensor.magneto_x_print_time_left
-                    name: Time Remaining
-                    icon: mdi:timer-outline
-                  - entity: sensor.magneto_x_print_eta
-                    name: Est. Completion
-                    icon: mdi:clock-end
-              - type: custom:imperial-panel
-                title: Thermal Systems
-                entities:
-                  - entity: sensor.magneto_x_extruder_temperature
-                    name: Extruder Temp
-                    icon: mdi:printer-3d-nozzle-heat
-                    round: true
-                  - entity: sensor.magneto_x_bed_temperature
-                    name: Bed Temp
-                    icon: mdi:radiator
-                    round: true
-                  - entity: sensor.magneto_x_beacon_coil_temp
-                    name: Beacon Coil Temp
-                    icon: mdi:radar
-                    round: true
+                  - type: entities
+                    title: Fabrication Status
+                    entities:
+                      - entity: sensor.magneto_x_filename
+                        name: Job Name
+                        icon: mdi:file-document-outline
+                      - entity: sensor.magneto_x_current_print_state
+                        name: Print Status
+                        icon: mdi:printer-3d
+                      - entity: sensor.magneto_x_printer_state
+                        name: System State
+                        icon: mdi:state-machine
+                      - entity: sensor.magneto_x_print_time_left
+                        name: Time Remaining
+                        icon: mdi:timer-outline
+                      - entity: sensor.magneto_x_print_eta
+                        name: Est. Completion
+                        icon: mdi:clock-end
+                  - type: entities
+                    title: Thermal Systems
+                    entities:
+                      - entity: sensor.magneto_x_extruder_temperature
+                        name: Extruder Temp
+                        icon: mdi:printer-3d-nozzle-heat
+                      - entity: sensor.magneto_x_bed_temperature
+                        name: Bed Temp
+                        icon: mdi:radiator
+                      - entity: sensor.magneto_x_beacon_coil_temp
+                        name: Beacon Coil Temp
+                        icon: mdi:radar
 
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 7: PRUSA MK4S
@@ -638,160 +657,156 @@ views:
     cards:
       - type: vertical-stack
         cards:
-          - type: custom:imperial-header
-            title: Prusa MK4S
-            subtitle: FDM fabrication unit — PrusaLink online
-            icon: mdi:printer-3d-nozzle
+          - type: markdown
+            content: "## Prusa MK4S"
 
-          - type: custom:imperial-responsive-columns
-            left:
-              - type: horizontal-stack
+          - type: horizontal-stack
+            cards:
+              - type: vertical-stack
                 cards:
-                  - type: custom:imperial-readout
-                    entity: sensor.prusa_mk4_progress
-                    name: Print Progress
-                    color: green
-                    unit: "%"
-                    round: true
-                  - type: custom:imperial-readout
-                    entity: sensor.prusa_mk4s_plug_current_consumption
-                    name: Power Draw
-                    color: amber
-                    unit: W
-                    round: true
+                  - type: horizontal-stack
+                    cards:
+                      - type: tile
+                        entity: sensor.prusa_mk4_progress
+                        name: Print Progress
+                      - type: tile
+                        entity: sensor.prusa_mk4s_plug_current_consumption
+                        name: Power Draw
 
-              - type: picture-entity
-                entity: camera.prusa_mk4_preview
-                name: Job Preview
-                show_name: false
-                show_state: false
+                  - type: picture-entity
+                    entity: camera.prusa_mk4_preview
+                    name: Job Preview
+                    show_name: false
+                    show_state: false
 
-              - type: grid
-                columns: 3
-                square: false
+                  - type: grid
+                    columns: 3
+                    square: false
+                    cards:
+                      - type: tile
+                        entity: button.prusa_mk4_pause_job
+                        name: Pause
+                        icon: mdi:pause-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.prusa_mk4_pause_job
+                      - type: tile
+                        entity: button.prusa_mk4_resume_job
+                        name: Resume
+                        icon: mdi:play-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.prusa_mk4_resume_job
+                      - type: tile
+                        entity: button.prusa_mk4_cancel_job
+                        name: Cancel
+                        icon: mdi:stop-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.prusa_mk4_cancel_job
+
+                  - type: grid
+                    columns: 2
+                    square: false
+                    cards:
+                      - type: tile
+                        entity: switch.prusa_mk4s_plug
+                        name: Power On
+                        icon: mdi:power-plug
+                        tap_action:
+                          action: call-service
+                          service: switch.turn_on
+                          service_data:
+                            entity_id: switch.prusa_mk4s_plug
+                      - type: tile
+                        entity: switch.prusa_mk4s_plug
+                        name: Power Off
+                        icon: mdi:power-plug-off
+                        tap_action:
+                          action: call-service
+                          service: switch.turn_off
+                          service_data:
+                            entity_id: switch.prusa_mk4s_plug
+
+              - type: vertical-stack
                 cards:
-                  - type: custom:imperial-button
-                    name: Pause
-                    icon: mdi:pause-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.prusa_mk4_pause_job
-                    entity: button.prusa_mk4_pause_job
-                    color: amber
-                  - type: custom:imperial-button
-                    name: Resume
-                    icon: mdi:play-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.prusa_mk4_resume_job
-                    entity: button.prusa_mk4_resume_job
-                    color: green
-                  - type: custom:imperial-button
-                    name: Cancel
-                    icon: mdi:stop-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.prusa_mk4_cancel_job
-                    entity: button.prusa_mk4_cancel_job
-                    color: red
+                  - type: entities
+                    title: Fabrication Status
+                    entities:
+                      - entity: sensor.prusa_mk4
+                        name: Printer State
+                        icon: mdi:printer-3d
+                      - entity: sensor.prusa_mk4_filename
+                        name: Job Name
+                        icon: mdi:file-document-outline
+                      - entity: sensor.prusa_mk4_material
+                        name: Material
+                        icon: mdi:spool
+                      - entity: sensor.prusa_mk4_print_speed
+                        name: Print Speed
+                        icon: mdi:speedometer
+                      - entity: sensor.prusa_mk4_print_start
+                        name: Print Started
+                        icon: mdi:clock-start
+                      - entity: sensor.prusa_mk4_print_finish
+                        name: Est. Completion
+                        icon: mdi:clock-end
 
-              - type: grid
-                columns: 2
-                square: false
-                cards:
-                  - type: custom:imperial-button
-                    name: Power On
-                    icon: mdi:power-plug
-                    service: switch.turn_on
-                    service_data:
-                      entity_id: switch.prusa_mk4s_plug
-                    entity: switch.prusa_mk4s_plug
-                    color: green
-                  - type: custom:imperial-button
-                    name: Power Off
-                    icon: mdi:power-plug-off
-                    service: switch.turn_off
-                    service_data:
-                      entity_id: switch.prusa_mk4s_plug
-                    entity: switch.prusa_mk4s_plug
-                    color: red
+                  - type: entities
+                    title: Thermal Systems
+                    entities:
+                      - entity: sensor.prusa_mk4_nozzle_temperature
+                        name: Nozzle Temp
+                        icon: mdi:printer-3d-nozzle-heat
+                      - entity: sensor.prusa_mk4_nozzle_target_temperature
+                        name: Nozzle Target
+                        icon: mdi:printer-3d-nozzle-heat-outline
+                      - entity: sensor.prusa_mk4_heatbed_temperature
+                        name: Bed Temp
+                        icon: mdi:radiator
+                      - entity: sensor.prusa_mk4_heatbed_target_temperature
+                        name: Bed Target
+                        icon: mdi:radiator
+                      - entity: sensor.prusa_mk4_hotend_fan
+                        name: Hotend Fan
+                        icon: mdi:fan
+                      - entity: sensor.prusa_mk4_print_fan
+                        name: Part Fan
+                        icon: mdi:fan-chevron-up
 
-            right:
-              - type: custom:imperial-panel
-                title: Fabrication Status
-                entities:
-                  - entity: sensor.prusa_mk4
-                    name: Printer State
-                    icon: mdi:printer-3d
-                  - entity: sensor.prusa_mk4_filename
-                    name: Job Name
-                    icon: mdi:file-document-outline
-                  - entity: sensor.prusa_mk4_material
-                    name: Material
-                    icon: mdi:spool
-                  - entity: sensor.prusa_mk4_print_speed
-                    name: Print Speed
-                    icon: mdi:speedometer
-                  - entity: sensor.prusa_mk4_print_start
-                    name: Print Started
-                    icon: mdi:clock-start
-                  - entity: sensor.prusa_mk4_print_finish
-                    name: Est. Completion
-                    icon: mdi:clock-end
-
-              - type: custom:imperial-panel
-                title: Thermal Systems
-                entities:
-                  - entity: sensor.prusa_mk4_nozzle_temperature
-                    name: Nozzle Temp
-                    icon: mdi:printer-3d-nozzle-heat
-                    round: true
-                  - entity: sensor.prusa_mk4_nozzle_target_temperature
-                    name: Nozzle Target
-                    icon: mdi:printer-3d-nozzle-heat-outline
-                    round: true
-                  - entity: sensor.prusa_mk4_heatbed_temperature
-                    name: Bed Temp
-                    icon: mdi:radiator
-                    round: true
-                  - entity: sensor.prusa_mk4_heatbed_target_temperature
-                    name: Bed Target
-                    icon: mdi:radiator
-                    round: true
-                  - entity: sensor.prusa_mk4_hotend_fan
-                    name: Hotend Fan
-                    icon: mdi:fan
-                  - entity: sensor.prusa_mk4_print_fan
-                    name: Part Fan
-                    icon: mdi:fan-chevron-up
-
-              - type: custom:imperial-panel
-                title: Power Systems
-                entities:
-                  - entity: switch.prusa_mk4s_plug
-                    name: Outlet
-                    icon: mdi:power-plug
-                  - entity: sensor.prusa_mk4s_plug_current_consumption
-                    name: Current Draw
-                    icon: mdi:lightning-bolt
-                  - entity: sensor.prusa_mk4s_plug_voltage
-                    name: Voltage
-                    icon: mdi:sine-wave
-                  - entity: sensor.prusa_mk4s_plug_today_s_consumption
-                    name: Today
-                    icon: mdi:calendar-today
-                  - entity: sensor.prusa_mk4s_plug_this_month_s_consumption
-                    name: This Month
-                    icon: mdi:calendar-month
-                  - entity: binary_sensor.prusa_mk4s_plug_overheated
-                    name: Overheat Alert
-                    icon: mdi:thermometer-alert
-                  - entity: binary_sensor.prusa_mk4s_plug_overloaded
-                    name: Overload Alert
-                    icon: mdi:alert-circle
+                  - type: entities
+                    title: Power Systems
+                    entities:
+                      - entity: switch.prusa_mk4s_plug
+                        name: Outlet
+                        icon: mdi:power-plug
+                      - entity: sensor.prusa_mk4s_plug_current_consumption
+                        name: Current Draw
+                        icon: mdi:lightning-bolt
+                      - entity: sensor.prusa_mk4s_plug_voltage
+                        name: Voltage
+                        icon: mdi:sine-wave
+                      - entity: sensor.prusa_mk4s_plug_today_s_consumption
+                        name: Today
+                        icon: mdi:calendar-today
+                      - entity: sensor.prusa_mk4s_plug_this_month_s_consumption
+                        name: This Month
+                        icon: mdi:calendar-month
+                      - entity: binary_sensor.prusa_mk4s_plug_overheated
+                        name: Overheat Alert
+                        icon: mdi:thermometer-alert
+                      - entity: binary_sensor.prusa_mk4s_plug_overloaded
+                        name: Overload Alert
+                        icon: mdi:alert-circle
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 8: BAMBU X1C 5
+  # VIEW 8: X1C 5
   # ═══════════════════════════════════════════════════════════════════════════
   - title: X1C 5
     path: x1c-5
@@ -801,156 +816,150 @@ views:
     cards:
       - type: vertical-stack
         cards:
-          - type: custom:imperial-header
-            title: Bambu X1C — Unit 5
-            subtitle: Bambu Lab X1 Carbon fabrication unit — Maker Space
-            icon: mdi:printer-3d-nozzle
+          - type: markdown
+            content: "## Bambu X1C — Unit 5"
 
-          - type: custom:imperial-responsive-columns
-            left:
-              - type: horizontal-stack
+          - type: horizontal-stack
+            cards:
+              - type: vertical-stack
                 cards:
-                  - type: custom:imperial-readout
-                    entity: sensor.maker_space_x1c_5_print_progress
-                    name: Print Progress
-                    color: green
-                    unit: "%"
-                    round: true
-                  - type: custom:imperial-readout
-                    entity: sensor.maker_space_x1c_5_current_layer
-                    name: Current Layer
-                    color: amber
-                  - type: custom:imperial-readout
-                    entity: sensor.maker_space_x1c_5_total_layer_count
-                    name: Total Layers
-                    color: red
+                  - type: horizontal-stack
+                    cards:
+                      - type: tile
+                        entity: sensor.maker_space_x1c_5_print_progress
+                        name: Print Progress
+                      - type: tile
+                        entity: sensor.maker_space_x1c_5_current_layer
+                        name: Current Layer
+                      - type: tile
+                        entity: sensor.maker_space_x1c_5_total_layer_count
+                        name: Total Layers
 
-              - type: picture-entity
-                entity: image.maker_space_x1c_5_cover_image
-                name: Job Preview
-                show_name: false
-                show_state: false
+                  - type: picture-entity
+                    entity: image.maker_space_x1c_5_cover_image
+                    name: Job Preview
+                    show_name: false
+                    show_state: false
 
-              - type: grid
-                columns: 3
-                square: false
+                  - type: grid
+                    columns: 3
+                    square: false
+                    cards:
+                      - type: tile
+                        entity: button.maker_space_x1c_5_pause
+                        name: Pause
+                        icon: mdi:pause-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.maker_space_x1c_5_pause
+                      - type: tile
+                        entity: button.maker_space_x1c_5_resume
+                        name: Resume
+                        icon: mdi:play-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.maker_space_x1c_5_resume
+                      - type: tile
+                        entity: button.maker_space_x1c_5_stop
+                        name: Stop Print
+                        icon: mdi:stop-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.maker_space_x1c_5_stop
+
+                  - type: grid
+                    columns: 2
+                    square: false
+                    cards:
+                      - type: tile
+                        entity: switch.maker_space_x1c_5_smart_plug
+                        name: Power On
+                        icon: mdi:power-plug
+                        tap_action:
+                          action: call-service
+                          service: switch.turn_on
+                          service_data:
+                            entity_id: switch.maker_space_x1c_5_smart_plug
+                      - type: tile
+                        entity: switch.maker_space_x1c_5_smart_plug
+                        name: Power Off
+                        icon: mdi:power-plug-off
+                        tap_action:
+                          action: call-service
+                          service: switch.turn_off
+                          service_data:
+                            entity_id: switch.maker_space_x1c_5_smart_plug
+
+              - type: vertical-stack
                 cards:
-                  - type: custom:imperial-button
-                    name: Pause
-                    icon: mdi:pause-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.maker_space_x1c_5_pause
-                    entity: button.maker_space_x1c_5_pause
-                    color: amber
-                  - type: custom:imperial-button
-                    name: Resume
-                    icon: mdi:play-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.maker_space_x1c_5_resume
-                    entity: button.maker_space_x1c_5_resume
-                    color: green
-                  - type: custom:imperial-button
-                    name: Stop Print
-                    icon: mdi:stop-circle
-                    service: button.press
-                    service_data:
-                      entity_id: button.maker_space_x1c_5_stop
-                    entity: button.maker_space_x1c_5_stop
-                    color: red
+                  - type: entities
+                    title: Fabrication Status
+                    entities:
+                      - entity: sensor.maker_space_x1c_5_task_name
+                        name: Job Name
+                        icon: mdi:file-document-outline
+                      - entity: sensor.maker_space_x1c_5_print_status
+                        name: Print Status
+                        icon: mdi:printer-3d
+                      - entity: sensor.maker_space_x1c_5_current_stage
+                        name: Current Stage
+                        icon: mdi:state-machine
+                      - entity: sensor.maker_space_x1c_5_remaining_time
+                        name: Time Remaining
+                        icon: mdi:timer-outline
+                      - entity: sensor.maker_space_x1c_5_end_time
+                        name: Est. Completion
+                        icon: mdi:clock-end
+                      - entity: sensor.maker_space_x1c_5_print_weight
+                        name: Filament Weight
+                        icon: mdi:weight-gram
+                      - entity: sensor.maker_space_x1c_5_print_length
+                        name: Filament Length
+                        icon: mdi:ruler
+                      - entity: sensor.maker_space_x1c_5_active_tray
+                        name: Active Tray
+                        icon: mdi:tray
 
-              - type: grid
-                columns: 2
-                square: false
-                cards:
-                  - type: custom:imperial-button
-                    name: Power On
-                    icon: mdi:power-plug
-                    service: switch.turn_on
-                    service_data:
-                      entity_id: switch.maker_space_x1c_5_smart_plug
-                    active_entity: switch.maker_space_x1c_5_smart_plug
-                    active_value: "on"
-                    color: green
-                  - type: custom:imperial-button
-                    name: Power Off
-                    icon: mdi:power-plug-off
-                    service: switch.turn_off
-                    service_data:
-                      entity_id: switch.maker_space_x1c_5_smart_plug
-                    active_entity: switch.maker_space_x1c_5_smart_plug
-                    active_value: "off"
-                    color: red
+                  - type: entities
+                    title: Thermal Systems
+                    entities:
+                      - entity: sensor.maker_space_x1c_5_nozzle_temperature
+                        name: Nozzle Temp
+                        icon: mdi:printer-3d-nozzle-heat
+                      - entity: sensor.maker_space_x1c_5_nozzle_target_temperature
+                        name: Nozzle Target
+                        icon: mdi:printer-3d-nozzle-heat-outline
+                      - entity: sensor.maker_space_x1c_5_bed_temperature
+                        name: Bed Temp
+                        icon: mdi:radiator
+                      - entity: sensor.maker_space_x1c_5_bed_target_temperature
+                        name: Bed Target
+                        icon: mdi:radiator
+                      - entity: sensor.maker_space_x1c_5_chamber_temperature
+                        name: Chamber Temp
+                        icon: mdi:cube-outline
 
-            right:
-              - type: custom:imperial-panel
-                title: Fabrication Status
-                entities:
-                  - entity: sensor.maker_space_x1c_5_task_name
-                    name: Job Name
-                    icon: mdi:file-document-outline
-                  - entity: sensor.maker_space_x1c_5_print_status
-                    name: Print Status
-                    icon: mdi:printer-3d
-                  - entity: sensor.maker_space_x1c_5_current_stage
-                    name: Current Stage
-                    icon: mdi:state-machine
-                  - entity: sensor.maker_space_x1c_5_remaining_time
-                    name: Time Remaining
-                    icon: mdi:timer-outline
-                  - entity: sensor.maker_space_x1c_5_end_time
-                    name: Est. Completion
-                    icon: mdi:clock-end
-                  - entity: sensor.maker_space_x1c_5_print_weight
-                    name: Filament Weight
-                    icon: mdi:weight-gram
-                  - entity: sensor.maker_space_x1c_5_print_length
-                    name: Filament Length
-                    icon: mdi:ruler
-                  - entity: sensor.maker_space_x1c_5_active_tray
-                    name: Active Tray
-                    icon: mdi:tray
-
-              - type: custom:imperial-panel
-                title: Thermal Systems
-                entities:
-                  - entity: sensor.maker_space_x1c_5_nozzle_temperature
-                    name: Nozzle Temp
-                    icon: mdi:printer-3d-nozzle-heat
-                    round: true
-                  - entity: sensor.maker_space_x1c_5_nozzle_target_temperature
-                    name: Nozzle Target
-                    icon: mdi:printer-3d-nozzle-heat-outline
-                    round: true
-                  - entity: sensor.maker_space_x1c_5_bed_temperature
-                    name: Bed Temp
-                    icon: mdi:radiator
-                    round: true
-                  - entity: sensor.maker_space_x1c_5_bed_target_temperature
-                    name: Bed Target
-                    icon: mdi:radiator
-                    round: true
-                  - entity: sensor.maker_space_x1c_5_chamber_temperature
-                    name: Chamber Temp
-                    icon: mdi:cube-outline
-                    round: true
-
-              - type: custom:imperial-panel
-                title: Power — Smart Plug
-                entities:
-                  - entity: sensor.maker_space_x1c_5_smart_plug_kp125m_current_consumption
-                    name: Power Draw
-                    icon: mdi:lightning-bolt
-                  - entity: sensor.maker_space_x1c_5_smart_plug_kp125m_today_s_consumption
-                    name: Today
-                    icon: mdi:calendar-today
-                  - entity: sensor.maker_space_x1c_5_smart_plug_kp125m_this_month_s_consumption
-                    name: This Month
-                    icon: mdi:calendar-month
-                  - entity: binary_sensor.maker_space_x1c_5_smart_plug_kp125m_overheated
-                    name: Overheat Alert
-                    icon: mdi:thermometer-alert
-                  - entity: binary_sensor.maker_space_x1c_5_smart_plug_kp125m_overloaded
-                    name: Overload Alert
-                    icon: mdi:alert-circle
+                  - type: entities
+                    title: Power — Smart Plug
+                    entities:
+                      - entity: sensor.maker_space_x1c_5_smart_plug_kp125m_current_consumption
+                        name: Power Draw
+                        icon: mdi:lightning-bolt
+                      - entity: sensor.maker_space_x1c_5_smart_plug_kp125m_today_s_consumption
+                        name: Today
+                        icon: mdi:calendar-today
+                      - entity: sensor.maker_space_x1c_5_smart_plug_kp125m_this_month_s_consumption
+                        name: This Month
+                        icon: mdi:calendar-month
+                      - entity: binary_sensor.maker_space_x1c_5_smart_plug_kp125m_overheated
+                        name: Overheat Alert
+                        icon: mdi:thermometer-alert
+                      - entity: binary_sensor.maker_space_x1c_5_smart_plug_kp125m_overloaded
+                        name: Overload Alert
+                        icon: mdi:alert-circle
