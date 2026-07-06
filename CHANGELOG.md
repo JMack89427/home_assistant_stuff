@@ -7,6 +7,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) for major str
 
 ### Added
 
+- **Lawn & Pool Dashboard — LUBA Mower Working Speed Setting**: Added settable LUBA mower target movement speed (`number.garden_luba_va624unr_working_speed`, 0.2–1.2 m/s) to the "Field Settings" entities card. Previously live but dashboard-hidden; follows the same pattern as cutting-pattern settings added earlier this session. Zero entity changes — presentation-layer only.
+
 - **Lawn & Pool Dashboard — LUBA Mower Cutting Settings**: Surfaced 7 previously-hidden LUBA mower configuration parameters in the "Field Settings" entities card: Cutting Pattern, Perimeter Laps, Path Spacing, Cutting Angle, Angle Mode, Traversal Mode, and Turnaround Mode. These HA entities (`select.garden_luba_va624unr_cutting_path_mode`, `select.garden_luba_va624unr_perimeter_mowing_laps`, etc.) were live but not dashboard-exposed; now accessible without navigating to entity details. Zero entity changes — presentation-layer only.
 
 - **Lawn & Pool Dashboard Zone Labels**: Updated Chopper (LUBA 3) zone switch labels in the Zones card from generic "Zone 1/2/3" to match manufacturer's physical area remap: "North Yard", "Back Yard", "South Yard" (Area 4 remains unmapped). Zone assignment now visible at a glance in the dashboard.

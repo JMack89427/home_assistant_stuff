@@ -1098,6 +1098,9 @@ views:
                       - entity: select.garden_luba_va624unr_turnaround_mode
                         name: Turnaround Mode
                         icon: mdi:sync
+                      - entity: number.garden_luba_va624unr_working_speed
+                        name: Working Speed
+                        icon: mdi:speedometer
 
               - type: vertical-stack
                 cards:
