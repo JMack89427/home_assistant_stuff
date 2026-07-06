@@ -1043,17 +1043,14 @@ views:
                   - type: entities
                     title: Zones
                     entities:
-                      - entity: switch.garden_luba_va624unr_area_area_1
-                        name: North Yard
-                        icon: mdi:map-marker-outline
-                      - entity: switch.garden_luba_va624unr_area_area_2
-                        name: Back Yard
-                        icon: mdi:map-marker-outline
                       - entity: switch.garden_luba_va624unr_area_area_3
-                        name: South Yard
+                        name: North Lawn
                         icon: mdi:map-marker-outline
                       - entity: switch.garden_luba_va624unr_area_area_4
-                        name: Zone 4
+                        name: Back Lawn
+                        icon: mdi:map-marker-outline
+                      - entity: switch.garden_luba_va624unr_area_area_2
+                        name: South Lawn
                         icon: mdi:map-marker-outline
 
                   - type: markdown

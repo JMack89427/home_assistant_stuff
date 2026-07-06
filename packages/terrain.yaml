@@ -8,7 +8,7 @@
 # successful mow. Skipped days (rain or Saturday) leave the rotation untouched
 # so the same zone's turn carries over to the next successful run.
 #
-# Defaults to the first option ("North Yard") on first load, matching the
+# Defaults to the first option ("North Lawn") on first load, matching the
 # requested starting order: North, then Back, then South.
 # ─────────────────────────────────────────────────────────────────────────────
 input_select:
@@ -16,6 +16,6 @@ input_select:
     name: Chopper Mow Rotation
     icon: mdi:rotate-3d-variant
     options:
-      - North Yard
-      - Back Yard
-      - South Yard
+      - North Lawn
+      - Back Lawn
+      - South Lawn

@@ -11,6 +11,10 @@ This project adheres to [Semantic Versioning](https://semver.org/) for major str
 
 - **Zone-Rotation Lawn Mowing Automation**: Extended `chopper_auto_mow_clear_morning` automation to automatically cycle through the three yard zones on successive mow runs (North → Back → South → repeat). New `input_select.chopper_mow_rotation` helper in `packages/terrain.yaml` tracks the queued zone. Mowing now runs at 11:00 (moved from 10:30) with Saturday as a no-mow day. Rotation advances only after a successful `start_mowing` call — skipped days (rain, Saturday, mower not docked) leave the current zone's turn intact for the next successful run, preventing zone slots from being silently skipped. Dashboard note added to the Zones card explaining that zone toggles may be overridden by the next scheduled rotation at 11am.
 
+### Fixed
+
+- **Chopper Zone-Rotation Mowing — Entity Remapping after Vendor App Remap**: User remapped/renamed LUBA 3 zones in the vendor app, causing Home Assistant's switch entity numbering to become misaligned with the mower's real zone index. Root cause: HA's entity_id slugs (`_area_1`, `_area_2`, etc.) are arbitrary registration-order assignments, not the vendor's actual zone numbers. Corrected zone-to-entity mapping in `chopper_auto_mow_clear_morning` automation and `input_select.chopper_mow_rotation` options: North Lawn → `switch.garden_luba_va624unr_area_area_3`, Back Lawn → `switch.garden_luba_va624unr_area_area_4`, South Lawn → `switch.garden_luba_va624unr_area_area_2`. Renamed zones from "Yard" to "Lawn" to match vendor app naming. Dashboard Zones card updated: dead `_area_1` row and generic "Zone 4" placeholder removed; now shows exactly 3 correctly-mapped rows matching the live mower switches.
+
 ## [2026-07-02]
 
 ### Changed
