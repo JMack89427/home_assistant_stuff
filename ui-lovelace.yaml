@@ -1056,29 +1056,6 @@ views:
                   - type: markdown
                     content: "_Zones are managed automatically by the mow rotation — manual toggles here may be overridden at the next scheduled run (11am)._"
 
-                  - type: grid
-                    columns: 2
-                    square: false
-                    cards:
-                      - type: tile
-                        entity: button.garden_luba_va624unr_task_1
-                        name: Task 1
-                        icon: mdi:play-circle-outline
-                        tap_action:
-                          action: call-service
-                          service: button.press
-                          service_data:
-                            entity_id: button.garden_luba_va624unr_task_1
-                      - type: tile
-                        entity: button.garden_luba_va624unr_task_2
-                        name: Task 2
-                        icon: mdi:play-circle-outline
-                        tap_action:
-                          action: call-service
-                          service: button.press
-                          service_data:
-                            entity_id: button.garden_luba_va624unr_task_2
-
                   - type: entities
                     title: Field Settings
                     entities:
@@ -1100,6 +1077,27 @@ views:
                       - entity: number.garden_luba_va624unr_blade_height
                         name: Blade Height
                         icon: mdi:ruler
+                      - entity: select.garden_luba_va624unr_cutting_path_mode
+                        name: Cutting Pattern
+                        icon: mdi:grid
+                      - entity: select.garden_luba_va624unr_perimeter_mowing_laps
+                        name: Perimeter Laps
+                        icon: mdi:vector-square
+                      - entity: number.garden_luba_va624unr_path_spacing
+                        name: Path Spacing
+                        icon: mdi:arrow-expand-horizontal
+                      - entity: number.garden_luba_va624unr_cutting_path_angle
+                        name: Cutting Angle
+                        icon: mdi:angle-acute
+                      - entity: select.garden_luba_va624unr_cutting_path_angle_mode
+                        name: Angle Mode
+                        icon: mdi:rotate-3d-variant
+                      - entity: select.garden_luba_va624unr_traversal_mode
+                        name: Traversal Mode
+                        icon: mdi:transit-connection-variant
+                      - entity: select.garden_luba_va624unr_turnaround_mode
+                        name: Turnaround Mode
+                        icon: mdi:sync
 
               - type: vertical-stack
                 cards:
