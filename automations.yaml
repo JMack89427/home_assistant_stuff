@@ -268,9 +268,9 @@
         # other two rotation switches (never area_1 — that zone no longer
         # exists after the mower's zones were remapped/renamed in the app).
         chopper_zone_switch_map:
-          North Lawn: switch.garden_luba_va624unr_area_area_3
-          Back Lawn: switch.garden_luba_va624unr_area_area_4
-          South Lawn: switch.garden_luba_va624unr_area_area_2
+          North Lawn: switch.garden_luba_va624unr_area_north_lawn
+          Back Lawn: switch.garden_luba_va624unr_area_area_2
+          South Lawn: switch.garden_luba_va624unr_area_south_lawn
         chopper_target_switch: >-
           {{ chopper_zone_switch_map[states('input_select.chopper_mow_rotation')] }}
         chopper_other_switches: >-
