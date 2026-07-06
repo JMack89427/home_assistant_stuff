@@ -1,0 +1,21 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# packages/terrain.yaml — Chopper (LUBA 3) zone-rotation mowing
+#
+# input_select.chopper_mow_rotation tracks which yard zone mows next.
+# Consumed by automation `chopper_auto_mow_clear_morning` in automations.yaml,
+# which resolves the current option to a zone switch, mows, then advances
+# this helper via input_select.select_next (cycle: true) — but only after a
+# successful mow. Skipped days (rain or Saturday) leave the rotation untouched
+# so the same zone's turn carries over to the next successful run.
+#
+# Defaults to the first option ("North Yard") on first load, matching the
+# requested starting order: North, then Back, then South.
+# ─────────────────────────────────────────────────────────────────────────────
+input_select:
+  chopper_mow_rotation:
+    name: Chopper Mow Rotation
+    icon: mdi:rotate-3d-variant
+    options:
+      - North Yard
+      - Back Yard
+      - South Yard

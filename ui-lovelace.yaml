@@ -1044,17 +1044,20 @@ views:
                     title: Zones
                     entities:
                       - entity: switch.garden_luba_va624unr_area_area_1
-                        name: Zone 1
+                        name: North Yard
                         icon: mdi:map-marker-outline
                       - entity: switch.garden_luba_va624unr_area_area_2
-                        name: Zone 2
+                        name: Back Yard
                         icon: mdi:map-marker-outline
                       - entity: switch.garden_luba_va624unr_area_area_3
-                        name: Zone 3
+                        name: South Yard
                         icon: mdi:map-marker-outline
                       - entity: switch.garden_luba_va624unr_area_area_4
                         name: Zone 4
                         icon: mdi:map-marker-outline
+
+                  - type: markdown
+                    content: "_Zones are managed automatically by the mow rotation — manual toggles here may be overridden at the next scheduled run (11am)._"
 
                   - type: grid
                     columns: 2

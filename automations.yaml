@@ -234,14 +234,23 @@
 
 # 1. Auto-start mowing on clear mornings
 - id: chopper_auto_mow_clear_morning
-  alias: "Terrain: Auto-mow clear morning"
+  alias: "Terrain: Auto-mow clear morning (zone rotation)"
   trigger:
     - platform: time
-      at: "10:30:00"
+      at: "11:00:00"
   condition:
     - condition: state
       entity_id: lawn_mower.garden_luba_va624unr
       state: docked
+    # No-mow day — rotation must NOT advance, so today's zone carries over
+    - condition: time
+      weekday:
+        - mon
+        - tue
+        - wed
+        - thu
+        - fri
+        - sun
     # Abort if precipitation is forecast — partly cloudy is acceptable
     - condition: not
       conditions:
@@ -254,9 +263,41 @@
             - lightning-rainy
             - hail
   action:
+    - variables:
+        # Map the current rotation option to its zone switch, and collect the
+        # other two rotation switches (never area_4 — it's not in rotation).
+        chopper_zone_switch_map:
+          North Yard: switch.garden_luba_va624unr_area_area_1
+          Back Yard: switch.garden_luba_va624unr_area_area_2
+          South Yard: switch.garden_luba_va624unr_area_area_3
+        chopper_target_switch: >-
+          {{ chopper_zone_switch_map[states('input_select.chopper_mow_rotation')] }}
+        chopper_other_switches: >-
+          {{ chopper_zone_switch_map.values() | reject('eq', chopper_target_switch) | list }}
+
+    # Step A/B — turn on the resolved target zone switch
+    - service: switch.turn_on
+      target:
+        entity_id: "{{ chopper_target_switch }}"
+
+    # Step C — turn off the other two rotation switches idempotently
+    - service: switch.turn_off
+      target:
+        entity_id: "{{ chopper_other_switches }}"
+
+    # Step D — start mowing
     - service: lawn_mower.start_mowing
       target:
         entity_id: lawn_mower.garden_luba_va624unr
+
+    # Step E — advance rotation LAST, only after mowing was successfully
+    # started; if step D fails/throws, this never runs and the same zone
+    # retries on the next scheduled run.
+    - service: input_select.select_next
+      target:
+        entity_id: input_select.chopper_mow_rotation
+      data:
+        cycle: true
   mode: single
 
 # 2. Dock and alert on low battery
