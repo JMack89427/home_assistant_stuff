@@ -271,17 +271,29 @@
         entity_id: input_boolean.chopper_battery_dock_active
 
     - variables:
-        # Map the current rotation option to its zone switch, and collect the
-        # other two rotation switches (never area_1 — that zone no longer
-        # exists after the mower's zones were remapped/renamed in the app).
-        chopper_zone_switch_map:
-          North Lawn: switch.garden_luba_va624unr_area_north_lawn
-          Back Lawn: switch.garden_luba_va624unr_area_area_2
-          South Lawn: switch.garden_luba_va624unr_area_south_lawn
+        # Resolve the target zone switch dynamically by matching friendly_name
+        # rather than a hardcoded entity_id map. This integration has repeatedly
+        # regenerated zone switch entity_ids (new internal hash) after restarts
+        # or app-side zone edits, silently breaking any hardcoded map. Matching
+        # on friendly_name instead is self-healing: as long as the mower still
+        # reports "Luba-VA624UNR Area <Zone Name>" for each switch, this finds
+        # the right entity regardless of what entity_id HA assigned it this time.
+        chopper_target_zone_name: "{{ states('input_select.chopper_mow_rotation') }}"
+        chopper_all_zone_switches: >-
+          {{ states.switch
+             | selectattr('entity_id', 'match', '^switch\.garden_luba_va624unr_area_')
+             | selectattr('attributes.friendly_name', 'search', '(North Lawn|Back Lawn|South Lawn)')
+             | list }}
         chopper_target_switch: >-
-          {{ chopper_zone_switch_map[states('input_select.chopper_mow_rotation')] }}
+          {{ (chopper_all_zone_switches
+              | selectattr('attributes.friendly_name', 'search', chopper_target_zone_name)
+              | map(attribute='entity_id')
+              | list | first) }}
         chopper_other_switches: >-
-          {{ chopper_zone_switch_map.values() | reject('eq', chopper_target_switch) | list }}
+          {{ chopper_all_zone_switches
+             | rejectattr('entity_id', 'eq', chopper_target_switch)
+             | map(attribute='entity_id')
+             | list }}
 
     # Step A/B — turn on the resolved target zone switch
     - service: switch.turn_on
@@ -469,10 +481,19 @@
     - condition: state
       entity_id: input_boolean.chopper_battery_dock_active
       state: "on"
-    # Redundant safety — mower must actually be docked before resuming
+    # Safety — mower must actually be at the charging station before resuming.
+    # NOTE: lawn_mower.garden_luba_va624unr's own `docked` state is unreliable
+    # for this — the integration reports `paused` (not `docked`) even when the
+    # mower is fully charged and sitting at the dock. device_position_type is
+    # a more durable signal (reflects physical location, not active charge
+    # draw, so it stays CHARGE_ON even after the battery tops out) — unlike
+    # binary_sensor.garden_luba_va624unr_charging, which can flip off once
+    # fully charged while still docked, or the generic `paused` state, which
+    # is also used for unrelated mid-lawn pauses (see chopper_paused_too_long)
+    # and would be unsafe to treat as "safe to resume" broadly.
     - condition: state
-      entity_id: lawn_mower.garden_luba_va624unr
-      state: docked
+      entity_id: sensor.garden_luba_va624unr_device_position_type
+      state: "CHARGE_ON"
     # Only resume during a reasonable operating window — mower is silent
     # with night-vision capability, so this isn't a noise/darkness guard,
     # just a hard stop against starting a fresh mow cycle after 2am
