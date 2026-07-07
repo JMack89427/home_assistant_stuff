@@ -473,10 +473,12 @@
     - condition: state
       entity_id: lawn_mower.garden_luba_va624unr
       state: docked
-    # Only resume during a reasonable operating window
+    # Only resume during a reasonable operating window — mower is silent
+    # with night-vision capability, so this isn't a noise/darkness guard,
+    # just a hard stop against starting a fresh mow cycle after 2am
     - condition: time
       after: "11:00:00"
-      before: "18:00:00"
+      before: "02:00:00"
   action:
     # Let the charge reading settle before resuming
     - delay: "00:02:00"

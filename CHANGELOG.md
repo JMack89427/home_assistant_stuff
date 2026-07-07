@@ -19,6 +19,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) for major str
 
 - **Lawn & Pool Dashboard — Task Button Grid Removed**: Deleted the "Task 1" / "Task 2" button grid card from the Lawn & Pool view. Both buttons were showing "Unavailable" in the live UI — functionality is now handled by the zone-rotation automation added earlier this session. Button entities remain in HA; dashboard presentation simplified.
 
+- **Chopper Resume After Charge — Operating Window Extended to 2:00 AM**: Widened `chopper_resume_after_charge` automation's upper time bound from `18:00:00` to `02:00:00`. Original assumption (avoid evening darkness) did not apply — mower is silent and equipped with camera and headlight for night operation. New constraint: no mow cycle start after 2:00 AM. Window now spans 11:00–02:00 with overnight wraparound.
+
 ### Fixed
 
 - **Chopper Lawn Mowing — Resume After Charge on Low-Battery Mid-Mow Dock**: Fixed critical gap in low-battery docking: when mower docked mid-task due to low battery (`chopper_low_battery_dock`), nothing resumed the interrupted zone after recharge. New automation `chopper_resume_after_charge` monitors for battery rising above 90% and automatically resumes mowing within the 11:00–18:00 operational window. New `input_boolean.chopper_battery_dock_active` helper (in `packages/terrain.yaml`) tracks whether a dock was triggered by mid-task low battery vs. a genuine mow completion. Helper is set by `chopper_low_battery_dock`, cleared on successful resume, and also cleared each morning by `chopper_auto_mow_clear_morning` to prevent stale flags from corrupting the next day's fresh rotation.
