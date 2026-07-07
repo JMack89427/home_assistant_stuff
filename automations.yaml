@@ -263,6 +263,13 @@
             - lightning-rainy
             - hail
   action:
+    # Clear any stale low-battery-dock flag before today's run starts — a day
+    # that docked on low battery and never recharged above the resume
+    # threshold must not corrupt this fresh scheduled mow.
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.chopper_battery_dock_active
+
     - variables:
         # Map the current rotation option to its zone switch, and collect the
         # other two rotation switches (never area_1 — that zone no longer
@@ -315,6 +322,12 @@
           entity_id: lawn_mower.garden_luba_va624unr
           state: docked
   action:
+    # Mark this dock as battery-forced so the resume automation knows to
+    # restart mowing later, and so chopper_mow_complete suppresses its
+    # "mow complete" notification for this dock event.
+    - service: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.chopper_battery_dock_active
     - service: lawn_mower.dock
       target:
         entity_id: lawn_mower.garden_luba_va624unr
@@ -410,7 +423,7 @@
   condition:
     # Only resume during the main mow window
     - condition: time
-      after: "10:30:00"
+      after: "11:00:00"
       before: "15:00:00"
     # Only issue start_mowing when fully docked — guards against issuing duplicate
     # commands if the forecast oscillates between rain states while mower is mid-run
@@ -444,16 +457,65 @@
         message: "Rain cleared — CHOPPER resuming mow."
   mode: single
 
-# 6. Notify when mow session completes (mower returns to dock)
+# 6. Resume mowing after low-battery recharge completes
+- id: chopper_resume_after_charge
+  alias: "Terrain: Resume after low-battery recharge"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.garden_luba_va624unr_battery
+      above: 90
+  condition:
+    # Only resume if this was a low-battery-forced dock, not a genuine completion
+    - condition: state
+      entity_id: input_boolean.chopper_battery_dock_active
+      state: "on"
+    # Redundant safety — mower must actually be docked before resuming
+    - condition: state
+      entity_id: lawn_mower.garden_luba_va624unr
+      state: docked
+    # Only resume during a reasonable operating window
+    - condition: time
+      after: "11:00:00"
+      before: "18:00:00"
+  action:
+    # Let the charge reading settle before resuming
+    - delay: "00:02:00"
+    - service: lawn_mower.start_mowing
+      target:
+        entity_id: lawn_mower.garden_luba_va624unr
+    # Clear the flag LAST, only after start_mowing succeeds — mirrors the
+    # advance-only-on-success pattern in chopper_auto_mow_clear_morning
+    - service: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.chopper_battery_dock_active
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Terrain Operations"
+        message: >
+          CHOPPER recharged to {{ states('sensor.garden_luba_va624unr_battery') }}% — resuming interrupted mow.
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Terrain Operations"
+        message: >
+          CHOPPER recharged to {{ states('sensor.garden_luba_va624unr_battery') }}% — resuming interrupted mow.
+  mode: single
+
+# 7. Notify when mow session completes (mower returns to dock)
 - id: chopper_mow_complete
   alias: "Terrain: Mow complete notification"
   trigger:
-    # from: mowing is required — without it this would also fire on low-battery
-    # dock events and manual recalls, producing spurious "mow complete" alerts
+    # from: mowing is required so manual recalls etc. don't fire this, but the
+    # real guard against spurious alerts is the condition below: it suppresses
+    # this notification whenever the dock was low-battery-forced rather than
+    # a genuine completed mow.
     - platform: state
       entity_id: lawn_mower.garden_luba_va624unr
       from: mowing
       to: docked
+  condition:
+    - condition: state
+      entity_id: input_boolean.chopper_battery_dock_active
+      state: "off"
   action:
     - service: notify.mobile_app_jason_s_iphone
       data:
@@ -467,7 +529,7 @@
           CHOPPER mow complete. Battery: {{ states('sensor.garden_luba_va624unr_battery') }}%
   mode: single
 
-# 7. Connectivity watchdog — reload integration and alert when Mammotion drops
+# 8. Connectivity watchdog — reload integration and alert when Mammotion drops
 - id: chopper_connection_watchdog
   alias: "Terrain Operations: CHOPPER connection lost"
   trigger:

@@ -10,6 +10,15 @@
 #
 # Defaults to the first option ("North Lawn") on first load, matching the
 # requested starting order: North, then Back, then South.
+#
+# input_boolean.chopper_battery_dock_active tracks whether the mower is
+# docked/docking specifically because of a mid-task low-battery event with
+# an unfinished zone still waiting to be resumed, as opposed to a genuine
+# completed mow. Set by `chopper_low_battery_dock`; cleared by
+# `chopper_resume_after_charge` on a successful resume, and also cleared at
+# the start of every `chopper_auto_mow_clear_morning` run so a stale flag
+# from a day that never recharged can't corrupt the next day's fresh
+# rotation.
 # ─────────────────────────────────────────────────────────────────────────────
 input_select:
   chopper_mow_rotation:
@@ -19,3 +28,8 @@ input_select:
       - North Lawn
       - Back Lawn
       - South Lawn
+
+input_boolean:
+  chopper_battery_dock_active:
+    name: Chopper Battery Dock Active
+    icon: mdi:battery-alert
