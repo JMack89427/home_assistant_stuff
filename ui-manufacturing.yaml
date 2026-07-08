@@ -878,23 +878,23 @@ views:
                     square: false
                     cards:
                       - type: tile
-                        entity: switch.maker_space_x1c_5_smart_plug
+                        entity: switch.maker_space_x1c_5_smart_plug_kp125m
                         name: Power On
                         icon: mdi:power-plug
                         tap_action:
                           action: call-service
                           service: switch.turn_on
                           service_data:
-                            entity_id: switch.maker_space_x1c_5_smart_plug
+                            entity_id: switch.maker_space_x1c_5_smart_plug_kp125m
                       - type: tile
-                        entity: switch.maker_space_x1c_5_smart_plug
+                        entity: switch.maker_space_x1c_5_smart_plug_kp125m
                         name: Power Off
                         icon: mdi:power-plug-off
                         tap_action:
                           action: call-service
                           service: switch.turn_off
                           service_data:
-                            entity_id: switch.maker_space_x1c_5_smart_plug
+                            entity_id: switch.maker_space_x1c_5_smart_plug_kp125m
 
               - type: vertical-stack
                 cards:
@@ -961,5 +961,317 @@ views:
                         name: Overheat Alert
                         icon: mdi:thermometer-alert
                       - entity: binary_sensor.maker_space_x1c_5_smart_plug_kp125m_overloaded
+                        name: Overload Alert
+                        icon: mdi:alert-circle
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # VIEW 9: X1C 4
+  # ═══════════════════════════════════════════════════════════════════════════
+  - title: X1C 4
+    path: x1c-4
+    panel: true
+    icon: mdi:printer-3d-nozzle
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: "## Bambu X1C — Unit 4"
+
+          - type: horizontal-stack
+            cards:
+              - type: vertical-stack
+                cards:
+                  - type: horizontal-stack
+                    cards:
+                      - type: tile
+                        entity: sensor.x1c_00m09a351803154_print_progress
+                        name: Print Progress
+                      - type: tile
+                        entity: sensor.x1c_00m09a351803154_current_layer
+                        name: Current Layer
+                      - type: tile
+                        entity: sensor.x1c_00m09a351803154_total_layer_count
+                        name: Total Layers
+
+                  - type: picture-entity
+                    entity: image.x1c_00m09a351803154_cover_image
+                    name: Job Preview
+                    show_name: false
+                    show_state: false
+
+                  - type: grid
+                    columns: 3
+                    square: false
+                    cards:
+                      - type: tile
+                        entity: button.x1c_00m09a351803154_pause
+                        name: Pause
+                        icon: mdi:pause-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.x1c_00m09a351803154_pause
+                      - type: tile
+                        entity: button.x1c_00m09a351803154_resume
+                        name: Resume
+                        icon: mdi:play-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.x1c_00m09a351803154_resume
+                      - type: tile
+                        entity: button.x1c_00m09a351803154_stop
+                        name: Stop Print
+                        icon: mdi:stop-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.x1c_00m09a351803154_stop
+
+                  - type: grid
+                    columns: 2
+                    square: false
+                    cards:
+                      - type: tile
+                        entity: switch.maker_space_x1c_4_smart_plug_2
+                        name: Power On
+                        icon: mdi:power-plug
+                        tap_action:
+                          action: call-service
+                          service: switch.turn_on
+                          service_data:
+                            entity_id: switch.maker_space_x1c_4_smart_plug_2
+                      - type: tile
+                        entity: switch.maker_space_x1c_4_smart_plug_2
+                        name: Power Off
+                        icon: mdi:power-plug-off
+                        tap_action:
+                          action: call-service
+                          service: switch.turn_off
+                          service_data:
+                            entity_id: switch.maker_space_x1c_4_smart_plug_2
+
+              - type: vertical-stack
+                cards:
+                  - type: entities
+                    title: Fabrication Status
+                    entities:
+                      - entity: sensor.x1c_00m09a351803154_task_name
+                        name: Job Name
+                        icon: mdi:file-document-outline
+                      - entity: sensor.x1c_00m09a351803154_print_status
+                        name: Print Status
+                        icon: mdi:printer-3d
+                      - entity: sensor.x1c_00m09a351803154_current_stage
+                        name: Current Stage
+                        icon: mdi:state-machine
+                      - entity: sensor.x1c_00m09a351803154_remaining_time
+                        name: Time Remaining
+                        icon: mdi:timer-outline
+                      - entity: sensor.x1c_00m09a351803154_end_time
+                        name: Est. Completion
+                        icon: mdi:clock-end
+                      - entity: sensor.x1c_00m09a351803154_print_weight
+                        name: Filament Weight
+                        icon: mdi:weight-gram
+                      - entity: sensor.x1c_00m09a351803154_print_length
+                        name: Filament Length
+                        icon: mdi:ruler
+
+                  - type: entities
+                    title: Thermal Systems
+                    entities:
+                      - entity: sensor.x1c_00m09a351803154_nozzle_temperature
+                        name: Nozzle Temp
+                        icon: mdi:printer-3d-nozzle-heat
+                      - entity: sensor.x1c_00m09a351803154_nozzle_target_temperature
+                        name: Nozzle Target
+                        icon: mdi:printer-3d-nozzle-heat-outline
+                      - entity: sensor.x1c_00m09a351803154_bed_temperature
+                        name: Bed Temp
+                        icon: mdi:radiator
+                      - entity: sensor.x1c_00m09a351803154_bed_target_temperature
+                        name: Bed Target
+                        icon: mdi:radiator
+                      - entity: sensor.x1c_00m09a351803154_chamber_temperature
+                        name: Chamber Temp
+                        icon: mdi:cube-outline
+
+                  - type: entities
+                    title: Power — Smart Plug
+                    entities:
+                      - entity: sensor.maker_space_x1c_4_smart_plug_current_consumption
+                        name: Power Draw
+                        icon: mdi:lightning-bolt
+                      - entity: sensor.maker_space_x1c_4_smart_plug_today_s_consumption
+                        name: Today
+                        icon: mdi:calendar-today
+                      - entity: sensor.maker_space_x1c_4_smart_plug_this_month_s_consumption
+                        name: This Month
+                        icon: mdi:calendar-month
+                      - entity: binary_sensor.maker_space_x1c_4_smart_plug_overheated
+                        name: Overheat Alert
+                        icon: mdi:thermometer-alert
+                      - entity: binary_sensor.maker_space_x1c_4_smart_plug_overloaded
+                        name: Overload Alert
+                        icon: mdi:alert-circle
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # VIEW 10: X1C 6
+  # ═══════════════════════════════════════════════════════════════════════════
+  - title: X1C 6
+    path: x1c-6
+    panel: true
+    icon: mdi:printer-3d-nozzle
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: "## Bambu X1C — Unit 6"
+
+          - type: horizontal-stack
+            cards:
+              - type: vertical-stack
+                cards:
+                  - type: horizontal-stack
+                    cards:
+                      - type: tile
+                        entity: sensor.x1c_00m09a3c1301432_print_progress
+                        name: Print Progress
+                      - type: tile
+                        entity: sensor.x1c_00m09a3c1301432_current_layer
+                        name: Current Layer
+                      - type: tile
+                        entity: sensor.x1c_00m09a3c1301432_total_layer_count
+                        name: Total Layers
+
+                  - type: picture-entity
+                    entity: image.x1c_00m09a3c1301432_cover_image
+                    name: Job Preview
+                    show_name: false
+                    show_state: false
+
+                  - type: grid
+                    columns: 3
+                    square: false
+                    cards:
+                      - type: tile
+                        entity: button.x1c_00m09a3c1301432_pause
+                        name: Pause
+                        icon: mdi:pause-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.x1c_00m09a3c1301432_pause
+                      - type: tile
+                        entity: button.x1c_00m09a3c1301432_resume
+                        name: Resume
+                        icon: mdi:play-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.x1c_00m09a3c1301432_resume
+                      - type: tile
+                        entity: button.x1c_00m09a3c1301432_stop
+                        name: Stop Print
+                        icon: mdi:stop-circle
+                        tap_action:
+                          action: call-service
+                          service: button.press
+                          service_data:
+                            entity_id: button.x1c_00m09a3c1301432_stop
+
+                  - type: grid
+                    columns: 2
+                    square: false
+                    cards:
+                      - type: tile
+                        entity: switch.maker_space_x1c_6_smart_plug_2
+                        name: Power On
+                        icon: mdi:power-plug
+                        tap_action:
+                          action: call-service
+                          service: switch.turn_on
+                          service_data:
+                            entity_id: switch.maker_space_x1c_6_smart_plug_2
+                      - type: tile
+                        entity: switch.maker_space_x1c_6_smart_plug_2
+                        name: Power Off
+                        icon: mdi:power-plug-off
+                        tap_action:
+                          action: call-service
+                          service: switch.turn_off
+                          service_data:
+                            entity_id: switch.maker_space_x1c_6_smart_plug_2
+
+              - type: vertical-stack
+                cards:
+                  - type: entities
+                    title: Fabrication Status
+                    entities:
+                      - entity: sensor.x1c_00m09a3c1301432_task_name
+                        name: Job Name
+                        icon: mdi:file-document-outline
+                      - entity: sensor.x1c_00m09a3c1301432_print_status
+                        name: Print Status
+                        icon: mdi:printer-3d
+                      - entity: sensor.x1c_00m09a3c1301432_current_stage
+                        name: Current Stage
+                        icon: mdi:state-machine
+                      - entity: sensor.x1c_00m09a3c1301432_remaining_time
+                        name: Time Remaining
+                        icon: mdi:timer-outline
+                      - entity: sensor.x1c_00m09a3c1301432_end_time
+                        name: Est. Completion
+                        icon: mdi:clock-end
+                      - entity: sensor.x1c_00m09a3c1301432_print_weight
+                        name: Filament Weight
+                        icon: mdi:weight-gram
+                      - entity: sensor.x1c_00m09a3c1301432_print_length
+                        name: Filament Length
+                        icon: mdi:ruler
+
+                  - type: entities
+                    title: Thermal Systems
+                    entities:
+                      - entity: sensor.x1c_00m09a3c1301432_nozzle_temperature
+                        name: Nozzle Temp
+                        icon: mdi:printer-3d-nozzle-heat
+                      - entity: sensor.x1c_00m09a3c1301432_nozzle_target_temperature
+                        name: Nozzle Target
+                        icon: mdi:printer-3d-nozzle-heat-outline
+                      - entity: sensor.x1c_00m09a3c1301432_bed_temperature
+                        name: Bed Temp
+                        icon: mdi:radiator
+                      - entity: sensor.x1c_00m09a3c1301432_bed_target_temperature
+                        name: Bed Target
+                        icon: mdi:radiator
+                      - entity: sensor.x1c_00m09a3c1301432_chamber_temperature
+                        name: Chamber Temp
+                        icon: mdi:cube-outline
+
+                  - type: entities
+                    title: Power — Smart Plug
+                    entities:
+                      - entity: sensor.maker_space_x1c_6_smart_plug_current_consumption
+                        name: Power Draw
+                        icon: mdi:lightning-bolt
+                      - entity: sensor.maker_space_x1c_6_smart_plug_today_s_consumption
+                        name: Today
+                        icon: mdi:calendar-today
+                      - entity: sensor.maker_space_x1c_6_smart_plug_this_month_s_consumption
+                        name: This Month
+                        icon: mdi:calendar-month
+                      - entity: binary_sensor.maker_space_x1c_6_smart_plug_overheated
+                        name: Overheat Alert
+                        icon: mdi:thermometer-alert
+                      - entity: binary_sensor.maker_space_x1c_6_smart_plug_overloaded
                         name: Overload Alert
                         icon: mdi:alert-circle
