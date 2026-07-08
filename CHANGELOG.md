@@ -37,6 +37,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) for major str
 
 - **Chopper Resume After Rain — Stale Time-Window Lower Bound**: Corrected `chopper_resume_after_rain` automation's time-window lower bound from `10:30:00` to `11:00:00`, matching the scheduled mow's actual start time (mow was moved to 11am in an earlier session, but this window was not updated).
 
+- **Lawn & Pool Dashboard — LUBA Zone Entity ID Reassignment (Fourth Occurrence)**: Updated Zones card entity references to match latest LUBA integration reload: `switch.garden_luba_va624unr_area_north_lawn` and `switch.garden_luba_va624unr_area_south_lawn` (reverted from prior-session `_2` suffixed versions). This is the fourth entity_id churn this session; root cause is the Mammotion/LUBA integration regenerating zone switch IDs on every restart. Automation (`chopper_auto_mow_clear_morning`) remains unaffected — it uses self-healing dynamic resolution by friendly_name (see "Chopper Lawn Mowing — Self-Healing Zone Switch Resolution"). Dashboard-only fix; no entity changes to automation logic.
+
 ## [2026-07-02]
 
 ### Changed
