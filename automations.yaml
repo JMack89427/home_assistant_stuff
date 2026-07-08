@@ -305,6 +305,13 @@
       target:
         entity_id: "{{ chopper_other_switches }}"
 
+    # Settle delay — this integration has shown laggy command propagation;
+    # calling start_mowing immediately after the zone-switch changes can
+    # silently no-op or start with stale zone state. A manual test confirmed
+    # a natural pause between toggling the switch and pressing Start works
+    # reliably, so give the mower a moment to register the zone change first.
+    - delay: "00:00:10"
+
     # Step D — start mowing
     - service: lawn_mower.start_mowing
       target:
