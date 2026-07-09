@@ -193,12 +193,12 @@
       data:
         title: "Terrain Operations"
         message: >
-          Rain forecast ({{ states('weather.forecast_home_3') }}) — Chopper mow delayed today
+          Rain forecast ({{ states('weather.forecast_home_3') }}) — Chopper's 11am mow may be delayed. Will recheck then.
     - service: notify.mobile_app_ipad
       data:
         title: "Terrain Operations"
         message: >
-          Rain forecast ({{ states('weather.forecast_home_3') }}) — Chopper mow delayed today
+          Rain forecast ({{ states('weather.forecast_home_3') }}) — Chopper's 11am mow may be delayed. Will recheck then.
   mode: single
 
 # ── Terrain: Chopper stuck notification ──────────────────────────────────────
@@ -331,9 +331,14 @@
 - id: chopper_low_battery_dock
   alias: "Terrain: Low battery dock + alert"
   trigger:
+    # Battery sensor occasionally glitches to 0% for a fraction of a second
+    # during connection instability, then recovers immediately. Require the
+    # low reading to hold for a full minute so we only react to genuine
+    # gradual battery drain, not the transient glitch.
     - platform: numeric_state
       entity_id: sensor.garden_luba_va624unr_battery
       below: 20
+      for: "00:01:00"
   condition:
     - condition: not
       conditions:
