@@ -1,11 +1,10 @@
 // =============================================================================
-// IMPERIAL COMMAND INTERFACE — Custom Lovelace Cards v1.0.0
-// Star Wars Dark Side aesthetic for Home Assistant
+// Custom Lovelace Cards — Fleet grid and alert panel
 // =============================================================================
 (function () {
   'use strict';
 
-  const VERSION = '2.8.0';
+  const VERSION = '2.9.0';
 
   const WX_ICONS = {
     'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
@@ -20,15 +19,15 @@
 
   // ── Shared CSS tokens ──────────────────────────────────────────────────────
   const V = `
-    --ir: #CC0000; --ir-dim: rgba(204,0,0,0.25); --ir-glow: rgba(204,0,0,0.15);
-    --ic:#C8C8C8;--ic-dim:rgba(200,200,200,0.12);--ic-glow:rgba(200,200,200,0.15);--iborder:rgba(200,200,200,0.30);
-    --ig: #00C853; --ig-glow: rgba(0,200,83,0.5);
-    --ia: #FFB300; --ia-glow: rgba(255,179,0,0.5);
-    --ibg: #0A0A0A; --ipanel: #1A1A1A;
-    --igrey: #444444; --igreyl: #909090;
-    --itext: #E8E8E8; --itextd: #909090;
-    --imono: 'Courier New', Courier, monospace;
-    --iui:   'Arial Narrow', Arial, sans-serif;
+    --ir: var(--error-color, #db4437); --ir-dim: rgba(219,68,55,0.12); --ir-glow: rgba(219,68,55,0.10);
+    --ic: var(--primary-color, #03a9f4); --ic-dim: rgba(0,0,0,0.06); --ic-glow: rgba(0,0,0,0.08); --iborder: var(--divider-color, rgba(0,0,0,0.12));
+    --ig: var(--success-color, #43a047); --ig-glow: rgba(67,160,71,0.12);
+    --ia: var(--warning-color, #ffa600); --ia-glow: rgba(255,166,0,0.12);
+    --ibg: var(--primary-background-color, #fafafa); --ipanel: var(--card-background-color, #ffffff);
+    --igrey: var(--disabled-text-color, #bdbdbd); --igreyl: var(--secondary-text-color, #727272);
+    --itext: var(--primary-text-color, #212121); --itextd: var(--secondary-text-color, #727272);
+    --imono: 'Roboto Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    --iui: Roboto, 'Helvetica Neue', Arial, sans-serif;
   `;
 
   const SCAN = `
@@ -124,13 +123,13 @@
     const isActive   = isPrinting || isPaused || hasError;
 
     let statusColor, statusLabel;
-    if (hasError || isFailed)  { statusColor = 'var(--ir)'; statusLabel = 'ERROR'; }
-    else if (isPrinting)       { statusColor = 'var(--ia)'; statusLabel = 'PRINTING'; }
-    else if (isPaused)         { statusColor = 'var(--ia)'; statusLabel = 'PAUSED'; }
-    else if (isDone)           { statusColor = 'var(--ig)'; statusLabel = 'COMPLETE'; }
-    else if (isCancelled)      { statusColor = 'var(--igreyl)'; statusLabel = 'CANCELLED'; }
-    else if (isOffline)        { statusColor = 'var(--igrey)'; statusLabel = 'OFFLINE'; }
-    else                       { statusColor = 'var(--igreyl)'; statusLabel = 'IDLE'; }
+    if (hasError || isFailed)  { statusColor = 'var(--ir)'; statusLabel = 'Error'; }
+    else if (isPrinting)       { statusColor = 'var(--ia)'; statusLabel = 'Printing'; }
+    else if (isPaused)         { statusColor = 'var(--ia)'; statusLabel = 'Paused'; }
+    else if (isDone)           { statusColor = 'var(--ig)'; statusLabel = 'Complete'; }
+    else if (isCancelled)      { statusColor = 'var(--igreyl)'; statusLabel = 'Cancelled'; }
+    else if (isOffline)        { statusColor = 'var(--igrey)'; statusLabel = 'Offline'; }
+    else                       { statusColor = 'var(--igreyl)'; statusLabel = 'Idle'; }
 
     const clean  = e => (!e || ['unavailable','unknown','none',''].includes(e.state)) ? null : e.state;
     const degC   = e => { const v = parseFloat(clean(e)); if (isNaN(v)) return null;
@@ -544,7 +543,6 @@
                 isPrinting, hasError } = info;
         return `
           <div class="pb-wrap">
-            ${PHTML}
             <div class="phd">
               <div class="dot" style="background:${statusColor};${isPrinting?`box-shadow:0 0 6px ${statusColor};animation:pulse 1.8s ease-in-out infinite`:''}"></div>
               <div class="pname">${displayName}</div>
@@ -557,8 +555,8 @@
               <div class="stat"><div class="slabel">Layers</div><div class="sval">${layerStr}</div></div>
               <div class="stat"><div class="slabel">Remain</div><div class="sval">${remStr}</div></div>
             </div>
-            ${taskStr ? `<div class="job"><span class="jlabel">JOB //</span><span class="jname">${taskStr.toUpperCase()}</span></div>` : ''}
-            ${hasError ? `<div class="err"><ha-icon icon="mdi:alert-circle" style="--mdc-icon-size:20px"></ha-icon>PRINT ERROR</div>` : ''}
+            ${taskStr ? `<div class="job"><span class="jlabel">Job</span><span class="jname">${taskStr}</span></div>` : ''}
+            ${hasError ? `<div class="err"><ha-icon icon="mdi:alert-circle" style="--mdc-icon-size:20px"></ha-icon>Print error</div>` : ''}
           </div>`;
       };
 
@@ -583,42 +581,41 @@
           .sh:first-child{margin-top:0}
           .shbar{width:5px;height:21px;flex-shrink:0}
           .shtitle{font-family:var(--iui);font-size:15px;font-weight:700;
-            letter-spacing:4px;text-transform:uppercase;flex:1}
+            flex:1}
           .shcount{font-family:var(--imono);font-size:16px;color:var(--itextd)}
           /* 2-col grid */
           .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px}
           /* printer block */
           .pb-wrap{${V} background:var(--ipanel);border:1px solid var(--iborder);
             position:relative;overflow:hidden}
-          ${PIPS} ${SCAN}
           .phd{display:flex;align-items:center;gap:12px;padding:14px 18px;
-            border-bottom:1px solid rgba(200,200,200,.12);position:relative;z-index:1}
+            border-bottom:1px solid var(--iborder);position:relative;z-index:1}
           .dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
           .pname{flex:1;font-family:var(--iui);font-size:15px;font-weight:700;
-            letter-spacing:3px;text-transform:uppercase;color:#fff;
+            color:var(--itext);
             overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-          .sbadge{font-family:var(--imono);font-size:12px;letter-spacing:2.5px;
+          .sbadge{font-family:var(--imono);font-size:12px;
             padding:4px 9px;border:1px solid;flex-shrink:0}
           .pbar{height:5px;background:var(--igrey);position:relative;z-index:1}
           .pfill{height:100%;transition:width .6s}
           .ppct{position:absolute;right:6px;top:50%;transform:translateY(-50%);
             font-family:var(--imono);font-size:10px;color:var(--itext);opacity:.6;z-index:2}
           .stats{display:grid;grid-template-columns:repeat(4,1fr);
-            border-bottom:1px solid rgba(200,200,200,.10);position:relative;z-index:1}
-          .stat{padding:9px 6px;text-align:center;border-right:1px solid rgba(200,200,200,.10)}
+            border-bottom:1px solid var(--iborder);position:relative;z-index:1}
+          .stat{padding:9px 6px;text-align:center;border-right:1px solid var(--iborder)}
           .stat:last-child{border-right:none}
-          .slabel{font-family:var(--imono);font-size:11px;letter-spacing:1px;
-            color:var(--itextd);text-transform:uppercase}
+          .slabel{font-family:var(--imono);font-size:11px;
+            color:var(--itextd)}
           .sval{font-family:var(--imono);font-size:16px;color:var(--itext);margin-top:3px}
           .job{padding:8px 18px;display:flex;align-items:center;gap:9px;
             position:relative;z-index:1}
-          .jlabel{font-family:var(--imono);font-size:12px;letter-spacing:1px;
+          .jlabel{font-family:var(--imono);font-size:12px;
             color:var(--itextd);flex-shrink:0}
           .jname{font-family:var(--imono);font-size:14px;color:var(--itext);
             overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-          .err{padding:8px 18px;background:rgba(204,0,0,.1);
-            border-top:1px solid rgba(204,0,0,.5);
-            font-family:var(--imono);font-size:12px;letter-spacing:2px;
+          .err{padding:8px 18px;background:var(--ir-dim);
+            border-top:1px solid var(--ir);
+            font-family:var(--imono);font-size:12px;
             color:var(--ir);display:flex;align-items:center;gap:8px;
             position:relative;z-index:1;animation:pulse 1.2s ease-in-out infinite}
         </style>
@@ -952,36 +949,33 @@
           :host{display:block}
           .card{${V} background:var(--ipanel);border:1px solid var(--iborder);
             position:relative;overflow:hidden}
-          ${PIPS} ${SCAN}
-          .hd{background:linear-gradient(90deg,rgba(200,200,200,.5),rgba(200,200,200,.1) 55%,transparent);
-            border-bottom:1px solid rgba(200,200,200,.25);padding:10px 20px;
+          .hd{background:linear-gradient(90deg, var(--iborder), transparent 60%);
+            border-bottom:1px solid var(--iborder);padding:10px 20px;
             font-family:var(--iui);font-size:14px;font-weight:700;
-            letter-spacing:4px;text-transform:uppercase;color:#fff;
+            color:var(--itext);
             position:relative;z-index:1}
           .sh{display:flex;align-items:center;gap:10px;
             padding:10px 20px 6px;position:relative;z-index:1}
           .shbar{width:4px;height:16px;flex-shrink:0}
-          .shtitle{flex:1;font-family:var(--iui);font-size:12px;font-weight:700;
-            letter-spacing:3px;text-transform:uppercase}
+          .shtitle{flex:1;font-family:var(--iui);font-size:12px;font-weight:700}
           .shcount{font-family:var(--imono);font-size:14px}
           .row{display:flex;align-items:center;gap:14px;padding:9px 20px;
-            border-bottom:1px solid rgba(200,200,200,.10);position:relative;z-index:1}
+            border-bottom:1px solid var(--iborder);position:relative;z-index:1}
           .row:last-of-type{border-bottom:none}
           ha-icon{--mdc-icon-size:20px;flex-shrink:0}
-          .nm{flex:1;font-family:var(--iui);font-size:13px;letter-spacing:1.5px;
+          .nm{flex:1;font-family:var(--iui);font-size:13px;
             color:var(--itext);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
           .vl{font-family:var(--imono);font-size:13px;flex-shrink:0}
           .more{padding:6px 20px 10px;font-family:var(--imono);font-size:11px;
-            letter-spacing:2px;opacity:.6;position:relative;z-index:1}
+            opacity:.6;position:relative;z-index:1}
           .ok{display:flex;align-items:center;gap:14px;padding:20px;
             position:relative;z-index:1}
           .ok ha-icon{color:var(--ig);--mdc-icon-size:28px}
           .ok span{font-family:var(--iui);font-size:14px;font-weight:700;
-            letter-spacing:4px;text-transform:uppercase;
-            color:var(--ig);text-shadow:0 0 10px rgba(0,200,83,.4)}
+            color:var(--ig)}
         </style>
-        <div class="card">${PHTML}<div class="sl"></div>
-          <div class="hd">${title.toUpperCase()}</div>
+        <div class="card">
+          <div class="hd">${title}</div>
           ${allClear
             ? `<div class="ok">
                 <ha-icon icon="mdi:shield-check"></ha-icon>

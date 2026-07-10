@@ -36,7 +36,7 @@ views:
       - type: vertical-stack
         cards:
           - type: markdown
-            content: "## Fabrication Fleet"
+            content: "## Manufacturing Fleet"
 
           # imperial-fleet-grid kept as-is — does cross-prefix printer
           # normalization (Bambu/Klipper/PrusaLink) backed by template
@@ -57,6 +57,10 @@ views:
                 name: Prusa MK4S
               - prefix: maker_space_x1c_5
                 name: X1C 5
+              - prefix: x1c_00m09a351803154
+                name: X1C 4
+              - prefix: x1c_00m09a3c1301432
+                name: X1C 6
 
   # ═══════════════════════════════════════════════════════════════════════════
   # VIEW 2: BAMBU P1P
