@@ -278,19 +278,29 @@
         # on friendly_name instead is self-healing: as long as the mower still
         # reports "Luba-VA624UNR Area <Zone Name>" for each switch, this finds
         # the right entity regardless of what entity_id HA assigned it this time.
+        #
+        # NOTE: the states.switch | selectattr | selectattr prefix below is
+        # intentionally duplicated in both chopper_target_switch and
+        # chopper_other_switches rather than factored into a shared variable.
+        # HA only preserves native Python types across a variable boundary
+        # when the rendered string round-trips through ast.literal_eval — a
+        # list of State objects does NOT round-trip, so HA silently falls
+        # back to storing it as a raw string, and any later selectattr/
+        # rejectattr against that "list" iterates it character-by-character
+        # instead. Only strings and lists of strings are ever assigned to a
+        # variable here to avoid that trap.
         chopper_target_zone_name: "{{ states('input_select.chopper_mow_rotation') }}"
-        chopper_all_zone_switches: >-
+        chopper_target_switch: >-
+          {{ (states.switch
+              | selectattr('entity_id', 'match', '^switch\.garden_luba_va624unr_area_')
+              | selectattr('attributes.friendly_name', 'search', '(North Lawn|Back Lawn|South Lawn)')
+              | selectattr('attributes.friendly_name', 'search', chopper_target_zone_name)
+              | map(attribute='entity_id')
+              | list | first | default('', true)) }}
+        chopper_other_switches: >-
           {{ states.switch
              | selectattr('entity_id', 'match', '^switch\.garden_luba_va624unr_area_')
              | selectattr('attributes.friendly_name', 'search', '(North Lawn|Back Lawn|South Lawn)')
-             | list }}
-        chopper_target_switch: >-
-          {{ (chopper_all_zone_switches
-              | selectattr('attributes.friendly_name', 'search', chopper_target_zone_name)
-              | map(attribute='entity_id')
-              | list | first) }}
-        chopper_other_switches: >-
-          {{ chopper_all_zone_switches
              | rejectattr('entity_id', 'eq', chopper_target_switch)
              | map(attribute='entity_id')
              | list }}
