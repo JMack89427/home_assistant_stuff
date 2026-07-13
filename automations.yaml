@@ -578,7 +578,7 @@
   action:
     - service: homeassistant.reload_config_entry
       data:
-        entry_id: 01KG00YSDYK6AJ8M0QTCZ5GX2P
+        entry_id: 01KSQ4PQJK1Z1YJJR15V8VA5KG  # Mammotion (LUBA) config entry ID — must not point to HACS integration
     - service: notify.mobile_app_jason_s_iphone
       data:
         title: "Terrain Operations"
