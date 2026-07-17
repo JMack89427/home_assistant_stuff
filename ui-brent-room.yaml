@@ -5,13 +5,13 @@
 # override). Built standard-cards-first to match the ui-cadets-barracks.yaml
 # redesign — no custom imperial-* cards, zero resource dependencies.
 #
-# Entity scope is intentionally limited: only a temp/humidity sensor pair
+# Entity scope is intentionally limited: a temp/humidity/battery sensor trio
 # (sensor.spare_bedroom_temp_humidity_sensor_*) and the existing occupancy
 # input_boolean (input_boolean.brent_room_occupied, defined in
-# packages/climate_control.yaml) are confirmed for this room. No fan, light,
-# wifi-signal, or battery entity has been found anywhere in the repo for the
-# spare_bedroom device — those rows are deliberately omitted pending
-# confirmation of additional room devices. Add them here once confirmed.
+# packages/climate_control.yaml). Confirmed 2026-07-17 against the live HA
+# device registry: the sensor device (now assigned to area brent_s_room) has
+# no sibling fan or light device in this room, so those rows are omitted —
+# unlike Cat's Room, Brent's Room has no ceiling fan/light fixture.
 # ─────────────────────────────────────────────────────────────────────────────
 
 title: Brent's Room
@@ -38,6 +38,9 @@ views:
                   - entity: sensor.spare_bedroom_temp_humidity_sensor_humidity
                     name: Humidity
                     icon: mdi:water-percent
+                  - entity: sensor.spare_bedroom_temp_humidity_sensor_battery
+                    name: Sensor Battery
+                    icon: mdi:battery
 
               - type: entities
                 title: Room Status
