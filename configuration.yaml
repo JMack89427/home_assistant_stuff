@@ -48,6 +48,13 @@ lovelace:
       icon: mdi:ceiling-fan
       show_in_sidebar: true
       require_admin: false
+    brent-room:
+      mode: yaml
+      filename: ui-brent-room.yaml
+      title: Brent's Room
+      icon: mdi:bed
+      show_in_sidebar: true
+      require_admin: false
 
 
 # ── HTTP ──────────────────────────────────────────────────────────────────────

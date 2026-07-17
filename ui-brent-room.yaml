@@ -1,0 +1,47 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ui-brent-room.yaml  —  Brent's Room dashboard (standard card design)
+# ─────────────────────────────────────────────────────────────────────────────
+# Single-view dashboard for Brent's room (temp/humidity monitoring, occupancy
+# override). Built standard-cards-first to match the ui-cadets-barracks.yaml
+# redesign — no custom imperial-* cards, zero resource dependencies.
+#
+# Entity scope is intentionally limited: only a temp/humidity sensor pair
+# (sensor.spare_bedroom_temp_humidity_sensor_*) and the existing occupancy
+# input_boolean (input_boolean.brent_room_occupied, defined in
+# packages/climate_control.yaml) are confirmed for this room. No fan, light,
+# wifi-signal, or battery entity has been found anywhere in the repo for the
+# spare_bedroom device — those rows are deliberately omitted pending
+# confirmation of additional room devices. Add them here once confirmed.
+# ─────────────────────────────────────────────────────────────────────────────
+
+title: Brent's Room
+views:
+  - title: Brent's Room
+    path: brent-room
+    icon: mdi:bed
+    panel: true
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: "## Brent's Room"
+
+          - type: horizontal-stack
+            cards:
+              - type: entities
+                title: Environment
+                entities:
+                  - entity: sensor.spare_bedroom_temp_humidity_sensor_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                  - entity: sensor.spare_bedroom_temp_humidity_sensor_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+
+              - type: entities
+                title: Room Status
+                entities:
+                  - entity: input_boolean.brent_room_occupied
+                    name: Occupied
+                    icon: mdi:bed
