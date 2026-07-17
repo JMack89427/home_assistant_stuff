@@ -281,10 +281,16 @@
         # Resolve the target zone switch dynamically by matching friendly_name
         # rather than a hardcoded entity_id map. This integration has repeatedly
         # regenerated zone switch entity_ids (new internal hash) after restarts
-        # or app-side zone edits, silently breaking any hardcoded map. Matching
-        # on friendly_name instead is self-healing: as long as the mower still
-        # reports "Luba-VA624UNR Area <Zone Name>" for each switch, this finds
-        # the right entity regardless of what entity_id HA assigned it this time.
+        # or app-side zone edits, and an area-registry rename (e.g. "garden" ->
+        # "yard") regenerates the entity_id's area-name prefix too — either
+        # would silently break a hardcoded map. The entity_id filter below is
+        # prefix-agnostic (matches any area-name token via \w+, anchored on
+        # the mower's stable device slug `_luba_va624unr_area_`), so it
+        # self-heals against both the hash suffix changing and the area
+        # prefix changing; the friendly_name filter right after it does the
+        # actual zone disambiguation — as long as the mower still reports
+        # "Luba-VA624UNR Area <Zone Name>" for each switch, this finds the
+        # right entity regardless of what entity_id HA assigned it this time.
         #
         # NOTE: the states.switch | selectattr | selectattr prefix below is
         # intentionally duplicated in both chopper_target_switch and
@@ -299,14 +305,14 @@
         chopper_target_zone_name: "{{ states('input_select.chopper_mow_rotation') }}"
         chopper_target_switch: >-
           {{ (states.switch
-              | selectattr('entity_id', 'match', '^switch\.garden_luba_va624unr_area_')
+              | selectattr('entity_id', 'match', '^switch\.\w+_luba_va624unr_area_')
               | selectattr('attributes.friendly_name', 'search', '(North Lawn|Back Lawn|South Lawn)')
               | selectattr('attributes.friendly_name', 'search', chopper_target_zone_name)
               | map(attribute='entity_id')
               | list | first | default('', true)) }}
         chopper_other_switches: >-
           {{ states.switch
-             | selectattr('entity_id', 'match', '^switch\.garden_luba_va624unr_area_')
+             | selectattr('entity_id', 'match', '^switch\.\w+_luba_va624unr_area_')
              | selectattr('attributes.friendly_name', 'search', '(North Lawn|Back Lawn|South Lawn)')
              | rejectattr('entity_id', 'eq', chopper_target_switch)
              | map(attribute='entity_id')
