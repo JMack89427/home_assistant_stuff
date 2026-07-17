@@ -70,9 +70,11 @@
             states('sensor.ewelink_snzb_02p_temperature') | float(72),
             states('sensor.master_bedroom_primary_suite_temp_humidity_temperature') | float(72),
             states('sensor.cats_room_temp_humidity_sensor_temperature') | float(72),
-            states('sensor.spare_bedroom_temp_humidity_sensor_temperature') | float(72),
             states('sensor.t6_pro_z_wave_programmable_thermostat_air_temperature') | float(72)
-          ] }}
+          ] + (
+            [states('sensor.spare_bedroom_temp_humidity_sensor_temperature') | float(72)]
+            if is_state('input_boolean.brent_room_occupied', 'on') else []
+          ) }}
         spread: "{{ room_temps | max - room_temps | min }}"
         fan_mode: "{{ 'Low' if spread > 3 else 'Circulation' }}"
     # Skip recalibration ticks when manual override is active.
@@ -117,7 +119,11 @@
         - sensor.spare_bedroom_temp_humidity_sensor_humidity
         - sensor.t6_pro_z_wave_programmable_thermostat_humidity
       above: 40
-  condition: []
+  condition:
+    - condition: template
+      value_template: >
+        {{ not (trigger.entity_id == 'sensor.spare_bedroom_temp_humidity_sensor_humidity'
+                and is_state('input_boolean.brent_room_occupied', 'off')) }}
   action:
     - service: humidifier.turn_on
       target:
@@ -142,8 +148,9 @@
         {{ states('sensor.ewelink_snzb_02p_humidity') | float(0) <= 40
            and states('sensor.master_bedroom_primary_suite_temp_humidity_humidity') | float(0) <= 40
            and states('sensor.cats_room_temp_humidity_sensor_humidity') | float(0) <= 40
-           and states('sensor.spare_bedroom_temp_humidity_sensor_humidity') | float(0) <= 40
-           and states('sensor.t6_pro_z_wave_programmable_thermostat_humidity') | float(0) <= 40 }}
+           and states('sensor.t6_pro_z_wave_programmable_thermostat_humidity') | float(0) <= 40
+           and (is_state('input_boolean.brent_room_occupied', 'off')
+                or states('sensor.spare_bedroom_temp_humidity_sensor_humidity') | float(0) <= 40) }}
   action:
     - service: humidifier.turn_off
       target:

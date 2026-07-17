@@ -4,6 +4,8 @@
 # Template sensors: house_average_temperature, house_average_humidity
 # NOTE: Carbonite Vault (freezer), Fabrication Bay, Basement, and Printing Room are intentionally
 #       excluded from all averages. Basement and Printing Room sensors pending arrival.
+# NOTE: Brent's Room is conditionally excluded from all averages/setpoint logic via the new
+#       input_boolean.brent_room_occupied (manual toggle, no auto-reset — see input_boolean: block below).
 #
 # Automation logic:
 #   - 6:00 AM  → daytime setpoint  (cool 72°F / heat 68°F)
@@ -26,6 +28,9 @@ input_boolean:
   climate_sensor_bypass:
     name: Climate Sensor Bypass
     icon: mdi:thermometer-off
+  brent_room_occupied:
+    name: Brent's Room Occupied
+    icon: mdi:bed
 
 template:
   - sensor:
@@ -35,13 +40,16 @@ template:
         device_class: temperature
         state_class: measurement
         state: >
-          {{ ((
-              states('sensor.ewelink_snzb_02p_temperature') | float(72) +
-              states('sensor.master_bedroom_primary_suite_temp_humidity_temperature') | float(72) +
-              states('sensor.cats_room_temp_humidity_sensor_temperature') | float(72) +
-              states('sensor.spare_bedroom_temp_humidity_sensor_temperature') | float(72) +
+          {% set readings = [
+              states('sensor.ewelink_snzb_02p_temperature') | float(72),
+              states('sensor.master_bedroom_primary_suite_temp_humidity_temperature') | float(72),
+              states('sensor.cats_room_temp_humidity_sensor_temperature') | float(72),
               states('sensor.t6_pro_z_wave_programmable_thermostat_air_temperature') | float(72)
-            ) / 5) | round(1) }}
+            ] %}
+          {% if is_state('input_boolean.brent_room_occupied', 'on') %}
+            {% set readings = readings + [states('sensor.spare_bedroom_temp_humidity_sensor_temperature') | float(72)] %}
+          {% endif %}
+          {{ (readings | sum / readings | length) | round(1) }}
 
       - name: "T6 Fan Status"
         unique_id: t6_fan_status
@@ -60,10 +68,13 @@ template:
         device_class: humidity
         state_class: measurement
         state: >
-          {{ ((
-              states('sensor.ewelink_snzb_02p_humidity') | float(50) +
-              states('sensor.master_bedroom_primary_suite_temp_humidity_humidity') | float(50) +
-              states('sensor.cats_room_temp_humidity_sensor_humidity') | float(50) +
-              states('sensor.spare_bedroom_temp_humidity_sensor_humidity') | float(50) +
+          {% set readings = [
+              states('sensor.ewelink_snzb_02p_humidity') | float(50),
+              states('sensor.master_bedroom_primary_suite_temp_humidity_humidity') | float(50),
+              states('sensor.cats_room_temp_humidity_sensor_humidity') | float(50),
               states('sensor.t6_pro_z_wave_programmable_thermostat_humidity') | float(50)
-            ) / 5) | round(1) }}
+            ] %}
+          {% if is_state('input_boolean.brent_room_occupied', 'on') %}
+            {% set readings = readings + [states('sensor.spare_bedroom_temp_humidity_sensor_humidity') | float(50)] %}
+          {% endif %}
+          {{ (readings | sum / readings | length) | round(1) }}
