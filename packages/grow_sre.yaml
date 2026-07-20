@@ -37,7 +37,10 @@ template:
       - name: "Grow Tent Temperature"
         unique_id: grow_sre_tent_temp
         unit_of_measurement: "°C"
-        device_class: temperature
+        # No device_class: temperature. HA's automatic unit conversion (this
+        # instance runs imperial) would rewrite the actual state value to °F,
+        # not just its display — grow_sre's _derive_vpd() does raw Celsius
+        # math and would silently corrupt VPD if it read a °F value here.
         state_class: measurement
         icon: mdi:thermometer
         state: "{{ states('input_number.grow_tent_temp') | float(25) | round(1) }}"
