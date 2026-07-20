@@ -1,0 +1,62 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# packages/grow_sre.yaml — GROW-SRE simulation entities (Botanical Bay)
+#
+# Entity IDs are contract-shared with the grow_sre repo
+# (/Users/jason/github/grow_sre) — see ha_config/simulation.yaml there for the
+# source of truth. Do not rename sensor.grow_tent_*.
+#
+# Two adjustable sliders (input_number) plus three derived template sensors
+# that stand in for real hardware until the ordered sensors arrive. Drag the
+# sliders to simulate tent conditions; the GROW-SRE control loop and the
+# Botanical Bay Lovelace view (ui-lovelace.yaml) both read the sensor.* below.
+#
+# sensor.grow_tent_vpd is derived via the Magnus formula from the other two —
+# keep in sync with backend/ha_client.py::_derive_vpd() in grow_sre if that
+# formula ever changes.
+# ─────────────────────────────────────────────────────────────────────────────
+
+input_number:
+  grow_tent_temp:
+    name: "Grow Tent Temperature"
+    min: 15
+    max: 40
+    step: 0.5
+    unit_of_measurement: "°C"
+    icon: mdi:thermometer
+
+  grow_tent_rh:
+    name: "Grow Tent Humidity"
+    min: 20
+    max: 95
+    step: 1
+    unit_of_measurement: "%"
+    icon: mdi:water-percent
+
+template:
+  - sensor:
+      - name: "Grow Tent Temperature"
+        unique_id: grow_sre_tent_temp
+        unit_of_measurement: "°C"
+        device_class: temperature
+        state_class: measurement
+        icon: mdi:thermometer
+        state: "{{ states('input_number.grow_tent_temp') | float(25) | round(1) }}"
+
+      - name: "Grow Tent Humidity"
+        unique_id: grow_sre_tent_rh
+        unit_of_measurement: "%"
+        device_class: humidity
+        state_class: measurement
+        icon: mdi:water-percent
+        state: "{{ states('input_number.grow_tent_rh') | float(60) | round(1) }}"
+
+      - name: "Grow Tent VPD"
+        unique_id: grow_sre_tent_vpd
+        unit_of_measurement: "kPa"
+        state_class: measurement
+        icon: mdi:leaf
+        state: >
+          {% set temp = states('input_number.grow_tent_temp') | float(25) %}
+          {% set rh   = states('input_number.grow_tent_rh')   | float(60) %}
+          {% set svp  = 0.6108 * (2.71828182845 ** (17.27 * temp / (temp + 237.3))) %}
+          {{ (svp * (1.0 - rh / 100.0)) | round(3) }}
