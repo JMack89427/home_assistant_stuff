@@ -1260,10 +1260,14 @@ views:
     cards:
       - type: vertical-stack
         cards:
-          - type: picture-entity
-            entity: camera.grow_room_fluent  # Reolink substream (main stream camera.grow_room_clear is disabled)
-            name: Grow Room Camera
-            aspect_ratio: "16 / 9"
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: picture-entity
+                entity: camera.grow_room_fluent  # Reolink substream (main stream camera.grow_room_clear is disabled)
+                name: Grow Room Camera
+                aspect_ratio: "16 / 9"
 
           - type: horizontal-stack
             cards:
