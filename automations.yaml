@@ -801,7 +801,7 @@
       from: printing
       to: complete
     - platform: state
-      entity_id: sensor.magneto_x_current_print_state
+      entity_id: sensor.magneto_current_print_state
       from: printing
       to: complete
     - platform: state
@@ -823,7 +823,7 @@
   variables:
     filename_map:
       sensor.flsuns1pro_current_print_state: sensor.flsuns1pro_filename
-      sensor.magneto_x_current_print_state: sensor.magneto_x_filename
+      sensor.magneto_current_print_state: sensor.magneto_filename
       sensor.printz_current_print_state: sensor.printz_filename
       sensor.ratrig_current_print_state: sensor.ratrig_filename
       sensor.p1p_01s00c431300106_print_status: sensor.p1p_01s00c431300106_gcode_filename

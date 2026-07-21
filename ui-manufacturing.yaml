@@ -51,7 +51,7 @@ views:
                 name: Printz
               - prefix: ratrig
                 name: RatRig
-              - prefix: magneto_x
+              - prefix: magneto
                 name: Magneto X
               - prefix: prusa_mk4
                 name: Prusa MK4S
@@ -563,17 +563,19 @@ views:
                   - type: horizontal-stack
                     cards:
                       - type: tile
-                        entity: sensor.magneto_x_progress
+                        entity: sensor.magneto_progress
                         name: Print Progress
                       - type: tile
-                        entity: sensor.magneto_x_current_layer
+                        entity: sensor.magneto_current_layer
                         name: Current Layer
                       - type: tile
-                        entity: sensor.magneto_x_total_layer
+                        entity: sensor.magneto_total_layer
                         name: Total Layers
                   - type: picture-glance
                     title: Fabrication Bay
-                    camera_image: camera.magneto_x_camera
+                    # NOTE: suffix is _webcam, not _camera. The old prefixed
+                    # camera entity was already dead pre-dating the reload incident.
+                    camera_image: camera.magneto_webcam
                     camera_view: auto
                     entities: []
                   - type: grid
@@ -581,72 +583,72 @@ views:
                     square: false
                     cards:
                       - type: tile
-                        entity: button.magneto_x_pause_print
+                        entity: button.magneto_pause_print
                         name: Pause
                         icon: mdi:pause-circle
                         tap_action:
                           action: call-service
                           service: button.press
                           service_data:
-                            entity_id: button.magneto_x_pause_print
+                            entity_id: button.magneto_pause_print
                       - type: tile
-                        entity: button.magneto_x_resume_print
+                        entity: button.magneto_resume_print
                         name: Resume
                         icon: mdi:play-circle
                         tap_action:
                           action: call-service
                           service: button.press
                           service_data:
-                            entity_id: button.magneto_x_resume_print
+                            entity_id: button.magneto_resume_print
                       - type: tile
-                        entity: button.magneto_x_cancel_print
+                        entity: button.magneto_cancel_print
                         name: Cancel
                         icon: mdi:stop-circle
                         tap_action:
                           action: call-service
                           service: button.press
                           service_data:
-                            entity_id: button.magneto_x_cancel_print
+                            entity_id: button.magneto_cancel_print
                       - type: tile
-                        entity: button.magneto_x_emergency_stop
+                        entity: button.magneto_emergency_stop
                         name: E-Stop
                         icon: mdi:alert-octagon
                         tap_action:
                           action: call-service
                           service: button.press
                           service_data:
-                            entity_id: button.magneto_x_emergency_stop
+                            entity_id: button.magneto_emergency_stop
 
               - type: vertical-stack
                 cards:
                   - type: entities
                     title: Fabrication Status
                     entities:
-                      - entity: sensor.magneto_x_filename
+                      - entity: sensor.magneto_filename
                         name: Job Name
                         icon: mdi:file-document-outline
-                      - entity: sensor.magneto_x_current_print_state
+                      - entity: sensor.magneto_current_print_state
                         name: Print Status
                         icon: mdi:printer-3d
-                      - entity: sensor.magneto_x_printer_state
+                      - entity: sensor.magneto_printer_state
                         name: System State
                         icon: mdi:state-machine
-                      - entity: sensor.magneto_x_print_time_left
+                      - entity: sensor.magneto_print_time_left
                         name: Time Remaining
                         icon: mdi:timer-outline
-                      - entity: sensor.magneto_x_print_eta
+                      - entity: sensor.magneto_print_eta
                         name: Est. Completion
                         icon: mdi:clock-end
                   - type: entities
                     title: Thermal Systems
                     entities:
-                      - entity: sensor.magneto_x_extruder_temperature
+                      - entity: sensor.magneto_extruder_temperature
                         name: Extruder Temp
                         icon: mdi:printer-3d-nozzle-heat
-                      - entity: sensor.magneto_x_bed_temperature
+                      - entity: sensor.magneto_bed_temperature
                         name: Bed Temp
                         icon: mdi:radiator
-                      - entity: sensor.magneto_x_beacon_coil_temp
+                      - entity: sensor.magneto_beacon_coil_temp
                         name: Beacon Coil Temp
                         icon: mdi:radar
 
