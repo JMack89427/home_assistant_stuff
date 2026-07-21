@@ -1269,24 +1269,6 @@ views:
                 name: Grow Room Camera
                 aspect_ratio: "16:9"
 
-          - type: horizontal-stack
-            cards:
-              - type: entities
-                title: Atmospheric Conditions
-                entities:
-                  - entity: sensor.grow_tent_vpd
-                    name: VPD
-                    icon: mdi:water-thermometer
-                  - entity: sensor.grow_tent_temp
-                    name: Temperature
-                    icon: mdi:thermometer
-                  - entity: sensor.grow_tent_rh
-                    name: Humidity
-                    icon: mdi:water-percent
-                  - entity: sensor.grow_tent_co2
-                    name: CO₂
-                    icon: mdi:molecule-co2
-
               - type: entities
                 title: Light & Fan Systems
                 entities:
