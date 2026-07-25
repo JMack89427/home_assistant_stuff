@@ -1248,9 +1248,20 @@ views:
                         entity_id: button.pool_spino_e13d6btg_fetch_cleaning_route
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 8: GROW ROOM
-  # Entity IDs are contract-shared with the grow_sre repo — relabel only, do
-  # not rename sensor.grow_tent_*, fan.ac_infinity_cloudline, switch.grow_lights.
+  # VIEW 8: GROW ROOM (Botanical Bay)
+  # Real sensors as of 2026-07-25 — the AC Infinity AI+ controller (integration
+  # dalinicus/homeassistant-acinfinity v2.2.0) is READ-ONLY for AI-series
+  # controllers; there is no fan.*/switch.* entity for any grow-room equipment,
+  # only sensor.grow_controller_* readouts. Do not add control tiles/services
+  # against fan.ac_infinity_cloudline or switch.grow_lights — neither exists.
+  # sensor.grow_tent_* (temp/rh/vpd) are the old simulation entities, now
+  # stale/frozen — do not use. Derived sensor.grow_room_* entities (defined in
+  # packages/botanical_bay.yaml) are the source of truth for this view; they
+  # re-derive temp/RH/VPD from the controller's raw probe/controller sensors
+  # the same way grow_sre's own backend does, since the vendor integration's
+  # own units are unreliable (°F on some sensors, VPD mislabeled psi).
+  # Entity IDs are still contract-shared with the grow_sre repo for the
+  # underlying sensor.grow_controller_* names — relabel only, don't rename.
   # ═══════════════════════════════════════════════════════════════════════════
   - title: Grow Room
     path: botanical-bay
@@ -1264,129 +1275,129 @@ views:
             columns: 2
             square: false
             cards:
-              - type: picture-entity
+              - type: custom:imperial-camera
                 entity: camera.grow_room_fluent  # Reolink substream (main stream camera.grow_room_clear is disabled)
-                name: Grow Room Camera
-                aspect_ratio: "16:9"
+                title: Grow Room Camera
 
-              - type: entities
-                title: Light & Fan Systems
+              - type: custom:imperial-panel
+                title: Equipment
                 entities:
-                  - entity: fan.ac_infinity_cloudline
+                  - entity: sensor.grow_controller_port_3_current_power
+                    name: Lights
+                    icon: mdi:lightbulb-on
+                  - entity: sensor.grow_controller_port_4_current_power
+                    name: Humidifier
+                    icon: mdi:air-humidifier
+                  - entity: sensor.grow_controller_port_5_current_power
+                    name: Dehumidifier
+                    icon: mdi:air-humidifier-off
+                  - entity: sensor.grow_controller_port_6_current_power
                     name: Exhaust Fan
                     icon: mdi:fan
-                  - type: attribute
-                    entity: fan.ac_infinity_cloudline
-                    name: Fan Speed
-                    icon: mdi:speedometer
-                    attribute: percentage
-                  - entity: switch.grow_lights
-                    name: Grow Lights
-                    icon: mdi:lightbulb-on
-
-          - type: horizontal-stack
-            cards:
-              - type: gauge
-                entity: sensor.grow_tent_vpd
-                name: VPD (kPa)
-                min: 0
-                max: 3
-                severity:
-                  green: 0.8
-                  yellow: 1.4
-                  red: 1.8
-
-              - type: gauge
-                entity: sensor.grow_tent_temp
-                name: Temp (°C)
-                min: 15
-                max: 35
-                severity:
-                  green: 20
-                  yellow: 28
-                  red: 31
-
-              - type: gauge
-                entity: sensor.grow_tent_rh
-                name: Humidity (%)
-                min: 0
-                max: 100
-                severity:
-                  green: 50
-                  yellow: 75
-                  red: 85
-
-              - type: gauge
-                entity: sensor.grow_tent_co2
-                name: CO₂ (ppm)
-                min: 300
-                max: 2000
-                severity:
-                  green: 800
-                  yellow: 1300
-                  red: 1600
-
-          - type: horizontal-stack
-            cards:
-              - type: grid
-                columns: 3
-                square: false
-                cards:
-                  - type: tile
-                    entity: fan.ac_infinity_cloudline
-                    name: Fan Off
-                    icon: mdi:fan-off
-                    tap_action:
-                      action: call-service
-                      service: fan.turn_off
-                      service_data:
-                        entity_id: fan.ac_infinity_cloudline
-
-                  - type: tile
-                    entity: fan.ac_infinity_cloudline
-                    name: Fan 50%
+                  - entity: sensor.grow_controller_port_7_current_power
+                    name: Oscillating Fan 1
                     icon: mdi:fan
-                    tap_action:
-                      action: call-service
-                      service: fan.set_percentage
-                      service_data:
-                        entity_id: fan.ac_infinity_cloudline
-                        percentage: 50
+                  - entity: sensor.grow_controller_port_8_current_power
+                    name: Oscillating Fan 2
+                    icon: mdi:fan
 
-                  - type: tile
-                    entity: fan.ac_infinity_cloudline
-                    name: Fan 100%
-                    icon: mdi:fan-alert
-                    tap_action:
-                      action: call-service
-                      service: fan.set_percentage
-                      service_data:
-                        entity_id: fan.ac_infinity_cloudline
-                        percentage: 100
+          - type: grid
+            columns: 4
+            square: false
+            cards:
+              - type: custom:imperial-readout
+                entity: sensor.grow_room_inside_vpd
+                name: Inside VPD
+                color: green
 
-                  - type: tile
-                    entity: switch.grow_lights
-                    name: Lights On
-                    icon: mdi:lightbulb-on
-                    tap_action:
-                      action: call-service
-                      service: switch.turn_on
-                      service_data:
-                        entity_id: switch.grow_lights
+              - type: custom:imperial-readout
+                entity: sensor.grow_room_inside_temp_c
+                name: Inside Temp
+                color: green
 
-                  - type: tile
-                    entity: switch.grow_lights
-                    name: Lights Off
-                    icon: mdi:lightbulb-off
-                    tap_action:
-                      action: call-service
-                      service: switch.turn_off
-                      service_data:
-                        entity_id: switch.grow_lights
+              - type: custom:imperial-readout
+                entity: sensor.grow_room_inside_rh
+                name: Inside Humidity
+                color: green
 
-              - type: history-graph
-                title: VPD History
-                hours_to_show: 12
-                entities:
-                  - entity: sensor.grow_tent_vpd
-                    name: VPD (kPa)
+              - type: custom:imperial-readout
+                entity: sensor.grow_controller_soil_sensor_soil_moisture
+                name: Soil Moisture
+                color: green
+
+          - type: horizontal-stack
+            cards:
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.grow_room_vpd_status
+                    state: "Optimal"
+                card:
+                  type: custom:imperial-readout
+                  entity: sensor.grow_room_vpd_status
+                  name: VPD Status
+                  color: green
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.grow_room_vpd_status
+                    state: "Too High"
+                card:
+                  type: custom:imperial-readout
+                  entity: sensor.grow_room_vpd_status
+                  name: VPD Status
+                  color: amber
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.grow_room_vpd_status
+                    state: "Too Low"
+                card:
+                  type: custom:imperial-readout
+                  entity: sensor.grow_room_vpd_status
+                  name: VPD Status
+                  color: red
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.grow_room_vpd_status
+                    state: "Unknown"
+                card:
+                  type: custom:imperial-readout
+                  entity: sensor.grow_room_vpd_status
+                  name: VPD Status
+                  color: amber
+
+              - type: custom:imperial-readout
+                entity: sensor.grow_room_dew_point
+                name: Dew Point
+                color: green
+
+          - type: custom:imperial-panel
+            title: Environment — Inside vs Outside
+            entities:
+              - entity: sensor.grow_room_inside_temp_c
+                name: Inside Temp
+                icon: mdi:thermometer
+              - entity: sensor.grow_room_inside_rh
+                name: Inside Humidity
+                icon: mdi:water-percent
+              - entity: sensor.grow_room_inside_vpd
+                name: Inside VPD
+                icon: mdi:water-thermometer
+              - entity: sensor.grow_room_outside_temp_c
+                name: Outside Temp
+                icon: mdi:thermometer
+              - entity: sensor.grow_room_outside_rh
+                name: Outside Humidity
+                icon: mdi:water-percent
+              - entity: sensor.grow_room_outside_vpd
+                name: Outside VPD
+                icon: mdi:water-thermometer-outline
+
+          - type: history-graph
+            title: VPD History (Inside)
+            hours_to_show: 24
+            entities:
+              - entity: sensor.grow_room_inside_vpd
+                name: VPD (kPa)

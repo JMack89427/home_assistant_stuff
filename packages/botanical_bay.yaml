@@ -1,0 +1,113 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# packages/botanical_bay.yaml — Grow Room dashboard: derived/interpreted sensors
+#
+# The AC Infinity integration's own probe/controller temperature sensors report
+# in °F (this instance runs imperial units) and their VPD sensors are mislabeled
+# unit_of_measurement: psi — not trustworthy at face value. Rather than have the
+# Botanical Bay view read those directly, this package re-derives clean,
+# correctly-labeled values once, the same way grow_sre's own backend does
+# (backend/ha_client.py::_derive_vpd, Magnus formula) — single formula, matches
+# across both surfaces.
+#
+# VPD target band (0.8–1.2 kPa) is hardcoded to the vegetative-stage default.
+# It does NOT follow grow_sre's Settings if the stage/targets change there —
+# there's no live link between the two. Update this file by hand if that drifts.
+# ─────────────────────────────────────────────────────────────────────────────
+
+template:
+  - sensor:
+      - name: "Grow Room Inside Temp"
+        unique_id: grow_room_inside_temp_c
+        unit_of_measurement: "°C"
+        state_class: measurement
+        icon: mdi:thermometer
+        state: >
+          {% set f = states('sensor.grow_controller_probe_sensor_probe_temperature') | float(None) %}
+          {{ ((f - 32) * 5 / 9) | round(1) if f is not none else 'unavailable' }}
+
+      - name: "Grow Room Inside Humidity"
+        unique_id: grow_room_inside_rh
+        unit_of_measurement: "%"
+        device_class: humidity
+        state_class: measurement
+        icon: mdi:water-percent
+        state: "{{ states('sensor.grow_controller_probe_sensor_probe_humidity') }}"
+
+      - name: "Grow Room Inside VPD"
+        unique_id: grow_room_inside_vpd
+        unit_of_measurement: "kPa"
+        state_class: measurement
+        icon: mdi:water-thermometer
+        state: >
+          {% set temp = states('sensor.grow_room_inside_temp_c') | float(None) %}
+          {% set rh = states('sensor.grow_room_inside_rh') | float(None) %}
+          {% if temp is none or rh is none %}
+            unavailable
+          {% else %}
+            {% set svp = 0.6108 * (2.71828182845 ** (17.27 * temp / (temp + 237.3))) %}
+            {{ (svp * (1.0 - rh / 100.0)) | round(3) }}
+          {% endif %}
+
+      - name: "Grow Room Outside Temp"
+        unique_id: grow_room_outside_temp_c
+        unit_of_measurement: "°C"
+        state_class: measurement
+        icon: mdi:thermometer
+        state: >
+          {% set f = states('sensor.grow_controller_controller_temperature') | float(None) %}
+          {{ ((f - 32) * 5 / 9) | round(1) if f is not none else 'unavailable' }}
+
+      - name: "Grow Room Outside Humidity"
+        unique_id: grow_room_outside_rh
+        unit_of_measurement: "%"
+        device_class: humidity
+        state_class: measurement
+        icon: mdi:water-percent
+        state: "{{ states('sensor.grow_controller_controller_humidity') }}"
+
+      - name: "Grow Room Outside VPD"
+        unique_id: grow_room_outside_vpd
+        unit_of_measurement: "kPa"
+        state_class: measurement
+        icon: mdi:water-thermometer-outline
+        state: >
+          {% set temp = states('sensor.grow_room_outside_temp_c') | float(None) %}
+          {% set rh = states('sensor.grow_room_outside_rh') | float(None) %}
+          {% if temp is none or rh is none %}
+            unavailable
+          {% else %}
+            {% set svp = 0.6108 * (2.71828182845 ** (17.27 * temp / (temp + 237.3))) %}
+            {{ (svp * (1.0 - rh / 100.0)) | round(3) }}
+          {% endif %}
+
+      - name: "Grow Room Dew Point"
+        unique_id: grow_room_dew_point
+        unit_of_measurement: "°C"
+        state_class: measurement
+        icon: mdi:water-thermometer-outline
+        state: >
+          {% set temp = states('sensor.grow_room_inside_temp_c') | float(None) %}
+          {% set rh = states('sensor.grow_room_inside_rh') | float(None) %}
+          {# Lawrence (2005) linear approximation — good to ~1°C for RH above ~50% #}
+          {{ (temp - ((100 - rh) / 5)) | round(1) if temp is not none and rh is not none else 'unavailable' }}
+
+      - name: "Grow Room VPD Status"
+        unique_id: grow_room_vpd_status
+        icon: >
+          {% set vpd = states('sensor.grow_room_inside_vpd') | float(None) %}
+          {% if vpd is none %} mdi:help-circle-outline
+          {% elif vpd < 0.8 %} mdi:water-plus
+          {% elif vpd > 1.2 %} mdi:water-minus
+          {% else %} mdi:check-circle
+          {% endif %}
+        state: >
+          {% set vpd = states('sensor.grow_room_inside_vpd') | float(None) %}
+          {% if vpd is none %}
+            Unknown
+          {% elif vpd < 0.8 %}
+            Too Low
+          {% elif vpd > 1.2 %}
+            Too High
+          {% else %}
+            Optimal
+          {% endif %}
