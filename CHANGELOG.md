@@ -19,6 +19,8 @@ This project adheres to [Semantic Versioning](https://semver.org/) for major str
 
 ### Changed
 
+- **Grow Room Dashboard — Masonry Layout for Mobile Responsiveness**: Restructured the Grow Room view (`path: botanical-bay`) from fixed single-column panel layout to responsive masonry layout, making it usable on phone screens. Removed `panel: true` from view config and the outer `vertical-stack` wrapper; all card children (camera, equipment panel, readouts grid, VPD/dew-point status, environment panel, history-graph) are now top-level so masonry can reflow them into one column on narrow viewports. Reduced readouts grid from 4 to 2 columns for tile legibility at phone width. Unwrapped previous camera/equipment `horizontal-stack` into two separate top-level cards for individual reflow. Matches Media and Meals views' existing masonry layout. Zero entity IDs touched — presentation-layer restructuring only.
+
 - **Grow Room Dashboard — View Reorganization**: Removed duplicate "Atmospheric Conditions" entities card from the Grow Room view (`path: botanical-bay`). This card was displaying VPD, temperature, humidity, and CO2 alongside an existing 4-gauge row at the top of the view, creating visual redundancy of the same four sensor values. Moved "Light & Fan Systems" (exhaust fan, fan speed, grow lights) into the top `grid` card alongside the Grow Room camera, eliminating wasted horizontal space and reducing view layout from 4 stacked sections to 3 (grid, gauges, controls + history). All contract-shared entity IDs (`sensor.grow_tent_*`, `fan.ac_infinity_cloudline`, `switch.grow_lights`) remain unchanged — presentation-layer only.
 
 ### Fixed
