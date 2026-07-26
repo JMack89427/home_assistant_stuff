@@ -39,8 +39,8 @@ template:
         state_class: measurement
         icon: mdi:water-thermometer
         state: >
-          {% set temp = states('sensor.grow_room_inside_temp_c') | float(None) %}
-          {% set rh = states('sensor.grow_room_inside_rh') | float(None) %}
+          {% set temp = states('sensor.grow_room_inside_temp') | float(None) %}
+          {% set rh = states('sensor.grow_room_inside_humidity') | float(None) %}
           {% if temp is none or rh is none %}
             unavailable
           {% else %}
@@ -71,8 +71,8 @@ template:
         state_class: measurement
         icon: mdi:water-thermometer-outline
         state: >
-          {% set temp = states('sensor.grow_room_outside_temp_c') | float(None) %}
-          {% set rh = states('sensor.grow_room_outside_rh') | float(None) %}
+          {% set temp = states('sensor.grow_room_outside_temp') | float(None) %}
+          {% set rh = states('sensor.grow_room_outside_humidity') | float(None) %}
           {% if temp is none or rh is none %}
             unavailable
           {% else %}
@@ -86,8 +86,8 @@ template:
         state_class: measurement
         icon: mdi:water-thermometer-outline
         state: >
-          {% set temp = states('sensor.grow_room_inside_temp_c') | float(None) %}
-          {% set rh = states('sensor.grow_room_inside_rh') | float(None) %}
+          {% set temp = states('sensor.grow_room_inside_temp') | float(None) %}
+          {% set rh = states('sensor.grow_room_inside_humidity') | float(None) %}
           {# Lawrence (2005) linear approximation — good to ~1°C for RH above ~50% #}
           {{ (temp - ((100 - rh) / 5)) | round(1) if temp is not none and rh is not none else 'unavailable' }}
 

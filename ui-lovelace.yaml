@@ -1311,12 +1311,12 @@ views:
                 color: green
 
               - type: custom:imperial-readout
-                entity: sensor.grow_room_inside_temp_c
+                entity: sensor.grow_room_inside_temp
                 name: Inside Temp
                 color: green
 
               - type: custom:imperial-readout
-                entity: sensor.grow_room_inside_rh
+                entity: sensor.grow_room_inside_humidity
                 name: Inside Humidity
                 color: green
 
@@ -1376,19 +1376,19 @@ views:
           - type: custom:imperial-panel
             title: Environment — Inside vs Outside
             entities:
-              - entity: sensor.grow_room_inside_temp_c
+              - entity: sensor.grow_room_inside_temp
                 name: Inside Temp
                 icon: mdi:thermometer
-              - entity: sensor.grow_room_inside_rh
+              - entity: sensor.grow_room_inside_humidity
                 name: Inside Humidity
                 icon: mdi:water-percent
               - entity: sensor.grow_room_inside_vpd
                 name: Inside VPD
                 icon: mdi:water-thermometer
-              - entity: sensor.grow_room_outside_temp_c
+              - entity: sensor.grow_room_outside_temp
                 name: Outside Temp
                 icon: mdi:thermometer
-              - entity: sensor.grow_room_outside_rh
+              - entity: sensor.grow_room_outside_humidity
                 name: Outside Humidity
                 icon: mdi:water-percent
               - entity: sensor.grow_room_outside_vpd
