@@ -1320,10 +1320,46 @@ views:
                 name: Inside Humidity
                 color: green
 
-              - type: custom:imperial-readout
-                entity: sensor.grow_controller_soil_sensor_soil_moisture
-                name: Soil Moisture
-                color: green
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.grow_room_soil_status
+                    state: "Optimal"
+                card:
+                  type: custom:imperial-readout
+                  entity: sensor.grow_controller_soil_sensor_soil_moisture
+                  name: Soil Moisture
+                  color: green
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.grow_room_soil_status
+                    state: "Needs Water"
+                card:
+                  type: custom:imperial-readout
+                  entity: sensor.grow_controller_soil_sensor_soil_moisture
+                  name: Soil Moisture
+                  color: red
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.grow_room_soil_status
+                    state: "Too Wet"
+                card:
+                  type: custom:imperial-readout
+                  entity: sensor.grow_controller_soil_sensor_soil_moisture
+                  name: Soil Moisture
+                  color: amber
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.grow_room_soil_status
+                    state: "Unknown"
+                card:
+                  type: custom:imperial-readout
+                  entity: sensor.grow_controller_soil_sensor_soil_moisture
+                  name: Soil Moisture
+                  color: amber
 
           - type: horizontal-stack
             cards:

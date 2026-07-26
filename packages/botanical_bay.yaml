@@ -9,9 +9,10 @@
 # (backend/ha_client.py::_derive_vpd, Magnus formula) — single formula, matches
 # across both surfaces.
 #
-# VPD target band (0.8–1.2 kPa) is hardcoded to the vegetative-stage default.
-# It does NOT follow grow_sre's Settings if the stage/targets change there —
-# there's no live link between the two. Update this file by hand if that drifts.
+# VPD target band (0.8–1.2 kPa) and the Soil Status band (40–70%) are both
+# hardcoded to the vegetative-stage default. Neither follows grow_sre's
+# Settings if the stage/targets change there — there's no live link between
+# the two. Update this file by hand if that drifts.
 # ─────────────────────────────────────────────────────────────────────────────
 
 template:
@@ -108,6 +109,27 @@ template:
             Too Low
           {% elif vpd > 1.2 %}
             Too High
+          {% else %}
+            Optimal
+          {% endif %}
+
+      - name: "Grow Room Soil Status"
+        unique_id: grow_room_soil_status
+        icon: >
+          {% set m = states('sensor.grow_controller_soil_sensor_soil_moisture') | float(None) %}
+          {% if m is none %} mdi:help-circle-outline
+          {% elif m < 40 %} mdi:water-alert
+          {% elif m > 70 %} mdi:water-minus
+          {% else %} mdi:check-circle
+          {% endif %}
+        state: >
+          {% set m = states('sensor.grow_controller_soil_sensor_soil_moisture') | float(None) %}
+          {% if m is none %}
+            Unknown
+          {% elif m < 40 %}
+            Needs Water
+          {% elif m > 70 %}
+            Too Wet
           {% else %}
             Optimal
           {% endif %}
