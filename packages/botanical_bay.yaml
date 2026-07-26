@@ -92,6 +92,37 @@ template:
           {# Lawrence (2005) linear approximation — good to ~1°C for RH above ~50% #}
           {{ (temp - ((100 - rh) / 5)) | round(1) if temp is not none and rh is not none else 'unavailable' }}
 
+      # Display-only °F versions for the dashboard. VPD/Dew Point above must
+      # keep doing their math in °C (Magnus formula, Lawrence approximation
+      # are both °C-based) — these are pure unit conversions off those
+      # sensors, not a second source of truth.
+      - name: "Grow Room Inside Temp F"
+        unique_id: grow_room_inside_temp_f
+        unit_of_measurement: "°F"
+        state_class: measurement
+        icon: mdi:thermometer
+        state: >
+          {% set c = states('sensor.grow_room_inside_temp') | float(None) %}
+          {{ (c * 9 / 5 + 32) | round(1) if c is not none else 'unavailable' }}
+
+      - name: "Grow Room Outside Temp F"
+        unique_id: grow_room_outside_temp_f
+        unit_of_measurement: "°F"
+        state_class: measurement
+        icon: mdi:thermometer
+        state: >
+          {% set c = states('sensor.grow_room_outside_temp') | float(None) %}
+          {{ (c * 9 / 5 + 32) | round(1) if c is not none else 'unavailable' }}
+
+      - name: "Grow Room Dew Point F"
+        unique_id: grow_room_dew_point_f
+        unit_of_measurement: "°F"
+        state_class: measurement
+        icon: mdi:water-thermometer-outline
+        state: >
+          {% set c = states('sensor.grow_room_dew_point') | float(None) %}
+          {{ (c * 9 / 5 + 32) | round(1) if c is not none else 'unavailable' }}
+
       - name: "Grow Room VPD Status"
         unique_id: grow_room_vpd_status
         icon: >
