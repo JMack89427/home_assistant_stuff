@@ -1263,175 +1263,193 @@ views:
   # Entity IDs are still contract-shared with the grow_sre repo for the
   # underlying sensor.grow_controller_* names — relabel only, don't rename.
   #
-  # Layout: Uses masonry grid (no panel: true, defaults to 2-column/1-column
-  # responsive) with top-level card children to reflow on mobile. Camera, Equipment
-  # panel, readouts grid (2 columns), VPD/dew-point row, Environment panel, and
-  # history-graph are now reflowable siblings rather than nested stacks.
+  # Layout: Uses type: sections (max_columns: 3) with 3 grid sections — Live,
+  # Vitals, and Environment & Trend — laid out up to 3-wide on desktop and
+  # collapsing to a single column on mobile, in the same top-to-bottom order
+  # as the previous masonry layout: camera -> equipment (Live), readouts grid
+  # + VPD-status/dew-point row (Vitals), environment panel -> history-graph
+  # (Environment & Trend). No grid_options are set on individual cards —
+  # custom:imperial-camera, custom:imperial-panel, and custom:imperial-readout
+  # don't implement getGridOptions, so each section is left as a simple
+  # full-width vertical stack of its 1-2 children; the section's own
+  # type: grid wrapper handles row/column mechanics at the view level. This
+  # preserves the already-confirmed-good mobile reflow.
   # ═══════════════════════════════════════════════════════════════════════════
   - title: Grow Room
     path: botanical-bay
     icon: mdi:sprout
     badges: []
-    cards:
-      - type: custom:imperial-camera
-        entity: camera.grow_room_fluent  # Reolink substream (main stream camera.grow_room_clear is disabled)
-        title: Grow Room Camera
-
-      - type: custom:imperial-panel
-        title: Equipment
-        entities:
-          - entity: sensor.grow_controller_port_3_current_power
-            name: Lights
-            icon: mdi:lightbulb-on
-          - entity: sensor.grow_controller_port_4_current_power
-            name: Humidifier
-            icon: mdi:air-humidifier
-          - entity: sensor.grow_controller_port_5_current_power
-            name: Dehumidifier
-            icon: mdi:air-humidifier-off
-          - entity: sensor.grow_controller_port_6_current_power
-            name: Exhaust Fan
-            icon: mdi:fan
-          - entity: sensor.grow_controller_port_7_current_power
-            name: Oscillating Fan 1
-            icon: mdi:fan
-          - entity: sensor.grow_controller_port_8_current_power
-            name: Oscillating Fan 2
-            icon: mdi:fan
-
-      - type: grid
-        columns: 2
-        square: false
+    type: sections
+    max_columns: 3
+    sections:
+      - title: Live
+        type: grid
         cards:
-          - type: custom:imperial-readout
-            entity: sensor.grow_room_inside_vpd
-            name: Inside VPD
-            color: green
+          - type: custom:imperial-camera
+            entity: camera.grow_room_fluent  # Reolink substream (main stream camera.grow_room_clear is disabled)
+            title: Grow Room Camera
 
-          - type: custom:imperial-readout
-            entity: sensor.grow_room_inside_temp_f
-            name: Inside Temp
-            color: green
+          - type: custom:imperial-panel
+            title: Equipment
+            entities:
+              - entity: sensor.grow_controller_port_3_current_power
+                name: Lights
+                icon: mdi:lightbulb-on
+              - entity: sensor.grow_controller_port_4_current_power
+                name: Humidifier
+                icon: mdi:air-humidifier
+              - entity: sensor.grow_controller_port_5_current_power
+                name: Dehumidifier
+                icon: mdi:air-humidifier-off
+              - entity: sensor.grow_controller_port_6_current_power
+                name: Exhaust Fan
+                icon: mdi:fan
+              - entity: sensor.grow_controller_port_7_current_power
+                name: Oscillating Fan 1
+                icon: mdi:fan
+              - entity: sensor.grow_controller_port_8_current_power
+                name: Oscillating Fan 2
+                icon: mdi:fan
 
-          - type: custom:imperial-readout
-            entity: sensor.grow_room_inside_humidity
-            name: Inside Humidity
-            color: green
-
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: sensor.grow_room_soil_status
-                state: "Optimal"
-            card:
-              type: custom:imperial-readout
-              entity: sensor.grow_controller_soil_sensor_soil_moisture
-              name: Soil Moisture
-              color: green
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: sensor.grow_room_soil_status
-                state: "Needs Water"
-            card:
-              type: custom:imperial-readout
-              entity: sensor.grow_controller_soil_sensor_soil_moisture
-              name: Soil Moisture
-              color: red
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: sensor.grow_room_soil_status
-                state: "Too Wet"
-            card:
-              type: custom:imperial-readout
-              entity: sensor.grow_controller_soil_sensor_soil_moisture
-              name: Soil Moisture
-              color: amber
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: sensor.grow_room_soil_status
-                state: "Unknown"
-            card:
-              type: custom:imperial-readout
-              entity: sensor.grow_controller_soil_sensor_soil_moisture
-              name: Soil Moisture
-              color: amber
-
-      - type: horizontal-stack
+      - title: Vitals
+        type: grid
         cards:
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: sensor.grow_room_vpd_status
-                state: "Optimal"
-            card:
-              type: custom:imperial-readout
-              entity: sensor.grow_room_vpd_status
-              name: VPD Status
-              color: green
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: sensor.grow_room_vpd_status
-                state: "Too High"
-            card:
-              type: custom:imperial-readout
-              entity: sensor.grow_room_vpd_status
-              name: VPD Status
-              color: amber
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: sensor.grow_room_vpd_status
-                state: "Too Low"
-            card:
-              type: custom:imperial-readout
-              entity: sensor.grow_room_vpd_status
-              name: VPD Status
-              color: red
-          - type: conditional
-            conditions:
-              - condition: state
-                entity: sensor.grow_room_vpd_status
-                state: "Unknown"
-            card:
-              type: custom:imperial-readout
-              entity: sensor.grow_room_vpd_status
-              name: VPD Status
-              color: amber
+          - type: grid
+            columns: 2
+            square: false
+            cards:
+              - type: custom:imperial-readout
+                entity: sensor.grow_room_inside_vpd
+                name: Inside VPD
+                color: green
 
-          - type: custom:imperial-readout
-            entity: sensor.grow_room_dew_point_f
-            name: Dew Point
-            color: green
+              - type: custom:imperial-readout
+                entity: sensor.grow_room_inside_temp_f
+                name: Inside Temp
+                color: green
 
-      - type: custom:imperial-panel
-        title: Environment — Inside vs Outside
-        entities:
-          - entity: sensor.grow_room_inside_temp_f
-            name: Inside Temp
-            icon: mdi:thermometer
-          - entity: sensor.grow_room_inside_humidity
-            name: Inside Humidity
-            icon: mdi:water-percent
-          - entity: sensor.grow_room_inside_vpd
-            name: Inside VPD
-            icon: mdi:water-thermometer
-          - entity: sensor.grow_room_outside_temp_f
-            name: Outside Temp
-            icon: mdi:thermometer
-          - entity: sensor.grow_room_outside_humidity
-            name: Outside Humidity
-            icon: mdi:water-percent
-          - entity: sensor.grow_room_outside_vpd
-            name: Outside VPD
-            icon: mdi:water-thermometer-outline
+              - type: custom:imperial-readout
+                entity: sensor.grow_room_inside_humidity
+                name: Inside Humidity
+                color: green
 
-      - type: history-graph
-        title: VPD History (Inside)
-        hours_to_show: 24
-        entities:
-          - entity: sensor.grow_room_inside_vpd
-            name: VPD (kPa)
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.grow_room_soil_status
+                    state: "Optimal"
+                card:
+                  type: custom:imperial-readout
+                  entity: sensor.grow_controller_soil_sensor_soil_moisture
+                  name: Soil Moisture
+                  color: green
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.grow_room_soil_status
+                    state: "Needs Water"
+                card:
+                  type: custom:imperial-readout
+                  entity: sensor.grow_controller_soil_sensor_soil_moisture
+                  name: Soil Moisture
+                  color: red
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.grow_room_soil_status
+                    state: "Too Wet"
+                card:
+                  type: custom:imperial-readout
+                  entity: sensor.grow_controller_soil_sensor_soil_moisture
+                  name: Soil Moisture
+                  color: amber
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.grow_room_soil_status
+                    state: "Unknown"
+                card:
+                  type: custom:imperial-readout
+                  entity: sensor.grow_controller_soil_sensor_soil_moisture
+                  name: Soil Moisture
+                  color: amber
+
+          - type: horizontal-stack
+            cards:
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.grow_room_vpd_status
+                    state: "Optimal"
+                card:
+                  type: custom:imperial-readout
+                  entity: sensor.grow_room_vpd_status
+                  name: VPD Status
+                  color: green
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.grow_room_vpd_status
+                    state: "Too High"
+                card:
+                  type: custom:imperial-readout
+                  entity: sensor.grow_room_vpd_status
+                  name: VPD Status
+                  color: amber
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.grow_room_vpd_status
+                    state: "Too Low"
+                card:
+                  type: custom:imperial-readout
+                  entity: sensor.grow_room_vpd_status
+                  name: VPD Status
+                  color: red
+              - type: conditional
+                conditions:
+                  - condition: state
+                    entity: sensor.grow_room_vpd_status
+                    state: "Unknown"
+                card:
+                  type: custom:imperial-readout
+                  entity: sensor.grow_room_vpd_status
+                  name: VPD Status
+                  color: amber
+
+              - type: custom:imperial-readout
+                entity: sensor.grow_room_dew_point_f
+                name: Dew Point
+                color: green
+
+      - title: Environment & Trend
+        type: grid
+        cards:
+          - type: custom:imperial-panel
+            title: Environment — Inside vs Outside
+            entities:
+              - entity: sensor.grow_room_inside_temp_f
+                name: Inside Temp
+                icon: mdi:thermometer
+              - entity: sensor.grow_room_inside_humidity
+                name: Inside Humidity
+                icon: mdi:water-percent
+              - entity: sensor.grow_room_inside_vpd
+                name: Inside VPD
+                icon: mdi:water-thermometer
+              - entity: sensor.grow_room_outside_temp_f
+                name: Outside Temp
+                icon: mdi:thermometer
+              - entity: sensor.grow_room_outside_humidity
+                name: Outside Humidity
+                icon: mdi:water-percent
+              - entity: sensor.grow_room_outside_vpd
+                name: Outside VPD
+                icon: mdi:water-thermometer-outline
+
+          - type: history-graph
+            title: VPD History (Inside)
+            hours_to_show: 24
+            entities:
+              - entity: sensor.grow_room_inside_vpd
+                name: VPD (kPa)
