@@ -1094,3 +1094,92 @@
       data:
         percentage: 100
   mode: single
+
+# ── Grow Room: Detect Watering Event ─────────────────────────────────────────
+# No physical pump/valve exists (hand-watered) — watering is inferred from the
+# soil moisture sawtooth: gradual drying, then a sharp rise on watering. A
+# below-45% crossing arms the Schmitt trigger; the next above-60% crossing
+# while armed is treated as one watering cycle. Requiring the prior dry
+# crossing (via the armed condition) keeps an isolated wet-crossing — e.g.
+# right after an HA restart — from being counted as a real cycle.
+# input_number.grow_room_watering_interval_avg is an adaptive EMA (alpha=0.4)
+# over the interval between cycles, not a plain running mean, so it tracks
+# the plant's current drying rate rather than being anchored to old cycles.
+# See packages/botanical_bay.yaml header for the full write-up.
+- id: grow_room_detect_watering
+  alias: "Grow Room: Detect Watering Event"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.grow_controller_soil_sensor_soil_moisture
+      below: 45
+      id: dry
+    - platform: numeric_state
+      entity_id: sensor.grow_controller_soil_sensor_soil_moisture
+      above: 60
+      id: wet
+  condition: []
+  action:
+    - choose:
+        # Dry crossing: arm. If already armed (e.g. a wobble back below 45
+        # before a real watering) this is a harmless no-op.
+        - conditions: "{{ trigger.id == 'dry' }}"
+          sequence:
+            - service: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.grow_room_soil_armed
+
+        # Wet crossing, but only counted as a real watering cycle if it was
+        # preceded by an armed (dry) crossing.
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.id == 'wet' }}"
+            - condition: state
+              entity_id: input_boolean.grow_room_soil_armed
+              state: "on"
+          sequence:
+            - variables:
+                last_watered: "{{ states('input_datetime.grow_room_last_watered') }}"
+            - if:
+                # Very first watering event ever observed — no prior
+                # timestamp to diff against, so just seed last_watered and
+                # skip the EMA math entirely (don't touch the average or
+                # counter on this cycle).
+                - condition: template
+                  value_template: "{{ last_watered in ['unknown', 'unavailable'] }}"
+              then:
+                - service: input_datetime.set_datetime
+                  target:
+                    entity_id: input_datetime.grow_room_last_watered
+                  data:
+                    datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+                - service: input_boolean.turn_off
+                  target:
+                    entity_id: input_boolean.grow_room_soil_armed
+              else:
+                - variables:
+                    interval_hours: "{{ (now() - as_local(as_datetime(last_watered))).total_seconds() / 3600 }}"
+                    current_avg: "{{ states('input_number.grow_room_watering_interval_avg') | float(0) }}"
+                    events_so_far: "{{ states('counter.grow_room_watering_events') | int(0) }}"
+                    new_avg: >
+                      {% if events_so_far == 0 %}
+                        {{ interval_hours }}
+                      {% else %}
+                        {{ 0.4 * interval_hours + 0.6 * current_avg }}
+                      {% endif %}
+                - service: input_number.set_value
+                  target:
+                    entity_id: input_number.grow_room_watering_interval_avg
+                  data:
+                    value: "{{ new_avg | float | round(2) }}"
+                - service: input_datetime.set_datetime
+                  target:
+                    entity_id: input_datetime.grow_room_last_watered
+                  data:
+                    datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+                - service: counter.increment
+                  target:
+                    entity_id: counter.grow_room_watering_events
+                - service: input_boolean.turn_off
+                  target:
+                    entity_id: input_boolean.grow_room_soil_armed
+  mode: single

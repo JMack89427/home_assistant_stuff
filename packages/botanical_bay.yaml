@@ -13,7 +13,62 @@
 # hardcoded to the vegetative-stage default. Neither follows grow_sre's
 # Settings if the stage/targets change there — there's no live link between
 # the two. Update this file by hand if that drifts.
+#
+# Grow Room Next Watering (Estimated) — sensor.grow_room_next_watering_estimated,
+# sensor.grow_room_watering_status, sensor.grow_room_days_since_watered:
+# There is no physical pump/valve on this setup (it's hand-watered), so there
+# is no relay signal to key off of. Instead, watering events are INFERRED from
+# the soil moisture curve itself, which the automation
+# `grow_room_detect_watering` in automations.yaml watches via two hardcoded
+# thresholds (45% / 60%) — the sensor produces a sawtooth: gradual drying then
+# a sharp rise on watering, so a dry-then-wet crossing pair is treated as one
+# watering cycle. The interval between detected cycles feeds an adaptive EMA
+# (alpha=0.4, input_number.grow_room_watering_interval_avg) rather than a
+# plain running mean, so the estimate drifts with the plant's actual current
+# drying rate instead of being dragged down by stale early-cycle data.
+# counter.grow_room_watering_events gates trust in the estimate — fewer than
+# 3 observed cycles and the dashboard shows "Learning…" instead of a real
+# ETA. This whole feature is descriptive of past watering habits, not a
+# physical guarantee — nothing here confirms water actually left a container.
+#
+# IMPORTANT: input_datetime state values are naive (no timezone info). Any
+# datetime arithmetic (comparisons, offsets) must wrap the as_datetime() result
+# with as_local() to convert to aware UTC before arithmetic with now() or
+# timedelta. See template sensors below for the pattern; if this changes,
+# audit all input_datetime reads for as_local() usage.
 # ─────────────────────────────────────────────────────────────────────────────
+
+input_datetime:
+  grow_room_last_watered:
+    name: "Grow Room Last Watered"
+    has_date: true
+    has_time: true
+    # No initial value — stays unknown until grow_room_detect_watering seeds
+    # it on the very first observed dry->wet cycle.
+
+input_number:
+  grow_room_watering_interval_avg:
+    name: "Grow Room Watering Interval (EMA)"
+    unit_of_measurement: "h"
+    min: 0
+    max: 720
+    step: 0.1
+    mode: box
+    icon: mdi:chart-bell-curve-cumulative
+
+input_boolean:
+  grow_room_soil_armed:
+    name: "Grow Room Soil Armed"
+    icon: mdi:shield-check
+    initial: off
+
+counter:
+  grow_room_watering_events:
+    name: "Grow Room Watering Events"
+    initial: 0
+    step: 1
+    # Confidence gate — sensor.grow_room_next_watering_estimated withholds a
+    # real ETA until this reaches 3.
 
 template:
   - sensor:
@@ -163,4 +218,60 @@ template:
             Too Wet
           {% else %}
             Optimal
+          {% endif %}
+
+      # Watering is inferred, not sensed directly — see header comment for
+      # the full rationale (no physical pump/valve exists on this setup).
+      - name: "Grow Room Next Watering Estimated"
+        unique_id: grow_room_next_watering_estimated
+        device_class: timestamp
+        icon: >
+          {% if states('counter.grow_room_watering_events') | int(0) >= 3 %}
+            mdi:watering-can-outline
+          {% else %}
+            mdi:progress-clock
+          {% endif %}
+        # device_class: timestamp requires either a valid ISO timestamp or
+        # unavailable/unknown as the state — never a plain string like
+        # "Learning..." here. That readiness messaging instead lives on
+        # sensor.grow_room_watering_status below.
+        state: >
+          {% set last = states('input_datetime.grow_room_last_watered') %}
+          {% if states('counter.grow_room_watering_events') | int(0) < 3
+             or last in ['unknown', 'unavailable'] %}
+            unavailable
+          {% else %}
+            {% set avg_h = states('input_number.grow_room_watering_interval_avg') | float(0) %}
+            {{ (as_local(as_datetime(last)) + timedelta(hours=avg_h)).isoformat() }}
+          {% endif %}
+
+      # Human-friendly companion to the timestamp sensor above — the
+      # dashboard tile shows this instead of a raw ISO timestamp/unavailable.
+      - name: "Grow Room Watering Status"
+        unique_id: grow_room_watering_status
+        icon: mdi:watering-can-outline
+        state: >
+          {% set n = states('counter.grow_room_watering_events') | int(0) %}
+          {% set next_watering = states('sensor.grow_room_next_watering_estimated') %}
+          {% if n < 3 or next_watering in ['unknown', 'unavailable'] %}
+            Learning… ({{ n }}/3 cycles)
+          {% else %}
+            {% set hours_remaining = (as_datetime(next_watering) - now()).total_seconds() / 3600 %}
+            {% if hours_remaining < 0 %}
+              Overdue
+            {% else %}
+              ~{{ (hours_remaining / 24) | round(1) }} days
+            {% endif %}
+          {% endif %}
+
+      - name: "Grow Room Days Since Watered"
+        unique_id: grow_room_days_since_watered
+        unit_of_measurement: "d"
+        icon: mdi:calendar-clock
+        state: >
+          {% set last = states('input_datetime.grow_room_last_watered') %}
+          {% if last in ['unknown', 'unavailable'] %}
+            unavailable
+          {% else %}
+            {{ ((now() - as_local(as_datetime(last))).total_seconds() / 86400) | round(1) }}
           {% endif %}

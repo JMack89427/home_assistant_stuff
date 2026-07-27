@@ -1422,6 +1422,14 @@ views:
                 name: Dew Point
                 color: green
 
+              # Estimated from the soil moisture curve (no physical pump/valve
+              # exists) — shows "Learning… (n/3 cycles)" until enough watering
+              # cycles are observed. See packages/botanical_bay.yaml.
+              - type: custom:imperial-readout
+                entity: sensor.grow_room_watering_status
+                name: Next Watering
+                color: green
+
       - title: Environment & Trend
         type: grid
         cards:
