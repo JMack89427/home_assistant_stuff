@@ -1422,13 +1422,19 @@ views:
                 name: Dew Point
                 color: green
 
-              # Estimated from the soil moisture curve (no physical pump/valve
-              # exists) — shows "Learning… (n/3 cycles)" until enough watering
-              # cycles are observed. See packages/botanical_bay.yaml.
-              - type: custom:imperial-readout
-                entity: sensor.grow_room_watering_status
-                name: Next Watering
-                color: green
+          # Estimated from the soil moisture curve (no physical pump/valve
+          # exists) — shows "Learning n/3" or "in Xd" until enough watering
+          # cycles are observed. See packages/botanical_bay.yaml. Moved out of
+          # the horizontal-stack above into its own imperial-panel row because
+          # imperial-readout's fixed 64px digit-display style clipped/wrapped
+          # this sensor's sentence-length values in the ~130px-wide stack slot;
+          # imperial-panel renders single-line name+value rows instead.
+          - type: custom:imperial-panel
+            title: Next Watering
+            entities:
+              - entity: sensor.grow_room_watering_status
+                name: Estimate
+                icon: mdi:watering-can-outline
 
       - title: Environment & Trend
         type: grid

@@ -254,13 +254,13 @@ template:
           {% set n = states('counter.grow_room_watering_events') | int(0) %}
           {% set next_watering = states('sensor.grow_room_next_watering_estimated') %}
           {% if n < 3 or next_watering in ['unknown', 'unavailable'] %}
-            Learning… ({{ n }}/3 cycles)
+            Learning {{ n }}/3
           {% else %}
             {% set hours_remaining = (as_datetime(next_watering) - now()).total_seconds() / 3600 %}
             {% if hours_remaining < 0 %}
               Overdue
             {% else %}
-              ~{{ (hours_remaining / 24) | round(1) }} days
+              in {{ (hours_remaining / 24) | round(1) }}d
             {% endif %}
           {% endif %}
 
