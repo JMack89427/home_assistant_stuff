@@ -190,13 +190,13 @@ template:
         state: >
           {% set vpd = states('sensor.grow_room_inside_vpd') | float(None) %}
           {% if vpd is none %}
-            Unknown
+            N/A
           {% elif vpd < 0.8 %}
-            Too Low
+            Low
           {% elif vpd > 1.2 %}
-            Too High
+            High
           {% else %}
-            Optimal
+            Ideal
           {% endif %}
 
       - name: "Grow Room Soil Status"

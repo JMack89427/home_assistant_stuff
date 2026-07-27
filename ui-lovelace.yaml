@@ -1380,7 +1380,7 @@ views:
                 conditions:
                   - condition: state
                     entity: sensor.grow_room_vpd_status
-                    state: "Optimal"
+                    state: "Ideal"
                 card:
                   type: custom:imperial-readout
                   entity: sensor.grow_room_vpd_status
@@ -1390,7 +1390,7 @@ views:
                 conditions:
                   - condition: state
                     entity: sensor.grow_room_vpd_status
-                    state: "Too High"
+                    state: "High"
                 card:
                   type: custom:imperial-readout
                   entity: sensor.grow_room_vpd_status
@@ -1400,7 +1400,7 @@ views:
                 conditions:
                   - condition: state
                     entity: sensor.grow_room_vpd_status
-                    state: "Too Low"
+                    state: "Low"
                 card:
                   type: custom:imperial-readout
                   entity: sensor.grow_room_vpd_status
@@ -1410,7 +1410,7 @@ views:
                 conditions:
                   - condition: state
                     entity: sensor.grow_room_vpd_status
-                    state: "Unknown"
+                    state: "N/A"
                 card:
                   type: custom:imperial-readout
                   entity: sensor.grow_room_vpd_status
