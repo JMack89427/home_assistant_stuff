@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.9.0';
+  const VERSION = '2.10.0';
 
   const WX_ICONS = {
     'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
@@ -991,7 +991,9 @@
   }
 
   // ============================================================================
-  // imperial-camera  (rotatable camera viewer — polls /api/camera_proxy)
+  // imperial-camera  (rotatable camera viewer — MJPEG stream via
+  // /api/camera_proxy_stream, with automatic fallback to snapshot polling
+  // of /api/camera_proxy every 5s if the stream never delivers a frame)
   // ============================================================================
   class ImperialCamera extends HTMLElement {
     constructor() {
@@ -1005,7 +1007,11 @@
     set hass(h) {
       this._h = h;
       if (!this._built) { this._build(); return; }
-      this._refresh();
+      // Streaming mode: do NOT touch img.src here. Re-assigning src while a
+      // multipart connection is open tears it down and restarts it, which is
+      // exactly the stutter we're fixing. Keeping this._h fresh is sufficient —
+      // the reconnect timer reads the (rotating) access_token from it.
+      if (this._mode === 'snapshot') this._snapshot();
     }
     _build() {
       if (!this._c?.entity) return;
@@ -1040,16 +1046,77 @@
       `;
       this._img = this.shadowRoot.getElementById('cam');
       this._built = true;
-      this._refresh();
-      this._timer = setInterval(() => this._refresh(), 5000);
+
+      this._mode = 'stream';
+      this._everLoaded = false;
+
+      this._img.addEventListener('load',  () => this._onLoad());
+      this._img.addEventListener('error', () => this._onError());
+
+      this._startStream();
     }
-    _refresh() {
+    _token() {
+      return this._h?.states?.[this._c.entity]?.attributes?.access_token || '';
+    }
+    _startStream() {
       if (!this._img || !this._h || !this._c?.entity) return;
-      const state = this._h.states[this._c.entity];
-      const token = state?.attributes?.access_token || '';
-      this._img.src = `/api/camera_proxy/${this._c.entity}?token=${token}&_t=${Date.now()}`;
+      this._img.src =
+        `/api/camera_proxy_stream/${this._c.entity}?token=${this._token()}&_t=${Date.now()}`;
+
+      // Safety-net reconnect, NOT a refresh mechanism. Proactively restarts the
+      // stream before the HA frontend's known ~30s service-worker MJPEG hang
+      // (github.com/home-assistant/frontend#27444) can silently freeze it.
+      clearInterval(this._timer);
+      this._timer = setInterval(() => this._startStream(), 25000);
+
+      // First-frame watchdog: covers the case where the endpoint returns 200 but
+      // never delivers a frame — neither 'load' nor 'error' would ever fire, so
+      // _everLoaded would stay false forever and we'd never fall back.
+      if (!this._everLoaded) {
+        clearTimeout(this._watchdog);
+        this._watchdog = setTimeout(() => {
+          if (!this._everLoaded) this._fallback('no frame within 10s');
+        }, 10000);
+      }
     }
-    disconnectedCallback() { clearInterval(this._timer); }
+    _onLoad() {
+      this._everLoaded = true;
+      clearTimeout(this._watchdog);
+    }
+    _onError() {
+      if (this._mode !== 'stream') return;
+      if (this._everLoaded) {
+        // Post-success error == transient drop or our own reconnect abort.
+        // Stream mode is fine; the 25s timer already re-establishes it.
+        return;
+      }
+      this._fallback('stream endpoint error before first frame');
+    }
+    _fallback(why) {
+      console.warn(
+        `[imperial-camera] ${this._c.entity}: MJPEG stream unavailable (${why}); ` +
+        `falling back to snapshot polling.`
+      );
+      this._mode = 'snapshot';           // sticky for this instance's lifetime
+      clearTimeout(this._watchdog);
+      clearInterval(this._timer);
+      this._snapshot();
+      this._timer = setInterval(() => this._snapshot(), 5000);
+    }
+    _snapshot() {                        // identical to the old _refresh()
+      if (!this._img || !this._h || !this._c?.entity) return;
+      this._img.src = `/api/camera_proxy/${this._c.entity}?token=${this._token()}&_t=${Date.now()}`;
+    }
+    connectedCallback() {
+      if (!this._built || !this._h) return;
+      if (this._mode === 'snapshot') { this._snapshot(); this._timer = setInterval(() => this._snapshot(), 5000); }
+      else this._startStream();
+    }
+    disconnectedCallback() {
+      clearInterval(this._timer);
+      clearTimeout(this._watchdog);
+      if (this._img) this._img.src = '';   // actively closes the multipart connection
+    }
     getCardSize() { return 3; }
     static getStubConfig() { return { entity: 'camera.example', rotation: 0, title: '' }; }
   }

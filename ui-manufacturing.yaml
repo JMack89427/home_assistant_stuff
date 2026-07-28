@@ -20,7 +20,7 @@
 
 title: Manufacturing
 resources:
-  - url: /local/imperial-cards.js?v=39
+  - url: /local/imperial-cards.js?v=40
     type: module
 views:
 
