@@ -1269,9 +1269,10 @@ views:
   # as the previous masonry layout: camera -> equipment (Live), readouts grid
   # + VPD-status/dew-point row (Vitals), environment panel -> history-graph
   # (Environment & Trend). No grid_options are set on individual cards —
-  # custom:imperial-camera, custom:imperial-panel, and custom:imperial-readout
-  # don't implement getGridOptions, so each section is left as a simple
-  # full-width vertical stack of its 1-2 children; the section's own
+  # custom:imperial-panel and custom:imperial-readout don't implement
+  # getGridOptions, and the standard cards here (picture-entity, history-graph)
+  # lay out acceptably on their own defaults, so each section is left as a
+  # simple full-width vertical stack of its 1-2 children; the section's own
   # type: grid wrapper handles row/column mechanics at the view level. This
   # preserves the already-confirmed-good mobile reflow.
   # ═══════════════════════════════════════════════════════════════════════════
@@ -1285,9 +1286,10 @@ views:
       - title: Live
         type: grid
         cards:
-          - type: custom:imperial-camera
+          - type: picture-entity
             entity: camera.grow_room_fluent  # Reolink substream (main stream camera.grow_room_clear is disabled)
-            title: Grow Room Camera
+            name: Grow Room Camera
+            camera_view: live
 
           - type: custom:imperial-panel
             title: Equipment
