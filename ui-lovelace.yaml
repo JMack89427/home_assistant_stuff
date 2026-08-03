@@ -1424,19 +1424,33 @@ views:
                 name: Dew Point
                 color: green
 
-          # Estimated from the soil moisture curve (no physical pump/valve
-          # exists) — shows "Learning n/3" or "in Xd" until enough watering
-          # cycles are observed. See packages/botanical_bay.yaml. Moved out of
-          # the horizontal-stack above into its own imperial-panel row because
-          # imperial-readout's fixed 64px digit-display style clipped/wrapped
-          # this sensor's sentence-length values in the ~130px-wide stack slot;
-          # imperial-panel renders single-line name+value rows instead.
-          - type: custom:imperial-panel
-            title: Next Watering
+          # 14-day soil moisture trend. Uses type: statistics-graph rather than
+          # type: history-graph on purpose: this repo sets no recorder: /
+          # purge_keep_days anywhere, so raw recorder history only reliably
+          # goes back ~10 days (HA stock default) and a history-graph would
+          # silently truncate the requested 14-day window. This sensor carries
+          # state_class: measurement, so HA records long-term statistics for it
+          # and retains them indefinitely regardless of the purge setting —
+          # statistics-graph reads those. (The 24h VPD history-graph in the
+          # Environment & Trend section below is fine as-is; 24h is well inside
+          # the raw-history retention window.)
+          #
+          # This replaced a text "Next Watering" estimate — the raw moisture
+          # curve is more informative and lets the reader judge watering timing
+          # directly. The inference logic behind that estimate
+          # (sensor.grow_room_watering_status, grow_room_next_watering_estimated,
+          # counter.grow_room_watering_events, and the grow_room_detect_watering
+          # automation) still runs in packages/botanical_bay.yaml; it is simply
+          # no longer surfaced on this dashboard.
+          - type: statistics-graph
+            title: Soil Moisture — 14 Day Trend
+            days_to_show: 14
+            chart_type: line
+            stat_types:
+              - mean
             entities:
-              - entity: sensor.grow_room_watering_status
-                name: Estimate
-                icon: mdi:watering-can-outline
+              - entity: sensor.grow_controller_soil_sensor_soil_moisture
+                name: Soil Moisture
 
       - title: Environment & Trend
         type: grid
