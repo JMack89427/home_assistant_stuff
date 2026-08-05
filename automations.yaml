@@ -34,6 +34,10 @@
 # ── Climate: Room-balanced heat_cool setpoints ────────────────────────────────
 # Runs at 7am (day → 72°F), 10pm (night → 68°F), and every 15 min to
 # recalibrate. Offsets the T6 setpoint so the whole-house average hits target.
+# Also owns fan_mode: forces 'Low' (continuous circulation) when room temps are
+# uneven OR house humidity is at/above 45%, to keep air moving through the
+# passive whole-house dehumidifier. Sole writer of fan_mode — do not add a
+# second automation that calls climate.set_fan_mode.
 - id: climate_apply_setpoints
   alias: "Climate: Room-balanced heat/cool setpoints"
   trigger:
@@ -76,7 +80,11 @@
             if is_state('input_boolean.brent_room_occupied', 'on') else []
           ) }}
         spread: "{{ room_temps | max - room_temps | min }}"
-        fan_mode: "{{ 'Low' if spread > 3 else 'Circulation' }}"
+        # Force continuous low-speed circulation when humid: the whole-house
+        # dehumidifier is passive ductwork with no HA entity, so airflow is the
+        # only control we have over it.
+        house_avg_humidity: "{{ states('sensor.house_average_humidity') | float(0) }}"
+        fan_mode: "{{ 'Low' if (spread > 3 or house_avg_humidity >= 45) else 'Circulation' }}"
     # Skip recalibration ticks when manual override is active.
     # Scheduled triggers (day/night) always run and clear the override.
     - condition: or
