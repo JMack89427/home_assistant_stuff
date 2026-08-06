@@ -1287,7 +1287,7 @@ views:
         type: grid
         cards:
           - type: picture-entity
-            entity: camera.grow_room_fluent  # Reolink substream (main stream camera.grow_room_clear is disabled)
+            entity: camera.grow_room_clear  # Reolink main stream (higher quality than the Fluent substream previously used)
             name: Grow Room Camera
             camera_view: live
 

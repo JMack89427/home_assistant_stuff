@@ -1191,3 +1191,95 @@
                   target:
                     entity_id: input_boolean.grow_room_soil_armed
   mode: single
+
+# ── Grow Room: Camera Day/Night Mode Follows Light ───────────────────────────
+# The Reolink camera was remounted close to the grow light, and its built-in
+# light sensor now misreads the light's spectrum/proximity — with the light on,
+# sensor.grow_room_day_night_state reports "night" and the feed drops to
+# black-and-white. So the camera's own `auto` detection is overridden while the
+# light is powered: force "color" on, restore "auto" off. Auto is restored
+# rather than pinning "blackwhite" so genuine darkness still gets proper IR
+# night vision — the confused-sensor condition only exists while the light is on.
+#
+# Trigger is sensor.grow_controller_port_3_current_power, NOT
+# binary_sensor.grow_controller_port_3_state or
+# select.grow_room_grow_controller_port_3_active_mode — both of those are
+# frozen/stale since the last HA restart and do not reflect live state.
+# NOT binary_sensor.grow_controller_port_3_status either — that's
+# device_class: connectivity (controller network reachability, always "on"),
+# unrelated to the light itself.
+#
+# The power sensor is mislabeled (device_class: power_factor, no unit) — its
+# history shows it's actually a 0-5 dimming ramp (AC Infinity sunrise/sunset
+# fade), not wattage. numeric_state triggers (not a state trigger) are used
+# deliberately: a state trigger would fire on every ramp step (6x per
+# transition) instead of once per edge.
+#
+# The homeassistant/start trigger resyncs mode after an HA restart, guarded so
+# it no-ops if the sensor hasn't polled yet (comes up non-numeric at startup).
+# Each branch also guards against redundantly re-setting a mode that's already
+# active, since the sensor can blip to unavailable and back, which would
+# otherwise re-fire the numeric_state trigger and add log noise.
+- id: grow_room_camera_day_night_sync
+  alias: "Grow Room: Camera Day/Night Follows Grow Light"
+  trigger:
+    - platform: numeric_state
+      entity_id: sensor.grow_controller_port_3_current_power
+      above: 0
+      id: lights_on
+    - platform: numeric_state
+      entity_id: sensor.grow_controller_port_3_current_power
+      below: 1
+      id: lights_off
+    - platform: homeassistant
+      event: start
+      id: sync
+  condition: []
+  action:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: lights_on
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: select.grow_room_day_night_mode
+                  state: "color"
+          sequence:
+            - service: select.select_option
+              target:
+                entity_id: select.grow_room_day_night_mode
+              data:
+                option: "color"
+        - conditions:
+            - condition: trigger
+              id: lights_off
+            - condition: not
+              conditions:
+                - condition: state
+                  entity_id: select.grow_room_day_night_mode
+                  state: "auto"
+          sequence:
+            - service: select.select_option
+              target:
+                entity_id: select.grow_room_day_night_mode
+              data:
+                option: "auto"
+        - conditions:
+            - condition: trigger
+              id: sync
+            - condition: template
+              value_template: "{{ states('sensor.grow_controller_port_3_current_power') | is_number }}"
+            - condition: template
+              # Guard against redundantly re-setting a mode that's already active,
+              # matching the lights_on/lights_off branches above.
+              value_template: >
+                {{ ('color' if states('sensor.grow_controller_port_3_current_power') | float > 0 else 'auto')
+                   != states('select.grow_room_day_night_mode') }}
+          sequence:
+            - service: select.select_option
+              target:
+                entity_id: select.grow_room_day_night_mode
+              data:
+                option: "{{ 'color' if states('sensor.grow_controller_port_3_current_power') | float > 0 else 'auto' }}"
+  mode: single
