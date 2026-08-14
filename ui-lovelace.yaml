@@ -18,7 +18,7 @@ title: Home
 resources:
   - url: /local/imperial-cards.js?v=40
     type: module
-  - url: /local/grow-room-cards.js?v=1
+  - url: /local/grow-room-cards.js?v=2
     type: module
   - url: /hacsfiles/calendar-card-pro/calendar-card-pro.js
     type: module
@@ -1315,63 +1315,6 @@ views:
             heading: GROW ROOM
             heading_style: title
             icon: mdi:sprout
-            badges:
-              - type: entity
-                entity: sensor.grow_room_vpd_status
-                color: green
-                visibility:
-                  - condition: state
-                    entity: sensor.grow_room_vpd_status
-                    state: "Ideal"
-              - type: entity
-                entity: sensor.grow_room_vpd_status
-                color: yellow
-                visibility:
-                  - condition: state
-                    entity: sensor.grow_room_vpd_status
-                    state: "High"
-              - type: entity
-                entity: sensor.grow_room_vpd_status
-                color: red
-                visibility:
-                  - condition: state
-                    entity: sensor.grow_room_vpd_status
-                    state: "Low"
-              - type: entity
-                entity: sensor.grow_room_vpd_status
-                color: grey
-                visibility:
-                  - condition: state
-                    entity: sensor.grow_room_vpd_status
-                    state: "N/A"
-              - type: entity
-                entity: sensor.grow_room_soil_status
-                color: green
-                visibility:
-                  - condition: state
-                    entity: sensor.grow_room_soil_status
-                    state: "Optimal"
-              - type: entity
-                entity: sensor.grow_room_soil_status
-                color: red
-                visibility:
-                  - condition: state
-                    entity: sensor.grow_room_soil_status
-                    state: "Needs Water"
-              - type: entity
-                entity: sensor.grow_room_soil_status
-                color: yellow
-                visibility:
-                  - condition: state
-                    entity: sensor.grow_room_soil_status
-                    state: "Too Wet"
-              - type: entity
-                entity: sensor.grow_room_soil_status
-                color: grey
-                visibility:
-                  - condition: state
-                    entity: sensor.grow_room_soil_status
-                    state: "Unknown"
 
       - type: grid
         column_span: 2
@@ -1426,9 +1369,6 @@ views:
                 ideal_min: 40
                 ideal_max: 70
                 status_entity: sensor.grow_room_soil_status
-            footer:
-              - entity: sensor.grow_room_dew_point_f
-                name: Dew Point
 
       - type: grid
         column_span: 1

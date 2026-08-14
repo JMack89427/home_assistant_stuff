@@ -6,7 +6,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '1.0.0';
+  const VERSION = '1.0.1';
 
   // ── Status → color map (exact vocab from packages/botanical_bay.yaml) ──────
   const DEFAULT_STATUS_COLORS = {
@@ -67,6 +67,11 @@
     }
     if (!isValid) colorKey = 'neutral';
     const color = TOKEN[colorKey];
+    // Readout text sits on a dark card background, unlike the needle (which
+    // sits on the light dial face) — TOKEN.neutral is dark ink meant for the
+    // needle only. When there's no real status color, fall back to null so
+    // the CSS default (var(--primary-text-color)) applies to the text.
+    const textColor = colorKey === 'neutral' ? null : color;
 
     const valueStr = isValid ? rawValue.toFixed(decimals) : '—';
 
@@ -122,7 +127,7 @@
         <circle cx="${CX}" cy="${CY}" r="3" fill="#b08d57"/>
       </svg>`;
 
-    return { label, svg, valueStr, unit, color, statusWord };
+    return { label, svg, valueStr, unit, color, textColor, statusWord };
   }
 
   function renderGaugeCell(cfg, hass, idx) {
@@ -131,8 +136,9 @@
       <div class="cell">
         <div class="glabel">${g.label.toUpperCase()}</div>
         ${g.svg}
-        <div class="greadout"><span class="gval" style="color:${g.color}">${g.valueStr}</span><span class="gunit">${g.unit}</span></div>
-        ${g.statusWord ? `<div class="gstatus" style="color:${g.color}">${g.statusWord.toUpperCase()}</div>` : ''}
+        <div class="greadout"><span class="gval"${g.textColor ? ` style="color:${g.textColor}"` : ''}>${g.valueStr}</span><span class="gunit">${g.unit}</span></div>
+        <!-- TODO (follow-up): .gstatus should conditionally guard g.textColor like .gval does, but is currently unreachable (no neutral status in packages/botanical_bay.yaml). Dormant gap, not a current defect. -->
+        ${g.statusWord ? `<div class="gstatus" style="color:${g.textColor}">${g.statusWord.toUpperCase()}</div>` : ''}
       </div>`;
   }
 
