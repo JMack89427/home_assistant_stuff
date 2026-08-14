@@ -1,0 +1,78 @@
+brass_instrument: &brass
+  # ═══════════════════════════════════════════════════════════════════════════
+  # BRASS INSTRUMENT THEME — Botanical Bay Panel
+  # The Grow Room's own instrument-panel identity: aged brass, warm dial faces,
+  # moss/amber/brick status lamps. Deliberately distinct from Imperial Dark —
+  # this is a greenhouse gauge cluster, not a Death Star console. First
+  # per-view theme override in this repo (applied via `theme:` on the Grow
+  # Room view only; every other view keeps imperial_dark).
+  #
+  # `brass_instrument_porthole` below is NOT a second full theme — it's a
+  # card-level override applied only to the Grow Room camera card (via its
+  # own `theme:` key) to render the live feed as a riveted brass porthole.
+  # It inherits every token from `brass_instrument` via the YAML anchor and
+  # only overrides card-chrome variables.
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  # ── Core background ──
+  primary-background-color: "#1c1d19"
+  secondary-background-color: "#232420"
+  card-background-color: "#232420"
+  dialog-background-color: "#262723"
+  clear-background-color: "transparent"
+
+  # ── Brass accent system ──
+  primary-color: "#b08d57"
+  accent-color: "#7a6238"
+  light-primary-color: "#c9a978"
+  dark-primary-color: "#7a6238"
+
+  # ── Text ──
+  primary-text-color: "#f3ede0"
+  text-primary-color: "#f3ede0"
+  secondary-text-color: "#a89f8b"
+  disabled-text-color: "#6b6455"
+  text-accent-color: "#b08d57"
+
+  # ── State ──
+  state-on-color: "#b08d57"
+  state-off-color: "#4a4638"
+  state-unavailable-color: "#6b6455"
+  state-unknown-color: "#8a8272"
+  state-sensor-color: "#f3ede0"
+
+  # ── Status (drives the gauge colors via CSS vars) ──
+  success-color: "#6f8f63"     # moss — Ideal / Optimal
+  warning-color: "#c98a3c"     # amber — High / Too Wet / N/A / Unknown
+  error-color: "#a6452f"       # warm brick — Low / Needs Water
+  info-color: "#7a6238"
+
+  # ── Plate chrome ──
+  ha-card-border-radius: "10px"
+  ha-card-border-width: "1px"
+  ha-card-border-color: "#34352e"
+  ha-card-box-shadow: "inset 0 0 0 1px #3c3d34, 0 2px 12px rgba(0,0,0,0.45)"
+  ha-card-background: "linear-gradient(180deg, #262723 0%, #232420 100%)"
+  ha-card-header-color: "#f3ede0"
+  ha-card-header-font-size: "14px"
+
+  # ── App header ──
+  app-header-background-color: "#1c1d19"
+  app-header-text-color: "#f3ede0"
+
+  divider-color: "#34352e"
+  mdc-theme-primary: "#b08d57"
+  mdc-theme-surface: "#232420"
+  mdc-theme-on-surface: "#f3ede0"
+
+  # ── Chart series (verify visually; harmless if HA's chart renderer ignores these — delete if the lines don't pick up brass) ──
+  graph-color-0: "#b08d57"
+  graph-color-1: "#6f8f63"
+
+brass_instrument_porthole:
+  <<: *brass
+  ha-card-border-width: "6px"
+  ha-card-border-color: "#b08d57"
+  ha-card-border-radius: "16px"
+  ha-card-box-shadow: "inset 0 0 0 2px #7a6238, 0 4px 18px rgba(0,0,0,0.55)"
+  ha-card-background: "#12130f"

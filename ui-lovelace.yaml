@@ -18,6 +18,8 @@ title: Home
 resources:
   - url: /local/imperial-cards.js?v=40
     type: module
+  - url: /local/grow-room-cards.js?v=1
+    type: module
   - url: /hacsfiles/calendar-card-pro/calendar-card-pro.js
     type: module
   - url: /hacsfiles/mealie-card/mealie-card.js
@@ -1248,51 +1250,195 @@ views:
                         entity_id: button.pool_spino_e13d6btg_fetch_cleaning_route
 
   # ═══════════════════════════════════════════════════════════════════════════
-  # VIEW 8: GROW ROOM (Botanical Bay)
-  # Real sensors as of 2026-07-25 — the AC Infinity AI+ controller (integration
-  # dalinicus/homeassistant-acinfinity v2.2.0) is READ-ONLY for AI-series
-  # controllers; there is no fan.*/switch.* entity for any grow-room equipment,
-  # only sensor.grow_controller_* readouts. Do not add control tiles/services
-  # against fan.ac_infinity_cloudline or switch.grow_lights — neither exists.
-  # sensor.grow_tent_* (temp/rh/vpd) are the old simulation entities, now
-  # stale/frozen — do not use. Derived sensor.grow_room_* entities (defined in
-  # packages/botanical_bay.yaml) are the source of truth for this view; they
-  # re-derive temp/RH/VPD from the controller's raw probe/controller sensors
-  # the same way grow_sre's own backend does, since the vendor integration's
-  # own units are unreliable (°F on some sensors, VPD mislabeled psi).
-  # Entity IDs are still contract-shared with the grow_sre repo for the
-  # underlying sensor.grow_controller_* names — relabel only, don't rename.
+  # VIEW 8: GROW ROOM (Botanical Bay) — rebuilt 2026-08-14
   #
-  # Layout: Uses type: sections (max_columns: 3) with 3 grid sections — Live,
-  # Vitals, and Environment & Trend — laid out up to 3-wide on desktop and
-  # collapsing to a single column on mobile, in the same top-to-bottom order
-  # as the previous masonry layout: camera -> equipment (Live), readouts grid
-  # + VPD-status/dew-point row (Vitals), environment panel -> history-graph
-  # (Environment & Trend). No grid_options are set on individual cards —
-  # custom:imperial-panel and custom:imperial-readout don't implement
-  # getGridOptions, and the standard cards here (picture-entity, history-graph)
-  # lay out acceptably on their own defaults, so each section is left as a
-  # simple full-width vertical stack of its 1-2 children; the section's own
-  # type: grid wrapper handles row/column mechanics at the view level. This
-  # preserves the already-confirmed-good mobile reflow.
+  # (a) AC Infinity AI+ integration (dalinicus/homeassistant-acinfinity) is
+  #     READ-ONLY for AI-series controllers — there is no fan.*/switch.*
+  #     entity for any grow-room equipment, only sensor.grow_controller_*
+  #     readouts. Do not add control tiles/services against
+  #     fan.ac_infinity_cloudline or switch.grow_lights — neither exists.
+  #     grow-equipment-card (www/grow-room-cards.js) is read-only for the
+  #     same reason; see the comment above its class definition.
+  # (b) sensor.grow_tent_* (temp/rh/vpd) are the old simulation entities, now
+  #     stale/frozen — do not use.
+  # (c) Derived sensor.grow_room_* entities (defined in
+  #     packages/botanical_bay.yaml) are the source of truth for this view;
+  #     they re-derive temp/RH/VPD from the controller's raw probe/controller
+  #     sensors the same way grow_sre's own backend does, since the vendor
+  #     integration's own units are unreliable (°F on some sensors, VPD
+  #     mislabeled psi).
+  # (d) Entity IDs are still contract-shared with the grow_sre repo for the
+  #     underlying sensor.grow_controller_* names — relabel only, don't
+  #     rename.
+  # (e) See the inline comment directly above the statistics-graph card below
+  #     for why 14-day trends use statistics-graph, not history-graph — this
+  #     repo sets no extended recorder.purge_keep_days.
+  # (f) This view now sets theme: brass_instrument — the first per-view theme
+  #     override in this repo. Intentional visual divergence from the rest of
+  #     the dashboard (which stays on imperial_dark): the Grow Room reads as
+  #     its own brass instrument panel, not a Death Star console.
+  # (g) column_span layout: masthead heading section is full-width (4/4);
+  #     main content (camera + vitals gauges) is 3/4; equipment + trend
+  #     sidebar is 1/4 — on wide screens these sit side by side. On narrow/
+  #     mobile widths the `sections` view type collapses them to a single
+  #     stacked column in source order: video, gauges, equipment, soil trend,
+  #     VPD trend. Verified against iPhone 16 Pro (402px) and iPhone 14 Pro
+  #     Max (430px) logical widths.
+  # (h) grid_options ARE used deliberately here on the camera card and both
+  #     new custom cards, because grow-gauge-card and grow-equipment-card
+  #     both implement getGridOptions() (unlike the old custom:imperial-panel
+  #     / custom:imperial-readout cards, which didn't — that was the reason
+  #     for the old "no grid_options anywhere in this view" rule). That old
+  #     blanket rule no longer applies to this view.
+  # (i) The old "Environment — Inside vs Outside" comparison panel has been
+  #     removed from this view per explicit user decision, not an oversight.
+  #     sensor.grow_room_outside_temp_f / _outside_humidity / _outside_vpd
+  #     remain defined and functional in packages/botanical_bay.yaml — they
+  #     are simply no longer displayed on this dashboard.
   # ═══════════════════════════════════════════════════════════════════════════
   - title: Grow Room
     path: botanical-bay
     icon: mdi:sprout
+    theme: brass_instrument
     badges: []
     type: sections
-    max_columns: 3
+    max_columns: 4
     sections:
-      - title: Live
-        type: grid
-        cards:
-          - type: picture-entity
-            entity: camera.grow_room_clear  # Reolink main stream (higher quality than the Fluent substream previously used)
-            name: Grow Room Camera
-            camera_view: live
 
-          - type: custom:imperial-panel
-            title: Equipment
+      - type: grid
+        column_span: 4
+        cards:
+          - type: heading
+            heading: "BOTANICAL BAY // ENVIRONMENTAL CONTROL"
+            heading_style: subtitle
+          - type: heading
+            heading: GROW ROOM
+            heading_style: title
+            icon: mdi:sprout
+            badges:
+              - type: entity
+                entity: sensor.grow_room_vpd_status
+                color: green
+                visibility:
+                  - condition: state
+                    entity: sensor.grow_room_vpd_status
+                    state: "Ideal"
+              - type: entity
+                entity: sensor.grow_room_vpd_status
+                color: yellow
+                visibility:
+                  - condition: state
+                    entity: sensor.grow_room_vpd_status
+                    state: "High"
+              - type: entity
+                entity: sensor.grow_room_vpd_status
+                color: red
+                visibility:
+                  - condition: state
+                    entity: sensor.grow_room_vpd_status
+                    state: "Low"
+              - type: entity
+                entity: sensor.grow_room_vpd_status
+                color: grey
+                visibility:
+                  - condition: state
+                    entity: sensor.grow_room_vpd_status
+                    state: "N/A"
+              - type: entity
+                entity: sensor.grow_room_soil_status
+                color: green
+                visibility:
+                  - condition: state
+                    entity: sensor.grow_room_soil_status
+                    state: "Optimal"
+              - type: entity
+                entity: sensor.grow_room_soil_status
+                color: red
+                visibility:
+                  - condition: state
+                    entity: sensor.grow_room_soil_status
+                    state: "Needs Water"
+              - type: entity
+                entity: sensor.grow_room_soil_status
+                color: yellow
+                visibility:
+                  - condition: state
+                    entity: sensor.grow_room_soil_status
+                    state: "Too Wet"
+              - type: entity
+                entity: sensor.grow_room_soil_status
+                color: grey
+                visibility:
+                  - condition: state
+                    entity: sensor.grow_room_soil_status
+                    state: "Unknown"
+
+      - type: grid
+        column_span: 3
+        cards:
+          - type: heading
+            heading: LIVE
+            heading_style: subtitle
+
+          - type: picture-entity
+            entity: camera.grow_room_clear
+            camera_view: live
+            aspect_ratio: "16:9"
+            show_name: false
+            show_state: false
+            theme: brass_instrument_porthole
+            grid_options:
+              columns: full
+              rows: auto
+
+          - type: heading
+            heading: VITALS
+            heading_style: subtitle
+
+          - type: custom:grow-gauge-card
+            grid_options:
+              columns: full
+              rows: auto
+            gauges:
+              - entity: sensor.grow_room_inside_vpd
+                name: VPD
+                min: 0
+                max: 2.0
+                decimals: 2
+                ideal_min: 0.8
+                ideal_max: 1.2
+                status_entity: sensor.grow_room_vpd_status
+              - entity: sensor.grow_room_inside_temp_f
+                name: Temp
+                min: 50
+                max: 100
+                decimals: 1
+              - entity: sensor.grow_room_inside_humidity
+                name: Humidity
+                min: 0
+                max: 100
+                decimals: 1
+              - entity: sensor.grow_controller_soil_sensor_soil_moisture
+                name: Soil Moisture
+                min: 0
+                max: 100
+                decimals: 0
+                ideal_min: 40
+                ideal_max: 70
+                status_entity: sensor.grow_room_soil_status
+            footer:
+              - entity: sensor.grow_room_dew_point_f
+                name: Dew Point
+
+      - type: grid
+        column_span: 1
+        cards:
+          - type: custom:grow-equipment-card
+            title: EQUIPMENT
+            max: 10
+            grid_options:
+              columns: full
+              rows: auto
             entities:
               - entity: sensor.grow_controller_port_3_current_power
                 name: Lights
@@ -1313,117 +1459,6 @@ views:
                 name: Oscillating Fan 2
                 icon: mdi:fan
 
-      - title: Vitals
-        type: grid
-        cards:
-          - type: grid
-            columns: 2
-            square: false
-            cards:
-              - type: custom:imperial-readout
-                entity: sensor.grow_room_inside_vpd
-                name: Inside VPD
-                color: green
-
-              - type: custom:imperial-readout
-                entity: sensor.grow_room_inside_temp_f
-                name: Inside Temp
-                color: green
-
-              - type: custom:imperial-readout
-                entity: sensor.grow_room_inside_humidity
-                name: Inside Humidity
-                color: green
-
-              - type: conditional
-                conditions:
-                  - condition: state
-                    entity: sensor.grow_room_soil_status
-                    state: "Optimal"
-                card:
-                  type: custom:imperial-readout
-                  entity: sensor.grow_controller_soil_sensor_soil_moisture
-                  name: Soil Moisture
-                  color: green
-              - type: conditional
-                conditions:
-                  - condition: state
-                    entity: sensor.grow_room_soil_status
-                    state: "Needs Water"
-                card:
-                  type: custom:imperial-readout
-                  entity: sensor.grow_controller_soil_sensor_soil_moisture
-                  name: Soil Moisture
-                  color: red
-              - type: conditional
-                conditions:
-                  - condition: state
-                    entity: sensor.grow_room_soil_status
-                    state: "Too Wet"
-                card:
-                  type: custom:imperial-readout
-                  entity: sensor.grow_controller_soil_sensor_soil_moisture
-                  name: Soil Moisture
-                  color: amber
-              - type: conditional
-                conditions:
-                  - condition: state
-                    entity: sensor.grow_room_soil_status
-                    state: "Unknown"
-                card:
-                  type: custom:imperial-readout
-                  entity: sensor.grow_controller_soil_sensor_soil_moisture
-                  name: Soil Moisture
-                  color: amber
-
-          - type: horizontal-stack
-            cards:
-              - type: conditional
-                conditions:
-                  - condition: state
-                    entity: sensor.grow_room_vpd_status
-                    state: "Ideal"
-                card:
-                  type: custom:imperial-readout
-                  entity: sensor.grow_room_vpd_status
-                  name: VPD Status
-                  color: green
-              - type: conditional
-                conditions:
-                  - condition: state
-                    entity: sensor.grow_room_vpd_status
-                    state: "High"
-                card:
-                  type: custom:imperial-readout
-                  entity: sensor.grow_room_vpd_status
-                  name: VPD Status
-                  color: amber
-              - type: conditional
-                conditions:
-                  - condition: state
-                    entity: sensor.grow_room_vpd_status
-                    state: "Low"
-                card:
-                  type: custom:imperial-readout
-                  entity: sensor.grow_room_vpd_status
-                  name: VPD Status
-                  color: red
-              - type: conditional
-                conditions:
-                  - condition: state
-                    entity: sensor.grow_room_vpd_status
-                    state: "N/A"
-                card:
-                  type: custom:imperial-readout
-                  entity: sensor.grow_room_vpd_status
-                  name: VPD Status
-                  color: amber
-
-              - type: custom:imperial-readout
-                entity: sensor.grow_room_dew_point_f
-                name: Dew Point
-                color: green
-
           # 14-day soil moisture trend. Uses type: statistics-graph rather than
           # type: history-graph on purpose: this repo sets no recorder: /
           # purge_keep_days anywhere, so raw recorder history only reliably
@@ -1431,19 +1466,10 @@ views:
           # silently truncate the requested 14-day window. This sensor carries
           # state_class: measurement, so HA records long-term statistics for it
           # and retains them indefinitely regardless of the purge setting —
-          # statistics-graph reads those. (The 24h VPD history-graph in the
-          # Environment & Trend section below is fine as-is; 24h is well inside
-          # the raw-history retention window.)
-          #
-          # This replaced a text "Next Watering" estimate — the raw moisture
-          # curve is more informative and lets the reader judge watering timing
-          # directly. The inference logic behind that estimate
-          # (sensor.grow_room_watering_status, grow_room_next_watering_estimated,
-          # counter.grow_room_watering_events, and the grow_room_detect_watering
-          # automation) still runs in packages/botanical_bay.yaml; it is simply
-          # no longer surfaced on this dashboard.
+          # statistics-graph reads those. (The 24h VPD history-graph below is
+          # fine as-is; 24h is well inside the raw-history retention window.)
           - type: statistics-graph
-            title: Soil Moisture — 14 Day Trend
+            title: "SOIL MOISTURE — 14 DAY TREND"
             days_to_show: 14
             chart_type: line
             stat_types:
@@ -1452,33 +1478,8 @@ views:
               - entity: sensor.grow_controller_soil_sensor_soil_moisture
                 name: Soil Moisture
 
-      - title: Environment & Trend
-        type: grid
-        cards:
-          - type: custom:imperial-panel
-            title: Environment — Inside vs Outside
-            entities:
-              - entity: sensor.grow_room_inside_temp_f
-                name: Inside Temp
-                icon: mdi:thermometer
-              - entity: sensor.grow_room_inside_humidity
-                name: Inside Humidity
-                icon: mdi:water-percent
-              - entity: sensor.grow_room_inside_vpd
-                name: Inside VPD
-                icon: mdi:water-thermometer
-              - entity: sensor.grow_room_outside_temp_f
-                name: Outside Temp
-                icon: mdi:thermometer
-              - entity: sensor.grow_room_outside_humidity
-                name: Outside Humidity
-                icon: mdi:water-percent
-              - entity: sensor.grow_room_outside_vpd
-                name: Outside VPD
-                icon: mdi:water-thermometer-outline
-
           - type: history-graph
-            title: VPD History (Inside)
+            title: "VPD HISTORY (INSIDE)"
             hours_to_show: 24
             entities:
               - entity: sensor.grow_room_inside_vpd
