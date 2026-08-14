@@ -1277,9 +1277,9 @@ views:
   #     override in this repo. Intentional visual divergence from the rest of
   #     the dashboard (which stays on imperial_dark): the Grow Room reads as
   #     its own brass instrument panel, not a Death Star console.
-  # (g) column_span layout: masthead heading section is full-width (4/4);
-  #     main content (camera + vitals gauges) is 3/4; equipment + trend
-  #     sidebar is 1/4 — on wide screens these sit side by side. On narrow/
+  # (g) column_span layout: masthead heading section is full-width (3/3);
+  #     main content (camera + vitals gauges) is 2/3; equipment + trend
+  #     sidebar is 1/3 — on wide screens these sit side by side. On narrow/
   #     mobile widths the `sections` view type collapses them to a single
   #     stacked column in source order: video, gauges, equipment, soil trend,
   #     VPD trend. Verified against iPhone 16 Pro (402px) and iPhone 14 Pro
@@ -1302,11 +1302,11 @@ views:
     theme: brass_instrument
     badges: []
     type: sections
-    max_columns: 4
+    max_columns: 3
     sections:
 
       - type: grid
-        column_span: 4
+        column_span: 3
         cards:
           - type: heading
             heading: "BOTANICAL BAY // ENVIRONMENTAL CONTROL"
@@ -1374,7 +1374,7 @@ views:
                     state: "Unknown"
 
       - type: grid
-        column_span: 3
+        column_span: 2
         cards:
           - type: heading
             heading: LIVE
