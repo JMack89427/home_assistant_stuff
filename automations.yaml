@@ -300,6 +300,24 @@
         # "Luba-VA624UNR Area <Zone Name>" for each switch, this finds the
         # right entity regardless of what entity_id HA assigned it this time.
         #
+        # On 2026-08-25 the integration regenerated North/South Lawn with new
+        # unique_ids but registered them as new entities rather than updating
+        # in place, leaving the old entity_ids as orphaned `restored: true`
+        # ghosts stuck at `unavailable`; HA appended `_2` to the new
+        # object_ids to resolve the naming collision. Both the ghost and its
+        # live duplicate carry the identical friendly_name, and `match` is a
+        # prefix test, so both pass the entity_id and friendly_name filters,
+        # leaving two candidates per zone and making `| first` non-
+        # deterministic. The consequence was not cosmetic: when `| first`
+        # picked the ghost, switch.turn_on no-opped against a dead entity
+        # while the live switch for that same zone landed in
+        # chopper_other_switches and got turned off — deactivating precisely
+        # the zone scheduled to mow. The rejectattr('state', ...) liveness
+        # filter below resolves this generally: ghosts are always
+        # unavailable/restored, live zone switches are always on/off, so the
+        # filter self-heals on any future recurrence without hardcoding
+        # specific _2/_3 entity_ids.
+        #
         # NOTE: the states.switch | selectattr | selectattr prefix below is
         # intentionally duplicated in both chopper_target_switch and
         # chopper_other_switches rather than factored into a shared variable.
@@ -314,6 +332,7 @@
         chopper_target_switch: >-
           {{ (states.switch
               | selectattr('entity_id', 'match', '^switch\.\w+_luba_va624unr_area_')
+              | rejectattr('state', 'in', ['unavailable', 'unknown'])
               | selectattr('attributes.friendly_name', 'search', '(North Lawn|Back Lawn|South Lawn)')
               | selectattr('attributes.friendly_name', 'search', chopper_target_zone_name)
               | map(attribute='entity_id')
@@ -321,6 +340,7 @@
         chopper_other_switches: >-
           {{ states.switch
              | selectattr('entity_id', 'match', '^switch\.\w+_luba_va624unr_area_')
+             | rejectattr('state', 'in', ['unavailable', 'unknown'])
              | selectattr('attributes.friendly_name', 'search', '(North Lawn|Back Lawn|South Lawn)')
              | rejectattr('entity_id', 'eq', chopper_target_switch)
              | map(attribute='entity_id')
