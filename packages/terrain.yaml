@@ -33,3 +33,144 @@ input_boolean:
   chopper_battery_dock_active:
     name: Chopper Battery Dock Active
     icon: mdi:battery-alert
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Chopper Zone Proxy Switches — durable dashboard-facing layer
+#
+# These three switch.chopper_zone_* template switches are a stable proxy layer
+# for the three Chopper (LUBA 3) mow zones. The dashboard — and any future
+# consumer — should talk to these, never to the raw Mammotion
+# switch.*_luba_va624unr_area_* entity_ids directly.
+#
+# Why this exists: the Mammotion HACS integration mints a NEW HA entity
+# registration for North Lawn and South Lawn specifically on every HA
+# restart, leaving the prior generation behind as an orphaned `restored: true`
+# ghost stuck at `unavailable`, with HA appending `_2`, `_3`, etc. to the
+# object_id to resolve the resulting collision. Three generations were
+# observed live in one session (2026-08-26). Since this workflow restarts HA
+# roughly once per deploy, a hardcoded dashboard entity_id goes stale almost
+# every time.
+#
+# Root-cause finding: the `hash` attribute (Mammotion's own internal zone id)
+# is IDENTICAL across generations — confirmed North Lawn stayed
+# `980946676459778300` from `_2` to `_3` — proving the underlying zone data
+# itself never changed. The integration is generating a non-stable HA
+# `unique_id` on every restart; this is an upstream third-party bug, and this
+# proxy layer insulates the dashboard against it rather than fixing it.
+#
+# Two things a future editor must NOT "clean up":
+#   (a) The unique_id values below (chopper_zone_north_lawn,
+#       chopper_zone_back_lawn, chopper_zone_south_lawn) are permanent —
+#       never renumber them. They are the whole point of this layer.
+#   (b) The resolution Jinja is duplicated across state/availability/turn_on/
+#       turn_off for each switch (4x per switch, 12x total in this file).
+#       This is because HA's template platform renders those four keys as
+#       independent contexts with no shared `variables:` scope — a
+#       structural HA constraint, NOT the same reason as the literal_eval
+#       duplication documented in automations.yaml. Don't conflate the two.
+#
+# Back Lawn is included here despite not having exhibited this churn,
+# deliberately — so all three zones route through one uniform proxy layer
+# instead of two proxied and one raw.
+# ─────────────────────────────────────────────────────────────────────────────
+template:
+  - switch:
+      - name: "Chopper Zone North Lawn"
+        unique_id: chopper_zone_north_lawn
+        icon: mdi:map-marker-outline
+        availability: >-
+          {{ (states.switch
+              | selectattr('entity_id', 'match', '^switch\.\w+_luba_va624unr_area_')
+              | rejectattr('state', 'in', ['unavailable', 'unknown'])
+              | selectattr('attributes.friendly_name', 'search', 'North Lawn')
+              | list | count) > 0 }}
+        state: >-
+          {{ (states.switch
+              | selectattr('entity_id', 'match', '^switch\.\w+_luba_va624unr_area_')
+              | rejectattr('state', 'in', ['unavailable', 'unknown'])
+              | selectattr('attributes.friendly_name', 'search', 'North Lawn')
+              | map(attribute='state') | list | first | default('off', true)) }}
+        turn_on:
+          - action: switch.turn_on
+            target:
+              entity_id: >-
+                {{ states.switch
+                   | selectattr('entity_id', 'match', '^switch\.\w+_luba_va624unr_area_')
+                   | rejectattr('state', 'in', ['unavailable', 'unknown'])
+                   | selectattr('attributes.friendly_name', 'search', 'North Lawn')
+                   | map(attribute='entity_id') | list }}
+        turn_off:
+          - action: switch.turn_off
+            target:
+              entity_id: >-
+                {{ states.switch
+                   | selectattr('entity_id', 'match', '^switch\.\w+_luba_va624unr_area_')
+                   | rejectattr('state', 'in', ['unavailable', 'unknown'])
+                   | selectattr('attributes.friendly_name', 'search', 'North Lawn')
+                   | map(attribute='entity_id') | list }}
+      - name: "Chopper Zone Back Lawn"
+        unique_id: chopper_zone_back_lawn
+        icon: mdi:map-marker-outline
+        availability: >-
+          {{ (states.switch
+              | selectattr('entity_id', 'match', '^switch\.\w+_luba_va624unr_area_')
+              | rejectattr('state', 'in', ['unavailable', 'unknown'])
+              | selectattr('attributes.friendly_name', 'search', 'Back Lawn')
+              | list | count) > 0 }}
+        state: >-
+          {{ (states.switch
+              | selectattr('entity_id', 'match', '^switch\.\w+_luba_va624unr_area_')
+              | rejectattr('state', 'in', ['unavailable', 'unknown'])
+              | selectattr('attributes.friendly_name', 'search', 'Back Lawn')
+              | map(attribute='state') | list | first | default('off', true)) }}
+        turn_on:
+          - action: switch.turn_on
+            target:
+              entity_id: >-
+                {{ states.switch
+                   | selectattr('entity_id', 'match', '^switch\.\w+_luba_va624unr_area_')
+                   | rejectattr('state', 'in', ['unavailable', 'unknown'])
+                   | selectattr('attributes.friendly_name', 'search', 'Back Lawn')
+                   | map(attribute='entity_id') | list }}
+        turn_off:
+          - action: switch.turn_off
+            target:
+              entity_id: >-
+                {{ states.switch
+                   | selectattr('entity_id', 'match', '^switch\.\w+_luba_va624unr_area_')
+                   | rejectattr('state', 'in', ['unavailable', 'unknown'])
+                   | selectattr('attributes.friendly_name', 'search', 'Back Lawn')
+                   | map(attribute='entity_id') | list }}
+      - name: "Chopper Zone South Lawn"
+        unique_id: chopper_zone_south_lawn
+        icon: mdi:map-marker-outline
+        availability: >-
+          {{ (states.switch
+              | selectattr('entity_id', 'match', '^switch\.\w+_luba_va624unr_area_')
+              | rejectattr('state', 'in', ['unavailable', 'unknown'])
+              | selectattr('attributes.friendly_name', 'search', 'South Lawn')
+              | list | count) > 0 }}
+        state: >-
+          {{ (states.switch
+              | selectattr('entity_id', 'match', '^switch\.\w+_luba_va624unr_area_')
+              | rejectattr('state', 'in', ['unavailable', 'unknown'])
+              | selectattr('attributes.friendly_name', 'search', 'South Lawn')
+              | map(attribute='state') | list | first | default('off', true)) }}
+        turn_on:
+          - action: switch.turn_on
+            target:
+              entity_id: >-
+                {{ states.switch
+                   | selectattr('entity_id', 'match', '^switch\.\w+_luba_va624unr_area_')
+                   | rejectattr('state', 'in', ['unavailable', 'unknown'])
+                   | selectattr('attributes.friendly_name', 'search', 'South Lawn')
+                   | map(attribute='entity_id') | list }}
+        turn_off:
+          - action: switch.turn_off
+            target:
+              entity_id: >-
+                {{ states.switch
+                   | selectattr('entity_id', 'match', '^switch\.\w+_luba_va624unr_area_')
+                   | rejectattr('state', 'in', ['unavailable', 'unknown'])
+                   | selectattr('attributes.friendly_name', 'search', 'South Lawn')
+                   | map(attribute='entity_id') | list }}
