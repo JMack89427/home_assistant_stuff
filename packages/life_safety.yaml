@@ -1,0 +1,83 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# packages/life_safety.yaml — Smoke/CO detector helper sensors
+#
+# Backs the "Safety" dashboard view (ui-lovelace.yaml) and four automations in
+# automations.yaml (life_safety_smoke_co_alarm, life_safety_sonos_alarm_snapshot,
+# life_safety_sonos_alarm_restore, life_safety_detector_maintenance) for the 5
+# First Alert SMCO410 Z-Wave smoke/CO units: grow_room, maker_space, kitchen,
+# primary_suite, bathroom_2nd_level.
+#
+# IDENTICAL FRIENDLY_NAME PROBLEM: All 5 physical units report identical stock
+# friendly names from the manufacturer (e.g., "Smoke & CO Alarm Smoke detected")
+# with zero room-identifying information. Entity-level area_id is None on every
+# detector entity (area is only inherited from the device level). As a result,
+# friendly_name alone cannot distinguish rooms in any context where it surfaces
+# (notifications, logbook, history, voice assistants). This package solves it via
+# a static entity_id -> room-name map; customize.yaml provides friendly_name
+# overrides as a secondary belt-and-suspenders layer. See customize.yaml header
+# for the list of ~40 override entries.
+#
+# binary_sensor.life_safety_alarm_active is 'on' whenever any of the 10
+# smoke/CO detection entities (5 smoke_detected + 5 carbon_monoxide_detected)
+# is 'on'. It drives the dashboard alarm banner and is also read live by the
+# critical automation's repeat `while:` condition — this sensor recomputes
+# from live entity state on every evaluation, so reading it there carries no
+# staleness risk (unlike passing a Jinja-built list through a `variables:`
+# boundary, which is a known pitfall — see automations.yaml comments).
+#
+# sensor.life_safety_active_zones is a comma-joined string of the display
+# room name(s) currently alarming, so the dashboard banner and the automation
+# share one source of truth for "which room(s) are active" rather than each
+# duplicating the join logic. Room identity comes from this static entity_id ->
+# room-name map (defined inline below), NOT from friendly_name or area names.
+#
+# Room name map (must match automations.yaml's zone_map and the customize.yaml
+# overrides — keep all three in sync if a room is renamed or a unit is added):
+#   grow_room_smoke_co_alarm            -> Grow Room
+#   maker_space_smoke_co_alarm          -> Maker Space
+#   kitchen_smoke_co_alarm              -> Kitchen
+#   primary_suite_smoke_co_alarm        -> Primary Suite (area: master_bedroom)
+#   bathroom_2nd_level_smoke_co_alarm   -> Bathroom (2nd Level)
+# ─────────────────────────────────────────────────────────────────────────────
+template:
+  - binary_sensor:
+      - name: "Life Safety Alarm Active"
+        unique_id: life_safety_alarm_active
+        device_class: safety
+        state: >
+          {{ [
+            'binary_sensor.grow_room_smoke_co_alarm_smoke_detected',
+            'binary_sensor.maker_space_smoke_co_alarm_smoke_detected',
+            'binary_sensor.kitchen_smoke_co_alarm_smoke_detected',
+            'binary_sensor.primary_suite_smoke_co_alarm_smoke_detected',
+            'binary_sensor.bathroom_2nd_level_smoke_co_alarm_smoke_detected',
+            'binary_sensor.grow_room_smoke_co_alarm_carbon_monoxide_detected',
+            'binary_sensor.maker_space_smoke_co_alarm_carbon_monoxide_detected',
+            'binary_sensor.kitchen_smoke_co_alarm_carbon_monoxide_detected',
+            'binary_sensor.primary_suite_smoke_co_alarm_carbon_monoxide_detected',
+            'binary_sensor.bathroom_2nd_level_smoke_co_alarm_carbon_monoxide_detected'
+          ] | map('states') | select('eq', 'on') | list | count > 0 }}
+
+  - sensor:
+      - name: "Life Safety Active Zones"
+        unique_id: life_safety_active_zones
+        state: >
+          {% set zone_map = {
+            'binary_sensor.grow_room_smoke_co_alarm_smoke_detected': 'Grow Room',
+            'binary_sensor.grow_room_smoke_co_alarm_carbon_monoxide_detected': 'Grow Room',
+            'binary_sensor.maker_space_smoke_co_alarm_smoke_detected': 'Maker Space',
+            'binary_sensor.maker_space_smoke_co_alarm_carbon_monoxide_detected': 'Maker Space',
+            'binary_sensor.kitchen_smoke_co_alarm_smoke_detected': 'Kitchen',
+            'binary_sensor.kitchen_smoke_co_alarm_carbon_monoxide_detected': 'Kitchen',
+            'binary_sensor.primary_suite_smoke_co_alarm_smoke_detected': 'Primary Suite',
+            'binary_sensor.primary_suite_smoke_co_alarm_carbon_monoxide_detected': 'Primary Suite',
+            'binary_sensor.bathroom_2nd_level_smoke_co_alarm_smoke_detected': 'Bathroom (2nd Level)',
+            'binary_sensor.bathroom_2nd_level_smoke_co_alarm_carbon_monoxide_detected': 'Bathroom (2nd Level)'
+          } %}
+          {% set ns = namespace(zones=[]) %}
+          {% for eid, name in zone_map.items() %}
+            {% if states(eid) == 'on' and name not in ns.zones %}
+              {% set ns.zones = ns.zones + [name] %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.zones | join(', ') }}

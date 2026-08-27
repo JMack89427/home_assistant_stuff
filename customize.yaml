@@ -12,3 +12,112 @@
 # switch.porch_light:
 #   friendly_name: "Porch Light"
 #   icon: mdi:outdoor-lamp
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Smoke/CO detectors (5x First Alert SMCO410, Z-Wave) — friendly_name overrides
+#
+# All 5 units report identical stock friendly names (e.g. "Smoke & CO Alarm
+# Smoke detected"), and entity-level area_id is None on every detector entity
+# (area is inherited from the device only) — so friendly_name alone can't
+# distinguish rooms anywhere it surfaces (notifications, logbook, history,
+# voice assistants). These overrides are the room-identity fix at the entity
+# level; ui-lovelace.yaml additionally sets an explicit name: on every
+# dashboard row as belt-and-suspenders. Keep this list, automations.yaml's
+# zone_map, and packages/life_safety.yaml's zone_map in sync if a room is
+# renamed or a unit is added/removed.
+#
+# alarm_silenced / alarm_silenced_2: which is smoke-silence vs CO-silence is
+# not determinable from the registry — labeled neutrally as "Silenced (A)"
+# and "Silenced (B)"; do not guess which is which.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Grow Room
+binary_sensor.grow_room_smoke_co_alarm_smoke_detected:
+  friendly_name: "Grow Room Smoke Detected"
+binary_sensor.grow_room_smoke_co_alarm_carbon_monoxide_detected:
+  friendly_name: "Grow Room CO Detected"
+binary_sensor.grow_room_smoke_co_alarm_smoke_alarm_test:
+  friendly_name: "Grow Room Alarm Test"
+binary_sensor.grow_room_smoke_co_alarm_alarm_silenced:
+  friendly_name: "Grow Room Silenced (A)"
+binary_sensor.grow_room_smoke_co_alarm_alarm_silenced_2:
+  friendly_name: "Grow Room Silenced (B)"
+binary_sensor.grow_room_smoke_co_alarm_maintenance_required_dust_in_device:
+  friendly_name: "Grow Room Dust Maintenance Required"
+binary_sensor.grow_room_smoke_co_alarm_replacement_required_end_of_life:
+  friendly_name: "Grow Room Replacement Required (End of Life)"
+binary_sensor.grow_room_smoke_co_alarm_system_hardware_failure:
+  friendly_name: "Grow Room Hardware Failure"
+
+# Maker Space
+binary_sensor.maker_space_smoke_co_alarm_smoke_detected:
+  friendly_name: "Maker Space Smoke Detected"
+binary_sensor.maker_space_smoke_co_alarm_carbon_monoxide_detected:
+  friendly_name: "Maker Space CO Detected"
+binary_sensor.maker_space_smoke_co_alarm_smoke_alarm_test:
+  friendly_name: "Maker Space Alarm Test"
+binary_sensor.maker_space_smoke_co_alarm_alarm_silenced:
+  friendly_name: "Maker Space Silenced (A)"
+binary_sensor.maker_space_smoke_co_alarm_alarm_silenced_2:
+  friendly_name: "Maker Space Silenced (B)"
+binary_sensor.maker_space_smoke_co_alarm_maintenance_required_dust_in_device:
+  friendly_name: "Maker Space Dust Maintenance Required"
+binary_sensor.maker_space_smoke_co_alarm_replacement_required_end_of_life:
+  friendly_name: "Maker Space Replacement Required (End of Life)"
+binary_sensor.maker_space_smoke_co_alarm_system_hardware_failure:
+  friendly_name: "Maker Space Hardware Failure"
+
+# Kitchen
+binary_sensor.kitchen_smoke_co_alarm_smoke_detected:
+  friendly_name: "Kitchen Smoke Detected"
+binary_sensor.kitchen_smoke_co_alarm_carbon_monoxide_detected:
+  friendly_name: "Kitchen CO Detected"
+binary_sensor.kitchen_smoke_co_alarm_smoke_alarm_test:
+  friendly_name: "Kitchen Alarm Test"
+binary_sensor.kitchen_smoke_co_alarm_alarm_silenced:
+  friendly_name: "Kitchen Silenced (A)"
+binary_sensor.kitchen_smoke_co_alarm_alarm_silenced_2:
+  friendly_name: "Kitchen Silenced (B)"
+binary_sensor.kitchen_smoke_co_alarm_maintenance_required_dust_in_device:
+  friendly_name: "Kitchen Dust Maintenance Required"
+binary_sensor.kitchen_smoke_co_alarm_replacement_required_end_of_life:
+  friendly_name: "Kitchen Replacement Required (End of Life)"
+binary_sensor.kitchen_smoke_co_alarm_system_hardware_failure:
+  friendly_name: "Kitchen Hardware Failure"
+
+# Primary Suite (area: master_bedroom — prefix intentionally differs from
+# area_id, matches existing household naming convention)
+binary_sensor.primary_suite_smoke_co_alarm_smoke_detected:
+  friendly_name: "Primary Suite Smoke Detected"
+binary_sensor.primary_suite_smoke_co_alarm_carbon_monoxide_detected:
+  friendly_name: "Primary Suite CO Detected"
+binary_sensor.primary_suite_smoke_co_alarm_smoke_alarm_test:
+  friendly_name: "Primary Suite Alarm Test"
+binary_sensor.primary_suite_smoke_co_alarm_alarm_silenced:
+  friendly_name: "Primary Suite Silenced (A)"
+binary_sensor.primary_suite_smoke_co_alarm_alarm_silenced_2:
+  friendly_name: "Primary Suite Silenced (B)"
+binary_sensor.primary_suite_smoke_co_alarm_maintenance_required_dust_in_device:
+  friendly_name: "Primary Suite Dust Maintenance Required"
+binary_sensor.primary_suite_smoke_co_alarm_replacement_required_end_of_life:
+  friendly_name: "Primary Suite Replacement Required (End of Life)"
+binary_sensor.primary_suite_smoke_co_alarm_system_hardware_failure:
+  friendly_name: "Primary Suite Hardware Failure"
+
+# Bathroom (2nd Level)
+binary_sensor.bathroom_2nd_level_smoke_co_alarm_smoke_detected:
+  friendly_name: "Bathroom (2nd Level) Smoke Detected"
+binary_sensor.bathroom_2nd_level_smoke_co_alarm_carbon_monoxide_detected:
+  friendly_name: "Bathroom (2nd Level) CO Detected"
+binary_sensor.bathroom_2nd_level_smoke_co_alarm_smoke_alarm_test:
+  friendly_name: "Bathroom (2nd Level) Alarm Test"
+binary_sensor.bathroom_2nd_level_smoke_co_alarm_alarm_silenced:
+  friendly_name: "Bathroom (2nd Level) Silenced (A)"
+binary_sensor.bathroom_2nd_level_smoke_co_alarm_alarm_silenced_2:
+  friendly_name: "Bathroom (2nd Level) Silenced (B)"
+binary_sensor.bathroom_2nd_level_smoke_co_alarm_maintenance_required_dust_in_device:
+  friendly_name: "Bathroom (2nd Level) Dust Maintenance Required"
+binary_sensor.bathroom_2nd_level_smoke_co_alarm_replacement_required_end_of_life:
+  friendly_name: "Bathroom (2nd Level) Replacement Required (End of Life)"
+binary_sensor.bathroom_2nd_level_smoke_co_alarm_system_hardware_failure:
+  friendly_name: "Bathroom (2nd Level) Hardware Failure"

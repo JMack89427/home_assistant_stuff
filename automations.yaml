@@ -3,6 +3,13 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Add automations here or create them through the UI (they will be written to
 # this file automatically when the file is referenced by configuration.yaml).
+#
+# CRITICAL AUTOMATIONS: life_safety_smoke_co_alarm (iOS critical push + TTS
+# announcement on Sonos), life_safety_sonos_alarm_snapshot/restore (Sonos
+# speaker volume management during alarms), life_safety_detector_maintenance
+# (low-battery and maintenance alerts for 5 Z-Wave smoke/CO detectors).
+# See packages/life_safety.yaml for template sensor definitions and
+# customize.yaml for entity-level friendly_name overrides.
 # ─────────────────────────────────────────────────────────────────────────────
 
 # ── Vacuum: Qrevo Curv (main level) — daily 10am ─────────────────────────────
@@ -1303,3 +1310,514 @@
               data:
                 option: "{{ 'color' if states('sensor.grow_controller_port_3_current_power') | float > 0 else 'auto' }}"
   mode: single
+
+# ── Life Safety: Smoke/CO Detectors (5x First Alert SMCO410, Z-Wave) ────────
+# Room identity for these 5 units cannot come from friendly_name (all 5
+# report identical text, e.g. "Smoke & CO Alarm Smoke detected") or from
+# area_name()/area_id() Jinja helpers (entity-level area_id is None on every
+# detector entity — area is inherited from the device only). All four
+# automations below use an explicit static zone_map dict instead. Keep that
+# map in sync with customize.yaml's friendly_name overrides and
+# packages/life_safety.yaml if a room is renamed or a unit is added/removed.
+#
+# QA fix (2026-08-27): Sonos snapshot/volume_set/restore used to live inside
+# life_safety_smoke_co_alarm itself. Two bugs came from that: (1) tts.speak
+# returns once playback is dispatched, not once it finishes, so restore
+# fired ~1s after the last tts.speak and likely truncated the announcement;
+# (2) mode: restart could cancel an in-flight run between its own snapshot
+# and restore (e.g. a second detector tripping mid-announcement) — the next
+# run's snapshot would then capture the ALARM volume (0.8) as "normal," so
+# restore afterward left the speakers stuck at alarm volume permanently.
+# Fix: snapshot/restore now live in two small edge-triggered automations
+# (life_safety_sonos_alarm_snapshot / life_safety_sonos_alarm_restore) keyed
+# off binary_sensor.life_safety_alarm_active's rising/falling edge, which is
+# immune to life_safety_smoke_co_alarm's internal restarts since it only
+# fires once per alarm episode. life_safety_smoke_co_alarm itself now only
+# does push notification + TTS.
+- id: life_safety_smoke_co_alarm
+  alias: "Life Safety: Smoke / CO Alarm"
+  description: >
+    Critical alert for the 5 smoke/CO detectors (grow_room, maker_space,
+    kitchen, primary_suite, bathroom_2nd_level). Pushes a critical iOS
+    notification to Jason's iPhone only (not the iPad — this path is
+    intentionally single-target so the one device most likely to be on
+    Jason at all times gets the alert with no ambiguity about which device
+    to check) and announces over the main-floor Sonos speakers (volume/
+    snapshot/restore are owned by life_safety_sonos_alarm_snapshot and
+    life_safety_sonos_alarm_restore below, not by this automation — see the
+    QA fix note above the header comment).
+    mode: restart — chosen over single/parallel deliberately: `single` would
+    drop a second room's alarm while the first announcement is still in
+    flight; `parallel` would produce overlapping, unintelligible TTS on the
+    same speakers; `restart` recomputes the full set of active zones on
+    every new trigger and is never overlapping.
+    No input_boolean mute/latch exists on this automation by design — the
+    repeat `while:` below reads live sensor state on every iteration, which
+    is the entire safety property here; do not add a manual override that
+    could suppress it.
+  trigger:
+    - platform: state
+      id: smoke
+      to: "on"
+      entity_id:
+        - binary_sensor.grow_room_smoke_co_alarm_smoke_detected
+        - binary_sensor.maker_space_smoke_co_alarm_smoke_detected
+        - binary_sensor.kitchen_smoke_co_alarm_smoke_detected
+        - binary_sensor.primary_suite_smoke_co_alarm_smoke_detected
+        - binary_sensor.bathroom_2nd_level_smoke_co_alarm_smoke_detected
+    - platform: state
+      id: co
+      to: "on"
+      entity_id:
+        - binary_sensor.grow_room_smoke_co_alarm_carbon_monoxide_detected
+        - binary_sensor.maker_space_smoke_co_alarm_carbon_monoxide_detected
+        - binary_sensor.kitchen_smoke_co_alarm_carbon_monoxide_detected
+        - binary_sensor.primary_suite_smoke_co_alarm_carbon_monoxide_detected
+        - binary_sensor.bathroom_2nd_level_smoke_co_alarm_carbon_monoxide_detected
+  condition:
+    - condition: template
+      value_template: "{{ trigger.to_state.state not in ['unavailable', 'unknown'] }}"
+  action:
+    - variables:
+        # Plain string -> string dict, not a Jinja-constructed list of State
+        # objects — safe to pass through the variables: boundary.
+        zone_map:
+          binary_sensor.grow_room_smoke_co_alarm_smoke_detected: "Grow Room"
+          binary_sensor.grow_room_smoke_co_alarm_carbon_monoxide_detected: "Grow Room"
+          binary_sensor.maker_space_smoke_co_alarm_smoke_detected: "Maker Space"
+          binary_sensor.maker_space_smoke_co_alarm_carbon_monoxide_detected: "Maker Space"
+          binary_sensor.kitchen_smoke_co_alarm_smoke_detected: "Kitchen"
+          binary_sensor.kitchen_smoke_co_alarm_carbon_monoxide_detected: "Kitchen"
+          binary_sensor.primary_suite_smoke_co_alarm_smoke_detected: "Primary Suite"
+          binary_sensor.primary_suite_smoke_co_alarm_carbon_monoxide_detected: "Primary Suite"
+          binary_sensor.bathroom_2nd_level_smoke_co_alarm_smoke_detected: "Bathroom (2nd Level)"
+          binary_sensor.bathroom_2nd_level_smoke_co_alarm_carbon_monoxide_detected: "Bathroom (2nd Level)"
+        # Each of the following is built as ONE template expression that
+        # returns a finished joined string — never a Jinja list passed
+        # through the variables: boundary.
+        #
+        # QA fix (2026-08-27): smoke_zones/co_zones are checked INDEPENDENTLY
+        # here (not derived from `trigger.id`) precisely so that a mode:
+        # restart re-trigger from a second, different hazard type can't drop
+        # the first hazard from the message. Previously the push notification
+        # branched on `hazard` (= trigger.id of the MOST RECENT trigger only)
+        # while active_zones aggregated all zones regardless of type — e.g.
+        # CO active in Kitchen, then smoke trips in Grow Room 10s later:
+        # restart replaced the run with hazard: 'smoke' and the push became
+        # "Smoke detected in the Kitchen, Grow Room... prepare to evacuate,"
+        # silently dropping the Kitchen CO warning (which demands the
+        # OPPOSITE instruction: evacuate, don't investigate). The push now
+        # reuses this same smoke_zones/co_zones-independent logic (via
+        # tts_message) instead of a hazard-branched template.
+        smoke_zones: >
+          {% set ns = namespace(z=[]) %}
+          {% for eid, name in zone_map.items() %}
+            {% if eid.endswith('_smoke_detected') and states(eid) == 'on' and name not in ns.z %}
+              {% set ns.z = ns.z + [name] %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.z | join(', ') }}
+        co_zones: >
+          {% set ns = namespace(z=[]) %}
+          {% for eid, name in zone_map.items() %}
+            {% if eid.endswith('_carbon_monoxide_detected') and states(eid) == 'on' and name not in ns.z %}
+              {% set ns.z = ns.z + [name] %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.z | join(', ') }}
+        tts_message: >
+          {% if co_zones != '' and smoke_zones != '' %}
+            Warning. Carbon monoxide detected in the {{ co_zones }}. Carbon
+            monoxide is invisible and has no smell. Move outside to fresh air
+            now, then call for help. Smoke also detected in the
+            {{ smoke_zones }}. Check the {{ smoke_zones }} immediately and
+            prepare to evacuate.
+          {% elif co_zones != '' %}
+            Warning. Carbon monoxide detected in the {{ co_zones }}. Carbon
+            monoxide is invisible and has no smell. Move outside to fresh air
+            now, then call for help.
+          {% else %}
+            Warning. Smoke detected in the {{ smoke_zones }}. Check the
+            {{ smoke_zones }} immediately and prepare to evacuate.
+          {% endif %}
+
+    # iPhone only — intentionally NOT also pushing to notify.mobile_app_ipad
+    # on this critical path (see description above). continue_on_error:
+    # true so a transient APNs failure can't block the in-house TTS/Sonos
+    # safety channel below from running.
+    # NOTE: iOS Critical Alerts (data.push.sound.critical: 1) requires the HA
+    # Companion app to have the Critical Alerts entitlement granted in iOS
+    # Settings > Notifications, or `critical: 1` silently downgrades to a
+    # normal notification. Send a live test push to confirm this is granted.
+    #
+    # Title and message both check smoke_zones/co_zones independently (same
+    # dual-hazard-aware logic as tts_message, reused verbatim as the body)
+    # rather than branching on the single most-recent `trigger.id` — see the
+    # QA fix note on the variables: step above.
+    - service: notify.mobile_app_jason_s_iphone
+      continue_on_error: true
+      data:
+        title: >
+          {% if co_zones != '' and smoke_zones != '' %}
+            Carbon Monoxide + Smoke Alarm
+          {% elif co_zones != '' %}
+            Carbon Monoxide Alarm
+          {% else %}
+            Smoke Alarm
+          {% endif %}
+        message: "{{ tts_message }}"
+        data:
+          push:
+            sound:
+              name: default
+              critical: 1
+              volume: 1.0
+
+    # TTS announcement — engine: tts.home_assistant_cloud. Fallback engine
+    # tts.google_translate_en_com exists if the Nabu Casa cloud TTS ever
+    # fails (subscription dependent) — informational only, no automatic
+    # fallback logic implemented, that's out of scope.
+    #
+    # No sonos.snapshot/volume_set here — life_safety_sonos_alarm_snapshot
+    # (triggered by binary_sensor.life_safety_alarm_active turning 'on')
+    # owns that now, so the speakers are expected to already be at alarm
+    # volume by the time these calls run. See the DEPENDENCY NOTE on that
+    # automation's description for why this ordering is safe in practice
+    # but not strictly enforced.
+    #
+    # One tts.speak call per speaker (not one call with all four in the
+    # target) — a single multi-target call fails as a unit, and a dead/
+    # unavailable portable speaker (crafting_room "Recroom" or unnamed_room
+    # "Portable") must not abort calls to the working main-floor speakers.
+    - service: tts.speak
+      continue_on_error: true
+      target:
+        entity_id: tts.home_assistant_cloud
+      data:
+        media_player_entity_id: media_player.living_room
+        message: "{{ tts_message }}"
+        cache: false
+    - service: tts.speak
+      continue_on_error: true
+      target:
+        entity_id: tts.home_assistant_cloud
+      data:
+        media_player_entity_id: media_player.family_room
+        message: "{{ tts_message }}"
+        cache: false
+    - service: tts.speak
+      continue_on_error: true
+      target:
+        entity_id: tts.home_assistant_cloud
+      data:
+        media_player_entity_id: media_player.crafting_room
+        message: "{{ tts_message }}"
+        cache: false
+    - service: tts.speak
+      continue_on_error: true
+      target:
+        entity_id: tts.home_assistant_cloud
+      data:
+        media_player_entity_id: media_player.unnamed_room
+        message: "{{ tts_message }}"
+        cache: false
+
+    # Self-terminates within ~2 min of the alarm clearing (while: reads live
+    # sensor state via binary_sensor.life_safety_alarm_active, which
+    # recomputes on every evaluation), caps at ~30 min of re-alerts
+    # (2 min delay x 15 iterations). No Sonos calls in here either — same
+    # reasoning as the initial TTS block above; life_safety_sonos_alarm_
+    # restore fires independently once the alarm sensor goes 'off'.
+    - repeat:
+        while:
+          - condition: template
+            value_template: "{{ states('binary_sensor.life_safety_alarm_active') == 'on' }}"
+          - condition: template
+            value_template: "{{ repeat.index < 15 }}"
+        sequence:
+          - delay: "00:02:00"
+          - variables:
+              # Recompute live — zones may have changed (grown or shrunk)
+              # during the 2-minute delay. zone_map itself is static and is
+              # inherited unchanged from the outer variables: step above.
+              smoke_zones: >
+                {% set ns = namespace(z=[]) %}
+                {% for eid, name in zone_map.items() %}
+                  {% if eid.endswith('_smoke_detected') and states(eid) == 'on' and name not in ns.z %}
+                    {% set ns.z = ns.z + [name] %}
+                  {% endif %}
+                {% endfor %}
+                {{ ns.z | join(', ') }}
+              co_zones: >
+                {% set ns = namespace(z=[]) %}
+                {% for eid, name in zone_map.items() %}
+                  {% if eid.endswith('_carbon_monoxide_detected') and states(eid) == 'on' and name not in ns.z %}
+                    {% set ns.z = ns.z + [name] %}
+                  {% endif %}
+                {% endfor %}
+                {{ ns.z | join(', ') }}
+              tts_message: >
+                {% if co_zones != '' and smoke_zones != '' %}
+                  Warning. Carbon monoxide detected in the {{ co_zones }}.
+                  Carbon monoxide is invisible and has no smell. Move outside
+                  to fresh air now, then call for help. Smoke also detected
+                  in the {{ smoke_zones }}. Check the {{ smoke_zones }}
+                  immediately and prepare to evacuate.
+                {% elif co_zones != '' %}
+                  Warning. Carbon monoxide detected in the {{ co_zones }}.
+                  Carbon monoxide is invisible and has no smell. Move outside
+                  to fresh air now, then call for help.
+                {% else %}
+                  Warning. Smoke detected in the {{ smoke_zones }}. Check the
+                  {{ smoke_zones }} immediately and prepare to evacuate.
+                {% endif %}
+          - service: tts.speak
+            continue_on_error: true
+            target:
+              entity_id: tts.home_assistant_cloud
+            data:
+              media_player_entity_id: media_player.living_room
+              message: "{{ tts_message }}"
+              cache: false
+          - service: tts.speak
+            continue_on_error: true
+            target:
+              entity_id: tts.home_assistant_cloud
+            data:
+              media_player_entity_id: media_player.family_room
+              message: "{{ tts_message }}"
+              cache: false
+          - service: tts.speak
+            continue_on_error: true
+            target:
+              entity_id: tts.home_assistant_cloud
+            data:
+              media_player_entity_id: media_player.crafting_room
+              message: "{{ tts_message }}"
+              cache: false
+          - service: tts.speak
+            continue_on_error: true
+            target:
+              entity_id: tts.home_assistant_cloud
+            data:
+              media_player_entity_id: media_player.unnamed_room
+              message: "{{ tts_message }}"
+              cache: false
+  mode: restart
+
+# ── Life Safety: Sonos snapshot/restore (decoupled from restart lifecycle) ──
+# Split out of life_safety_smoke_co_alarm per QA fix (2026-08-27) — see the
+# note above that automation's header comment for the full rationale. Both
+# of these are mode: single, edge-triggered on the AGGREGATE sensor's real
+# state transition (not a manual toggle), so this does not reintroduce the
+# input_boolean mute/latch that was explicitly declined for this feature.
+- id: life_safety_sonos_alarm_snapshot
+  alias: "Life Safety: Sonos Alarm Snapshot"
+  description: >
+    Rising-edge companion to life_safety_smoke_co_alarm. Captures Sonos
+    state and raises volume to alarm level exactly once per alarm episode —
+    triggered off binary_sensor.life_safety_alarm_active turning 'on' rather
+    than the individual smoke/CO entities, so it is immune to
+    life_safety_smoke_co_alarm's mode: restart internally cancelling and
+    re-running on every additional detector that trips during the same
+    episode. That immunity is the whole point: previously, a second
+    detector tripping between the in-flight run's own snapshot and restore
+    would cause mode: restart to cancel that run before restore ever
+    executed, and the new run's snapshot would then capture the speakers
+    already sitting at ALARM volume (0.8) as "normal" — so the eventual
+    restore left them stuck at 0.8 permanently after the fire alarm cleared.
+    DEPENDENCY NOTE for future maintainers: life_safety_smoke_co_alarm's
+    tts.speak calls assume the speakers are already at alarm volume by the
+    time TTS fires. That depends on THIS automation's snapshot/volume_set
+    completing before life_safety_smoke_co_alarm's TTS action runs. Both are
+    triggered off the same underlying sensor state change (this one off the
+    aggregate binary_sensor.life_safety_alarm_active, the other off the
+    individual smoke/CO entities that make it go 'on'), and HA processes
+    automation triggers fast enough in practice for this ordering to hold —
+    but it is not an enforced/blocking dependency. If TTS content or Sonos
+    setup ever needs strict ordering, add an explicit wait_template here.
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.life_safety_alarm_active
+      to: "on"
+  condition: []
+  action:
+    - service: sonos.snapshot
+      target:
+        entity_id:
+          - media_player.living_room
+          - media_player.family_room
+          - media_player.crafting_room
+          - media_player.unnamed_room
+      data:
+        with_group: true
+    - service: media_player.volume_set
+      target:
+        entity_id:
+          - media_player.living_room
+          - media_player.family_room
+          - media_player.crafting_room
+          - media_player.unnamed_room
+      data:
+        volume_level: 0.8
+  mode: single
+
+- id: life_safety_sonos_alarm_restore
+  alias: "Life Safety: Sonos Alarm Restore"
+  description: >
+    Falling-edge companion to life_safety_sonos_alarm_snapshot, triggered
+    off binary_sensor.life_safety_alarm_active turning 'off' (all 5 units
+    clear). Waits 20s before restoring — life_safety_smoke_co_alarm's final
+    TTS announcement may still be dispatching/playing right as the alarm
+    clears, and tts.speak returns once playback is DISPATCHED, not once it
+    FINISHES, so restoring immediately risked truncating the last
+    announcement on all 4 speakers. The 20s settle delay gives that
+    announcement time to finish before pre-alarm volume/source/group are
+    reapplied.
+    mode: restart (QA fix, 2026-08-27) — not single. If the alarm fully
+    clears and then re-trips within the 20s settle delay (a brief Z-Wave
+    flicker, or a genuinely new event starting right as the first ends),
+    mode: single would sleep through its first delay and silently drop the
+    second falling-edge trigger, so that clearing event would never get its
+    own restore call. mode: restart resets the 20s wait on every fresh
+    falling edge instead, guaranteeing the most recent clear always gets a
+    restore.
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.life_safety_alarm_active
+      to: "off"
+  condition: []
+  action:
+    - delay: "00:00:20"
+    - service: sonos.restore
+      continue_on_error: true
+      target:
+        entity_id:
+          - media_player.living_room
+          - media_player.family_room
+          - media_player.crafting_room
+          - media_player.unnamed_room
+      data:
+        with_group: true
+  mode: restart
+
+- id: life_safety_detector_maintenance
+  alias: "Life Safety: Detector Maintenance Required"
+  description: >
+    Low-urgency maintenance alert for the 5 smoke/CO detectors — low battery,
+    dust maintenance, end-of-life replacement, hardware failure, or a node
+    gone offline (Z-Wave status 'dead'). Normal-priority push to both iPhone
+    and iPad (unlike life_safety_smoke_co_alarm, which is iPhone-only). No
+    TTS, no critical flag — this is not an active-hazard alert.
+    Anti-spam throttle is 21600s (6h), longer than R2's 3600s pattern
+    elsewhere in this file, since this is low-urgency and repeated pushes
+    for a fault that persists for days would just be noise.
+  trigger:
+    - platform: numeric_state
+      id: battery
+      below: 20
+      # NOTE: verify via history that sensor.P_battery_level reports
+      # intermediate values (not just 100/50/0) before trusting this 20%
+      # threshold in practice. eol/hardware triggers below provide
+      # independent coverage regardless. 20% matches battery_threshold: 20
+      # already set on custom:imperial-alert-panel in ui-lovelace.yaml.
+      entity_id:
+        - sensor.grow_room_smoke_co_alarm_battery_level
+        - sensor.maker_space_smoke_co_alarm_battery_level
+        - sensor.kitchen_smoke_co_alarm_battery_level
+        - sensor.primary_suite_smoke_co_alarm_battery_level
+        - sensor.bathroom_2nd_level_smoke_co_alarm_battery_level
+    - platform: state
+      id: dust
+      to: "on"
+      entity_id:
+        - binary_sensor.grow_room_smoke_co_alarm_maintenance_required_dust_in_device
+        - binary_sensor.maker_space_smoke_co_alarm_maintenance_required_dust_in_device
+        - binary_sensor.kitchen_smoke_co_alarm_maintenance_required_dust_in_device
+        - binary_sensor.primary_suite_smoke_co_alarm_maintenance_required_dust_in_device
+        - binary_sensor.bathroom_2nd_level_smoke_co_alarm_maintenance_required_dust_in_device
+    - platform: state
+      id: eol
+      to: "on"
+      entity_id:
+        - binary_sensor.grow_room_smoke_co_alarm_replacement_required_end_of_life
+        - binary_sensor.maker_space_smoke_co_alarm_replacement_required_end_of_life
+        - binary_sensor.kitchen_smoke_co_alarm_replacement_required_end_of_life
+        - binary_sensor.primary_suite_smoke_co_alarm_replacement_required_end_of_life
+        - binary_sensor.bathroom_2nd_level_smoke_co_alarm_replacement_required_end_of_life
+    - platform: state
+      id: hardware
+      to: "on"
+      entity_id:
+        - binary_sensor.grow_room_smoke_co_alarm_system_hardware_failure
+        - binary_sensor.maker_space_smoke_co_alarm_system_hardware_failure
+        - binary_sensor.kitchen_smoke_co_alarm_system_hardware_failure
+        - binary_sensor.primary_suite_smoke_co_alarm_system_hardware_failure
+        - binary_sensor.bathroom_2nd_level_smoke_co_alarm_system_hardware_failure
+    - platform: state
+      id: offline
+      to: "dead"
+      entity_id:
+        - sensor.grow_room_smoke_co_alarm_node_status
+        - sensor.maker_space_smoke_co_alarm_node_status
+        - sensor.kitchen_smoke_co_alarm_node_status
+        - sensor.primary_suite_smoke_co_alarm_node_status
+        - sensor.bathroom_2nd_level_smoke_co_alarm_node_status
+  condition:
+    - condition: template
+      value_template: "{{ trigger.to_state.state not in ['unavailable', 'unknown'] }}"
+    - condition: template
+      value_template: >
+        {{ this.last_triggered is none or
+           (now() - this.last_triggered).total_seconds() > 21600 }}
+  action:
+    - variables:
+        zone_map:
+          sensor.grow_room_smoke_co_alarm_battery_level: "Grow Room"
+          sensor.maker_space_smoke_co_alarm_battery_level: "Maker Space"
+          sensor.kitchen_smoke_co_alarm_battery_level: "Kitchen"
+          sensor.primary_suite_smoke_co_alarm_battery_level: "Primary Suite"
+          sensor.bathroom_2nd_level_smoke_co_alarm_battery_level: "Bathroom (2nd Level)"
+          binary_sensor.grow_room_smoke_co_alarm_maintenance_required_dust_in_device: "Grow Room"
+          binary_sensor.maker_space_smoke_co_alarm_maintenance_required_dust_in_device: "Maker Space"
+          binary_sensor.kitchen_smoke_co_alarm_maintenance_required_dust_in_device: "Kitchen"
+          binary_sensor.primary_suite_smoke_co_alarm_maintenance_required_dust_in_device: "Primary Suite"
+          binary_sensor.bathroom_2nd_level_smoke_co_alarm_maintenance_required_dust_in_device: "Bathroom (2nd Level)"
+          binary_sensor.grow_room_smoke_co_alarm_replacement_required_end_of_life: "Grow Room"
+          binary_sensor.maker_space_smoke_co_alarm_replacement_required_end_of_life: "Maker Space"
+          binary_sensor.kitchen_smoke_co_alarm_replacement_required_end_of_life: "Kitchen"
+          binary_sensor.primary_suite_smoke_co_alarm_replacement_required_end_of_life: "Primary Suite"
+          binary_sensor.bathroom_2nd_level_smoke_co_alarm_replacement_required_end_of_life: "Bathroom (2nd Level)"
+          binary_sensor.grow_room_smoke_co_alarm_system_hardware_failure: "Grow Room"
+          binary_sensor.maker_space_smoke_co_alarm_system_hardware_failure: "Maker Space"
+          binary_sensor.kitchen_smoke_co_alarm_system_hardware_failure: "Kitchen"
+          binary_sensor.primary_suite_smoke_co_alarm_system_hardware_failure: "Primary Suite"
+          binary_sensor.bathroom_2nd_level_smoke_co_alarm_system_hardware_failure: "Bathroom (2nd Level)"
+          sensor.grow_room_smoke_co_alarm_node_status: "Grow Room"
+          sensor.maker_space_smoke_co_alarm_node_status: "Maker Space"
+          sensor.kitchen_smoke_co_alarm_node_status: "Kitchen"
+          sensor.primary_suite_smoke_co_alarm_node_status: "Primary Suite"
+          sensor.bathroom_2nd_level_smoke_co_alarm_node_status: "Bathroom (2nd Level)"
+        room: "{{ zone_map[trigger.entity_id] }}"
+        fault_type: >
+          {% if trigger.id == 'battery' %}
+            Low battery
+          {% elif trigger.id == 'dust' %}
+            Needs cleaning (dust)
+          {% elif trigger.id == 'eol' %}
+            Replacement required (end of life)
+          {% elif trigger.id == 'hardware' %}
+            Hardware failure
+          {% else %}
+            Detector offline / unreachable
+          {% endif %}
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Life Safety"
+        message: "{{ room }}: {{ fault_type }}"
+    - service: notify.mobile_app_ipad
+      data:
+        title: "Life Safety"
+        message: "{{ room }}: {{ fault_type }}"
+  mode: queued
+  max: 10

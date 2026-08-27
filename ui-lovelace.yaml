@@ -1,5 +1,5 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# ui-lovelace.yaml  —  Main household dashboard (8 views, plain naming)
+# ui-lovelace.yaml  —  Main household dashboard (9 views, plain naming)
 # ─────────────────────────────────────────────────────────────────────────────
 # Primary Lovelace dashboard with standard card types (entities, tile, clock,
 # picture-entity). Custom imperial-* cards replaced except imperial-alert-panel,
@@ -1424,3 +1424,260 @@ views:
             entities:
               - entity: sensor.grow_room_inside_vpd
                 name: VPD (kPa)
+
+  # ═══════════════════════════════════════════════════════════════════════════
+  # VIEW 9: SAFETY — Z-Wave smoke/CO detectors (5× First Alert SMCO410)
+  #
+  # All 5 units report identical friendly_name text ("Smoke & CO Alarm ...")
+  # and entity-level area_id is None on every detector entity (area is
+  # inherited from the device only) — so every row below carries an explicit
+  # name: override, and customize.yaml carries friendly_name overrides for
+  # the same reason. Do not rely on friendly_name or area_name()/area_id()
+  # Jinja helpers anywhere for room identity; use the zone_map pattern from
+  # automations.yaml (life_safety_smoke_co_alarm / life_safety_detector_
+  # maintenance) as the source of truth instead.
+  #
+  # alarm_silenced vs alarm_silenced_2: which is smoke-silence vs CO-silence
+  # is not determinable from the registry — labeled neutrally as
+  # "Silenced (A)" / "Silenced (B)" here and in customize.yaml. Do not guess.
+  #
+  # Standard cards + imperial_dark.yaml theme tokens only — no custom card
+  # class, no imperial-cards.js changes, no resources/version bump.
+  # ═══════════════════════════════════════════════════════════════════════════
+  - title: Safety
+    path: life-support
+    icon: mdi:smoke-detector-variant
+    panel: true
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          # ── Alarm banner — only rendered while any of the 10 smoke/CO
+          # entities is 'on'. binary_sensor.life_safety_alarm_active is the
+          # template helper defined in packages/life_safety.yaml.
+          - type: conditional
+            conditions:
+              - condition: state
+                entity: binary_sensor.life_safety_alarm_active
+                state: "on"
+            card:
+              type: markdown
+              content: >
+                <div style="background: var(--error-color); color: #ffffff;
+                padding: 16px; border-radius: 8px; font-weight: bold;
+                font-size: 1.1em; text-align: center;">
+                🚨 ALARM ACTIVE — {{ states('sensor.life_safety_active_zones') }}
+                </div>
+
+          - type: markdown
+            content: "## Grow Room — Smoke & CO"
+
+          - type: entities
+            title: Grow Room
+            entities:
+              - entity: binary_sensor.grow_room_smoke_co_alarm_smoke_detected
+                name: Smoke
+                icon: mdi:smoke-detector-variant-alert
+              - entity: binary_sensor.grow_room_smoke_co_alarm_carbon_monoxide_detected
+                name: CO
+                icon: mdi:molecule-co
+              - entity: binary_sensor.grow_room_smoke_co_alarm_smoke_alarm_test
+                name: Test
+                icon: mdi:test-tube
+              - entity: binary_sensor.grow_room_smoke_co_alarm_alarm_silenced
+                name: Silenced (A)
+                icon: mdi:volume-off
+              - entity: binary_sensor.grow_room_smoke_co_alarm_alarm_silenced_2
+                name: Silenced (B)
+                icon: mdi:volume-off
+              - entity: binary_sensor.grow_room_smoke_co_alarm_maintenance_required_dust_in_device
+                name: Dust
+                icon: mdi:spray-bottle
+              - entity: binary_sensor.grow_room_smoke_co_alarm_replacement_required_end_of_life
+                name: End-of-life
+                icon: mdi:calendar-alert
+              - entity: binary_sensor.grow_room_smoke_co_alarm_system_hardware_failure
+                name: Hardware fault
+                icon: mdi:alert-circle
+              - entity: sensor.grow_room_smoke_co_alarm_battery_level
+                name: Battery
+                icon: mdi:battery
+              - entity: sensor.grow_room_smoke_co_alarm_node_status
+                name: Node status
+                icon: mdi:lan-connect
+
+          - type: markdown
+            content: "## Maker Space — Smoke & CO"
+
+          - type: entities
+            title: Maker Space
+            entities:
+              - entity: binary_sensor.maker_space_smoke_co_alarm_smoke_detected
+                name: Smoke
+                icon: mdi:smoke-detector-variant-alert
+              - entity: binary_sensor.maker_space_smoke_co_alarm_carbon_monoxide_detected
+                name: CO
+                icon: mdi:molecule-co
+              - entity: binary_sensor.maker_space_smoke_co_alarm_smoke_alarm_test
+                name: Test
+                icon: mdi:test-tube
+              - entity: binary_sensor.maker_space_smoke_co_alarm_alarm_silenced
+                name: Silenced (A)
+                icon: mdi:volume-off
+              - entity: binary_sensor.maker_space_smoke_co_alarm_alarm_silenced_2
+                name: Silenced (B)
+                icon: mdi:volume-off
+              - entity: binary_sensor.maker_space_smoke_co_alarm_maintenance_required_dust_in_device
+                name: Dust
+                icon: mdi:spray-bottle
+              - entity: binary_sensor.maker_space_smoke_co_alarm_replacement_required_end_of_life
+                name: End-of-life
+                icon: mdi:calendar-alert
+              - entity: binary_sensor.maker_space_smoke_co_alarm_system_hardware_failure
+                name: Hardware fault
+                icon: mdi:alert-circle
+              - entity: sensor.maker_space_smoke_co_alarm_battery_level
+                name: Battery
+                icon: mdi:battery
+              - entity: sensor.maker_space_smoke_co_alarm_node_status
+                name: Node status
+                icon: mdi:lan-connect
+
+          - type: markdown
+            content: "## Kitchen — Smoke & CO"
+
+          - type: entities
+            title: Kitchen
+            entities:
+              - entity: binary_sensor.kitchen_smoke_co_alarm_smoke_detected
+                name: Smoke
+                icon: mdi:smoke-detector-variant-alert
+              - entity: binary_sensor.kitchen_smoke_co_alarm_carbon_monoxide_detected
+                name: CO
+                icon: mdi:molecule-co
+              - entity: binary_sensor.kitchen_smoke_co_alarm_smoke_alarm_test
+                name: Test
+                icon: mdi:test-tube
+              - entity: binary_sensor.kitchen_smoke_co_alarm_alarm_silenced
+                name: Silenced (A)
+                icon: mdi:volume-off
+              - entity: binary_sensor.kitchen_smoke_co_alarm_alarm_silenced_2
+                name: Silenced (B)
+                icon: mdi:volume-off
+              - entity: binary_sensor.kitchen_smoke_co_alarm_maintenance_required_dust_in_device
+                name: Dust
+                icon: mdi:spray-bottle
+              - entity: binary_sensor.kitchen_smoke_co_alarm_replacement_required_end_of_life
+                name: End-of-life
+                icon: mdi:calendar-alert
+              - entity: binary_sensor.kitchen_smoke_co_alarm_system_hardware_failure
+                name: Hardware fault
+                icon: mdi:alert-circle
+              - entity: sensor.kitchen_smoke_co_alarm_battery_level
+                name: Battery
+                icon: mdi:battery
+              - entity: sensor.kitchen_smoke_co_alarm_node_status
+                name: Node status
+                icon: mdi:lan-connect
+
+          - type: markdown
+            content: "## Primary Suite — Smoke & CO"
+
+          - type: entities
+            title: Primary Suite
+            entities:
+              - entity: binary_sensor.primary_suite_smoke_co_alarm_smoke_detected
+                name: Smoke
+                icon: mdi:smoke-detector-variant-alert
+              - entity: binary_sensor.primary_suite_smoke_co_alarm_carbon_monoxide_detected
+                name: CO
+                icon: mdi:molecule-co
+              - entity: binary_sensor.primary_suite_smoke_co_alarm_smoke_alarm_test
+                name: Test
+                icon: mdi:test-tube
+              - entity: binary_sensor.primary_suite_smoke_co_alarm_alarm_silenced
+                name: Silenced (A)
+                icon: mdi:volume-off
+              - entity: binary_sensor.primary_suite_smoke_co_alarm_alarm_silenced_2
+                name: Silenced (B)
+                icon: mdi:volume-off
+              - entity: binary_sensor.primary_suite_smoke_co_alarm_maintenance_required_dust_in_device
+                name: Dust
+                icon: mdi:spray-bottle
+              - entity: binary_sensor.primary_suite_smoke_co_alarm_replacement_required_end_of_life
+                name: End-of-life
+                icon: mdi:calendar-alert
+              - entity: binary_sensor.primary_suite_smoke_co_alarm_system_hardware_failure
+                name: Hardware fault
+                icon: mdi:alert-circle
+              - entity: sensor.primary_suite_smoke_co_alarm_battery_level
+                name: Battery
+                icon: mdi:battery
+              - entity: sensor.primary_suite_smoke_co_alarm_node_status
+                name: Node status
+                icon: mdi:lan-connect
+
+          - type: markdown
+            content: "## Bathroom (2nd Level) — Smoke & CO"
+
+          - type: entities
+            title: Bathroom (2nd Level)
+            entities:
+              - entity: binary_sensor.bathroom_2nd_level_smoke_co_alarm_smoke_detected
+                name: Smoke
+                icon: mdi:smoke-detector-variant-alert
+              - entity: binary_sensor.bathroom_2nd_level_smoke_co_alarm_carbon_monoxide_detected
+                name: CO
+                icon: mdi:molecule-co
+              - entity: binary_sensor.bathroom_2nd_level_smoke_co_alarm_smoke_alarm_test
+                name: Test
+                icon: mdi:test-tube
+              - entity: binary_sensor.bathroom_2nd_level_smoke_co_alarm_alarm_silenced
+                name: Silenced (A)
+                icon: mdi:volume-off
+              - entity: binary_sensor.bathroom_2nd_level_smoke_co_alarm_alarm_silenced_2
+                name: Silenced (B)
+                icon: mdi:volume-off
+              - entity: binary_sensor.bathroom_2nd_level_smoke_co_alarm_maintenance_required_dust_in_device
+                name: Dust
+                icon: mdi:spray-bottle
+              - entity: binary_sensor.bathroom_2nd_level_smoke_co_alarm_replacement_required_end_of_life
+                name: End-of-life
+                icon: mdi:calendar-alert
+              - entity: binary_sensor.bathroom_2nd_level_smoke_co_alarm_system_hardware_failure
+                name: Hardware fault
+                icon: mdi:alert-circle
+              - entity: sensor.bathroom_2nd_level_smoke_co_alarm_battery_level
+                name: Battery
+                icon: mdi:battery
+              - entity: sensor.bathroom_2nd_level_smoke_co_alarm_node_status
+                name: Node status
+                icon: mdi:lan-connect
+
+          - type: entities
+            title: Firmware
+            entities:
+              - entity: update.grow_room_smoke_co_alarm_firmware
+                name: "Grow Room — Firmware"
+              - entity: update.maker_space_smoke_co_alarm_firmware
+                name: "Maker Space — Firmware"
+              - entity: update.kitchen_smoke_co_alarm_firmware
+                name: "Kitchen — Firmware"
+              - entity: update.primary_suite_smoke_co_alarm_firmware
+                name: "Primary Suite — Firmware"
+              - entity: update.bathroom_2nd_level_smoke_co_alarm_firmware
+                name: "Bathroom (2nd Level) — Firmware"
+
+          - type: entities
+            title: Diagnostics — Identify
+            entities:
+              - entity: button.grow_room_smoke_co_alarm_identify
+                name: "Grow Room — Identify"
+              - entity: button.maker_space_smoke_co_alarm_identify
+                name: "Maker Space — Identify"
+              - entity: button.kitchen_smoke_co_alarm_identify
+                name: "Kitchen — Identify"
+              - entity: button.primary_suite_smoke_co_alarm_identify
+                name: "Primary Suite — Identify"
+              - entity: button.bathroom_2nd_level_smoke_co_alarm_identify
+                name: "Bathroom (2nd Level) — Identify"
