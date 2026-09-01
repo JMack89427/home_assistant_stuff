@@ -172,6 +172,20 @@
         entity_id: humidifier.150633095484711_humidifier
   mode: single
 
+# ── Dehumidifier: Tank Full ──────────────────────────────────────────────────
+- id: dehumidifier_tank_full
+  alias: "Dehumidifier: Tank Full"
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.150633095484711_tank_full
+      to: "on"
+  action:
+    - service: notify.mobile_app_jason_s_iphone
+      data:
+        title: "Dehumidifier"
+        message: "Midea 50 Pint tank is full — empty it to resume dehumidifying."
+  mode: single
+
 # ── Terrain: Chopper rain delay ───────────────────────────────────────────────
 # Uses weather forecast entity — physical rain sensor unreliable under garage.
 # Morning check fires regardless of mower state (day-ahead notice).
