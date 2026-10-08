@@ -40,6 +40,100 @@ sync_github_config:
   icon: mdi:github
   sequence:
     - service: shell_command.git_pull_config
+      data: {}
     - delay: "00:00:05" # Wait 5 seconds for the git pull to finish
     - service: homeassistant.restart
+      data: {}
   mode: single
+
+# ── Roborock Qrevo Curv: Room-by-room cleaning with dock & empty ──────────────
+roborock_curv_clean_room_by_room:
+  alias: "Roborock Curv: Clean Room by Room"
+  description: "Cleans mapped rooms one by one, docking and auto-emptying the dustbin between each room."
+  icon: mdi:robot-vacuum
+  mode: single
+  max_exceeded: silent
+  sequence:
+    # Ensure vacuum is docked before starting routine
+    - condition: state
+      entity_id: vacuum.roborock_qrevo_curv_series
+      state: "docked"
+
+    - repeat:
+        for_each:
+          - id: 5
+            name: "Front Room"
+          - id: 7
+            name: "Kitchen"
+          - id: 14
+            name: "Fireplace Room"
+          - id: 1
+            name: "Master bedroom"
+          - id: 4
+            name: "Bathroom"
+          - id: 3
+            name: "Room 3"
+          - id: 2
+            name: "Bedroom (Segment 2)"
+          - id: 8
+            name: "Bedroom (Segment 8)"
+          - id: 9
+            name: "Bedroom (Segment 9)"
+          - id: 10
+            name: "Bedroom (Segment 10)"
+          - id: 11
+            name: "Bedroom (Segment 11)"
+          - id: 12
+            name: "Bedroom (Segment 12)"
+          - id: 13
+            name: "Bedroom (Segment 13)"
+        sequence:
+          - action: logbook.log
+            data:
+              name: "Roborock Qrevo Curv"
+              message: "Starting clean: {{ repeat.item.name }} (Segment {{ repeat.item.id }})"
+              entity_id: vacuum.roborock_qrevo_curv_series
+
+          # Send segment clean command for the room
+          - action: vacuum.send_command
+            target:
+              entity_id: vacuum.roborock_qrevo_curv_series
+            data:
+              command: app_segment_clean
+              params:
+                - segments:
+                    - "{{ repeat.item.id | int }}"
+                  repeat: 1
+
+          # Wait for vacuum to leave dock and enter cleaning state
+          - wait_for_trigger:
+              - platform: state
+                entity_id: binary_sensor.roborock_qrevo_curv_series_cleaning
+                to: "on"
+            timeout: "00:03:00"
+            continue_on_timeout: true
+
+          # Wait for vacuum to finish the room and return to dock
+          - wait_template: >-
+              {{ is_state('vacuum.roborock_qrevo_curv_series', 'docked') and
+                 is_state('binary_sensor.roborock_qrevo_curv_series_cleaning', 'off') }}
+            timeout: "02:00:00"
+            continue_on_timeout: false
+
+          # Settle on dock charging contacts
+          - delay: "00:00:10"
+
+          # Trigger dock dustbin empty cycle
+          - action: switch.turn_on
+            target:
+              entity_id: switch.piano_room_roborock_qrevo_curv_series_dock_dust_emptying
+
+          # Allow dustbin empty cycle to finish before deploying for next room
+          - delay: "00:00:35"
+
+          - action: logbook.log
+            data:
+              name: "Roborock Qrevo Curv"
+              message: "Finished {{ repeat.item.name }} and emptied dustbin."
+              entity_id: vacuum.roborock_qrevo_curv_series
+

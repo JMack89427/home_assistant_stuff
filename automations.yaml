@@ -20,9 +20,7 @@
       at: "10:00:00"
   condition: []
   action:
-    - service: vacuum.start
-      target:
-        entity_id: vacuum.roborock_qrevo_curv_series
+    - action: script.roborock_curv_clean_room_by_room
   mode: single
 
 # ── Vacuum: QR 798 (basement) — daily 5pm ────────────────────────────────────
