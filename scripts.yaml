@@ -137,3 +137,30 @@ roborock_curv_clean_room_by_room:
               message: "Finished {{ repeat.item.name }} and emptied dustbin."
               entity_id: vacuum.roborock_qrevo_curv_series
 
+# ── Grow Room: Reservoir Pump Manual Run with Auto-Shutoff ───────────────────
+grow_room_run_reservoir_pump:
+  alias: "Grow Room: Run Reservoir Pump"
+  description: "Runs the reservoir pump for a set duration (defaults to 30s) with an automatic safety shutoff."
+  icon: mdi:water-pump
+  mode: restart
+  fields:
+    duration_seconds:
+      name: "Duration (seconds)"
+      description: "Run duration in seconds before automatically shutting off (5–300s)."
+      default: 30
+      selector:
+        number:
+          min: 5
+          max: 300
+          step: 5
+          unit_of_measurement: "s"
+          mode: box
+  sequence:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.grow_room_reservoir_pump
+    - delay:
+        seconds: "{{ [[(duration_seconds | default(30) | int(30)), 300] | min, 5] | max }}"
+    - action: switch.turn_off
+      target:
+        entity_id: switch.grow_room_reservoir_pump

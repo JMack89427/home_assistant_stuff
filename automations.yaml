@@ -1323,6 +1323,46 @@
                 option: "{{ 'color' if states('sensor.grow_controller_port_3_current_power') | float > 0 else 'auto' }}"
   mode: single
 
+# ── Grow Room: Reservoir Pump Circulation Schedule ──────────────────────────
+# Runs the reservoir pump for 15 minutes every 2 hours on even hours (e.g.
+# 00:00–00:15, 02:00–02:15). Uses discrete start and stop time triggers rather
+# than a single long delay so an HA restart during the run window doesn't leave
+# the pump running indefinitely; includes a 20-minute continuous-on safety
+# trigger as a secondary guard.
+- id: grow_room_reservoir_pump_circulation_cycle
+  alias: "Grow Room: Reservoir Pump Circulation Cycle"
+  trigger:
+    - platform: time_pattern
+      hours: "/2"
+      minutes: 0
+      seconds: 0
+      id: start
+    - platform: time_pattern
+      hours: "/2"
+      minutes: 15
+      seconds: 0
+      id: stop
+    - platform: state
+      entity_id: switch.grow_room_reservoir_pump
+      to: "on"
+      for:
+        minutes: 20
+      id: safety_stop
+  condition: []
+  action:
+    - choose:
+        - conditions: "{{ trigger.id == 'start' }}"
+          sequence:
+            - action: switch.turn_on
+              target:
+                entity_id: switch.grow_room_reservoir_pump
+        - conditions: "{{ trigger.id in ['stop', 'safety_stop'] }}"
+          sequence:
+            - action: switch.turn_off
+              target:
+                entity_id: switch.grow_room_reservoir_pump
+  mode: single
+
 # ── Life Safety: Smoke/CO Detectors (5x First Alert SMCO410, Z-Wave) ────────
 # Room identity for these 5 units cannot come from friendly_name (all 5
 # report identical text, e.g. "Smoke & CO Alarm Smoke detected") or from
