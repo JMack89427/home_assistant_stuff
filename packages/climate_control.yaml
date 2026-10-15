@@ -6,6 +6,8 @@
 #       excluded from all averages. Basement and Printing Room sensors pending arrival.
 # NOTE: Brent's Room is conditionally excluded from all averages/setpoint logic via the new
 #       input_boolean.brent_room_occupied (manual toggle, no auto-reset — see input_boolean: block below).
+# NOTE: Cat's Room is conditionally excluded from all averages/setpoint logic via
+#       input_boolean.cats_room_occupied (manual toggle, no auto-reset — see input_boolean: block below).
 #
 # Automation logic:
 #   - 6:00 AM  → daytime setpoint  (cool 72°F / heat 68°F)
@@ -31,6 +33,9 @@ input_boolean:
   brent_room_occupied:
     name: Brent's Room Occupied
     icon: mdi:bed
+  cats_room_occupied:
+    name: Cat's Room Occupied
+    icon: mdi:bed
 
 template:
   - sensor:
@@ -43,9 +48,11 @@ template:
           {% set readings = [
               states('sensor.ewelink_snzb_02p_temperature') | float(72),
               states('sensor.master_bedroom_primary_suite_temp_humidity_temperature') | float(72),
-              states('sensor.cats_room_temp_humidity_sensor_temperature') | float(72),
               states('sensor.t6_pro_z_wave_programmable_thermostat_air_temperature') | float(72)
             ] %}
+          {% if is_state('input_boolean.cats_room_occupied', 'off') %}
+            {% set readings = readings + [states('sensor.cats_room_temp_humidity_sensor_temperature') | float(72)] %}
+          {% endif %}
           {% if is_state('input_boolean.brent_room_occupied', 'on') %}
             {% set readings = readings + [states('sensor.spare_bedroom_temp_humidity_sensor_temperature') | float(72)] %}
           {% endif %}
@@ -71,9 +78,11 @@ template:
           {% set readings = [
               states('sensor.ewelink_snzb_02p_humidity') | float(50),
               states('sensor.master_bedroom_primary_suite_temp_humidity_humidity') | float(50),
-              states('sensor.cats_room_temp_humidity_sensor_humidity') | float(50),
               states('sensor.t6_pro_z_wave_programmable_thermostat_humidity') | float(50)
             ] %}
+          {% if is_state('input_boolean.cats_room_occupied', 'off') %}
+            {% set readings = readings + [states('sensor.cats_room_temp_humidity_sensor_humidity') | float(50)] %}
+          {% endif %}
           {% if is_state('input_boolean.brent_room_occupied', 'on') %}
             {% set readings = readings + [states('sensor.spare_bedroom_temp_humidity_sensor_humidity') | float(50)] %}
           {% endif %}

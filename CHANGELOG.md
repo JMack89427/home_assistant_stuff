@@ -7,6 +7,16 @@ This project adheres to [Semantic Versioning](https://semver.org/) for major str
 
 ### Added
 
+- **Cat's Room Occupancy Override & Dashboard Controls**: Added `input_boolean.cats_room_occupied` (default off, manual toggle, no auto-reset) to conditionally exclude Cat's Room from ceiling fan automations and climate/dehumidifier logic when occupied.
+  - **Dashboard Controls (`ui-cadets-barracks.yaml`)**: Added a prominent "Room Occupied" Amber Tile card (`mdi:bed`) and a "Room Status" entities card in the dashboard's horizontal stack.
+  - **Climate Logic (`packages/climate_control.yaml`)**: Updated `sensor.house_average_temperature` and `sensor.house_average_humidity` template sensors to conditionally include Cat's Room only when `input_boolean.cats_room_occupied` is `off`.
+  - **Automations (`automations.yaml`)**:
+    - `climate_apply_setpoints`: Excludes Cat's Room temperature from the room temperature spread calculation when occupied.
+    - `dehumidifier_force_on_any_room_humid`: Ignores humidity spikes from Cat's Room when occupied.
+    - `dehumidifier_allow_off_all_rooms_dry`: Prevents Cat's Room humidity from blocking whole-house dehumidifier shutoff when occupied.
+    - `cadets_barracks_fan_temp_control`: Prevents daytime temperature-adaptive ceiling fan speed adjustments when occupied.
+    - `cadets_barracks_fan_night_high`: Prevents 9:00 PM automatic 100% ceiling fan override when occupied.
+
 - **Grow Room — Reservoir Pump 2-Hour Circulation Automation**: Added `grow_room_reservoir_pump_circulation_cycle` automation in `automations.yaml` to run the reservoir pump (`switch.grow_room_reservoir_pump`) for 15 minutes every 2 hours on even hours (e.g., 00:00–00:15, 02:00–02:15). Employs discrete time-pattern triggers for start (:00) and stop (:15) on even hours rather than an in-flight 15-minute delay, guaranteeing that HA restarts during an active circulation window cannot cause the shut-off to be skipped. Includes an additional state-based safety trigger to automatically shut down the pump if it remains continuously on for 20 minutes under any circumstance.
 
 - **Grow Room — Reservoir Pump Manual Run Script with Auto-Shutoff**: Added `grow_room_run_reservoir_pump` script in `scripts.yaml` for the newly paired Matter smart plug (`switch.grow_room_reservoir_pump`, Kasa Smart Wi-Fi Plug) controlling the grow room reservoir pump. Provides a manual execution routine with a configurable `duration_seconds` selector (clamped between 5 and 300 seconds, defaulting to 30 seconds) and an automatic safety shutoff timer to prevent unattended overflows or dry-running the pump. Uses `mode: restart` so re-triggering the script safely resets the timer rather than stacking duplicate runs.

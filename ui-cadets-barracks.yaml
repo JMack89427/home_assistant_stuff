@@ -26,6 +26,12 @@ views:
           - type: markdown
             content: "## Cat's Room"
 
+          - type: tile
+            entity: input_boolean.cats_room_occupied
+            name: Room Occupied
+            icon: mdi:bed
+            color: amber
+
           - type: grid
             columns: 2
             square: false
@@ -110,3 +116,10 @@ views:
                   - entity: sensor.cats_ceiling_fan_wifi_rssi
                     name: Signal
                     icon: mdi:wifi
+
+              - type: entities
+                title: Room Status
+                entities:
+                  - entity: input_boolean.cats_room_occupied
+                    name: Occupied
+                    icon: mdi:bed

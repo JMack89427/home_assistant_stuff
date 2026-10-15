@@ -78,9 +78,11 @@
           {{ [
             states('sensor.ewelink_snzb_02p_temperature') | float(72),
             states('sensor.master_bedroom_primary_suite_temp_humidity_temperature') | float(72),
-            states('sensor.cats_room_temp_humidity_sensor_temperature') | float(72),
             states('sensor.t6_pro_z_wave_programmable_thermostat_air_temperature') | float(72)
           ] + (
+            [states('sensor.cats_room_temp_humidity_sensor_temperature') | float(72)]
+            if is_state('input_boolean.cats_room_occupied', 'off') else []
+          ) + (
             [states('sensor.spare_bedroom_temp_humidity_sensor_temperature') | float(72)]
             if is_state('input_boolean.brent_room_occupied', 'on') else []
           ) }}
@@ -136,7 +138,9 @@
     - condition: template
       value_template: >
         {{ not (trigger.entity_id == 'sensor.spare_bedroom_temp_humidity_sensor_humidity'
-                and is_state('input_boolean.brent_room_occupied', 'off')) }}
+                and is_state('input_boolean.brent_room_occupied', 'off'))
+           and not (trigger.entity_id == 'sensor.cats_room_temp_humidity_sensor_humidity'
+                and is_state('input_boolean.cats_room_occupied', 'on')) }}
   action:
     - service: humidifier.turn_on
       target:
@@ -160,7 +164,8 @@
       value_template: >
         {{ states('sensor.ewelink_snzb_02p_humidity') | float(0) <= 40
            and states('sensor.master_bedroom_primary_suite_temp_humidity_humidity') | float(0) <= 40
-           and states('sensor.cats_room_temp_humidity_sensor_humidity') | float(0) <= 40
+           and (is_state('input_boolean.cats_room_occupied', 'on')
+                or states('sensor.cats_room_temp_humidity_sensor_humidity') | float(0) <= 40)
            and states('sensor.t6_pro_z_wave_programmable_thermostat_humidity') | float(0) <= 40
            and (is_state('input_boolean.brent_room_occupied', 'off')
                 or states('sensor.spare_bedroom_temp_humidity_sensor_humidity') | float(0) <= 40) }}
@@ -949,13 +954,13 @@
       to: FINISHED
   condition:
     - condition: state
-      entity_id: switch.prusa_mk4s_plug
+      entity_id: switch.kasa_smart_wi_fi_plug
       state: "on"
   action:
     - delay: "00:05:00"
     - service: switch.turn_off
       target:
-        entity_id: switch.prusa_mk4s_plug
+        entity_id: switch.kasa_smart_wi_fi_plug
     - service: notify.mobile_app_jason_s_iphone
       data:
         title: "Manufacturing"
@@ -1101,6 +1106,9 @@
     - condition: time
       after: "07:00:00"
       before: "21:00:00"
+    - condition: state
+      entity_id: input_boolean.cats_room_occupied
+      state: "off"
   action:
     - variables:
         setpoint: >
@@ -1134,6 +1142,10 @@
   trigger:
     - platform: time
       at: "21:00:00"
+  condition:
+    - condition: state
+      entity_id: input_boolean.cats_room_occupied
+      state: "off"
   action:
     - service: fan.set_percentage
       target:
