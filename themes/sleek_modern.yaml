@@ -1,0 +1,62 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# sleek_modern.yaml  —  Sleek Modern Glassmorphic Dark Theme
+# ─────────────────────────────────────────────────────────────────────────────
+sleek_modern:
+  # ── Core Canvas & Backgrounds ───────────────────────────────────────────────
+  primary-background-color: "#0a0f1d"          # Deep Midnight Obsidian
+  secondary-background-color: "#0f172a"        # Deep Slate Blue
+  card-background-color: "#141e33"             # Modern Slate Card Surface
+  dialog-background-color: "#18243e"
+  clear-background-color: "transparent"
+
+  # ── Modern Color Palette ────────────────────────────────────────────────────
+  primary-color: "#38bdf8"                     # Vibrant Sky Blue
+  accent-color: "#818cf8"                      # Soft Indigo Accent
+  light-primary-color: "#7dd3fc"
+  dark-primary-color: "#0284c7"
+
+  # ── Typography & Readability ────────────────────────────────────────────────
+  primary-text-color: "#f8fafc"                # Crisp White-Grey
+  text-primary-color: "#ffffff"
+  secondary-text-color: "#94a3b8"              # Muted Slate
+  disabled-text-color: "#475569"
+  text-accent-color: "#38bdf8"
+  divider-color: "rgba(255, 255, 255, 0.08)"
+
+  # ── Reactive States ─────────────────────────────────────────────────────────
+  state-active-color: "#38bdf8"
+  state-icon-color: "#94a3b8"
+  state-icon-active-color: "#38bdf8"
+  state-on-color: "#38bdf8"
+  state-off-color: "#64748b"
+  state-unavailable-color: "#475569"
+
+  # ── Semantic Indicators ─────────────────────────────────────────────────────
+  success-color: "#10b981"                     # Emerald Green
+  warning-color: "#f59e0b"                     # Radiant Amber
+  error-color: "#f43f5e"                       # Crimson Rose
+  info-color: "#0ea5e9"                        # Azure
+
+  # ── Modern Rounded Cards with Soft Ambient Shadows ──────────────────────────
+  ha-card-border-radius: "16px"
+  ha-card-border-width: "1px"
+  ha-card-border-color: "rgba(255, 255, 255, 0.08)"
+  ha-card-box-shadow: "0 4px 24px -2px rgba(0, 0, 0, 0.35)"
+  ha-card-background: "rgba(20, 30, 51, 0.88)"
+  ha-card-header-color: "#f8fafc"
+  ha-card-header-font-size: "18px"
+  ha-card-header-font-weight: "600"
+
+  # ── Top Navigation Bar ──────────────────────────────────────────────────────
+  app-header-background-color: "#0a0f1d"
+  app-header-text-color: "#f8fafc"
+  app-header-edit-background-color: "#0f172a"
+  app-header-edit-text-color: "#38bdf8"
+
+  # ── Sidebar Styling ─────────────────────────────────────────────────────────
+  sidebar-background-color: "#0a0f1d"
+  sidebar-text-color: "#94a3b8"
+  sidebar-icon-color: "#64748b"
+  sidebar-selected-icon-color: "#38bdf8"
+  sidebar-selected-text-color: "#f8fafc"
+  sidebar-selected-background-color: "rgba(56, 189, 248, 0.12)"

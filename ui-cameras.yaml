@@ -1,70 +1,145 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# ui-cameras.yaml  —  Cameras dashboard (standalone)
+# ui-cameras.yaml  —  Modern Surveillance & Live Cameras Hub
 # ─────────────────────────────────────────────────────────────────────────────
 
 title: Cameras
+theme: sleek_modern
 views:
   - title: Cameras
-    path: cameras
-    panel: true
+    path: default_view
     icon: mdi:cctv
-    badges: []
+    panel: true
     cards:
-      - type: vertical-stack
-        cards:
-          - type: horizontal-stack
-            cards:
-              - type: picture-entity
-                entity: camera.front_door_live_view
-                name: Front Door
-                aspect_ratio: "3 / 4"
-              - type: picture-entity
-                entity: camera.front_door_live_view_2
-                name: Doorbell
-                aspect_ratio: "3 / 4"
+      - type: custom:imperial-responsive-console
+        header:
+          - type: heading
+            heading: Live Surveillance Hub
+            heading_style: title
+            icon: mdi:cctv
 
-          - type: horizontal-stack
-            cards:
+        columns:
+          # ═══════════════════════════════════════════════════════════════════
+          # COLUMN 1: PERIMETER & ENTRY (RING FRONT DOOR)
+          # ═══════════════════════════════════════════════════════════════════
+          - cards:
               - type: picture-glance
-                title: Front
-                camera_image: camera.front_live_view
-                camera_view: auto
+                title: Front Door & Entry
+                camera_image: camera.front_door_live_view_2
+                camera_view: live
                 entities:
-                  - entity: switch.front_motion_detection
-                    icon: mdi:motion-sensor
-              - type: picture-glance
-                title: Garage
-                camera_image: camera.garage_live_view
-                camera_view: auto
-                entities:
-                  - entity: switch.garage_motion_detection
-                    icon: mdi:motion-sensor
-              - type: picture-glance
-                title: Side
-                camera_image: camera.side_live_view
-                camera_view: auto
-                entities:
-                  - entity: switch.side_motion_detection
-                    icon: mdi:motion-sensor
+                  - entity: sensor.front_door_battery_2
+                    icon: mdi:battery
+                  - entity: sensor.front_door_last_activity_2
+                    icon: mdi:clock-outline
 
-          - type: entities
-            title: Motion Detection
-            entities:
-              - entity: switch.front_door_motion_detection
-                name: Front Door Motion
-                icon: mdi:shield-lock
-              - entity: switch.front_motion_detection
-                name: Front Motion
-                icon: mdi:shield-lock
-              - entity: switch.garage_motion_detection
-                name: Garage Motion
-                icon: mdi:shield-lock
-              - entity: switch.side_motion_detection
-                name: Side Motion
-                icon: mdi:shield-lock
-              - entity: sensor.front_door_battery_2
-                name: Doorbell Battery
-                icon: mdi:battery
-              - entity: sensor.front_door_last_activity_2
-                name: Doorbell Last Activity
-                icon: mdi:clock-outline
+              - type: entities
+                title: Front Door Diagnostics
+                entities:
+                  - entity: camera.front_door_live_view_2
+                    name: Camera Stream Status
+                  - entity: sensor.front_door_battery_2
+                    name: Battery Level
+                    icon: mdi:battery
+                  - entity: sensor.front_door_last_activity_2
+                    name: Last Activity Timestamp
+                    icon: mdi:history
+                  - entity: number.front_door_volume_2
+                    name: Chime / Speaker Volume
+                    icon: mdi:volume-high
+
+          # ═══════════════════════════════════════════════════════════════════
+          # COLUMN 2: BOTANICAL BAY (GROW ROOM FEED)
+          # ═══════════════════════════════════════════════════════════════════
+          - cards:
+              - type: picture-glance
+                title: Grow Room Enclosure (HD Clear)
+                camera_image: camera.grow_room_clear
+                camera_view: auto
+                entities:
+                  - entity: sensor.grow_room_inside_air_temperature
+                    icon: mdi:thermometer
+                  - entity: sensor.grow_room_inside_air_relative_humidity
+                    icon: mdi:water-percent
+                  - entity: sensor.grow_room_inside_vpd
+                    icon: mdi:gauge
+                tap_action:
+                  action: navigate
+                  navigation_path: /grow-room
+
+              - type: entities
+                title: Grow Room Environment Glance
+                entities:
+                  - entity: binary_sensor.grow_room_motion
+                    name: Motion Detected
+                    icon: mdi:motion-sensor
+                  - entity: sensor.grow_room_inside_air_temperature
+                    name: Tent Temperature
+                    icon: mdi:thermometer
+                  - entity: sensor.grow_room_inside_air_relative_humidity
+                    name: Tent Relative Humidity
+                    icon: mdi:water-percent
+                  - entity: sensor.grow_room_inside_vpd
+                    name: Vapor Pressure Deficit
+                    icon: mdi:sprout
+
+          # ═══════════════════════════════════════════════════════════════════
+          # COLUMN 3: YARD & LAWN (MAMMOTION LUBA VISION)
+          # ═══════════════════════════════════════════════════════════════════
+          - cards:
+              - type: picture-glance
+                title: Luba Mower Vision Cam
+                camera_image: camera.yard_luba_va624unr_vision_camera
+                camera_view: live
+                entities:
+                  - entity: sensor.garden_luba_va624unr_battery
+                    icon: mdi:battery
+                  - entity: sensor.garden_luba_va624unr_mowing_speed
+                    icon: mdi:speedometer
+                tap_action:
+                  action: navigate
+                  navigation_path: /lawn-pool
+
+              - type: entities
+                title: Luba Vision & Navigation Telemetry
+                entities:
+                  - entity: lawn_mower.garden_luba_va624unr
+                    name: Mower Operation State
+                  - entity: sensor.garden_luba_va624unr_battery
+                    name: Battery Charge
+                    icon: mdi:battery-charging
+                  - entity: sensor.yard_luba_va624unr_lidar_positioning_status
+                    name: LiDAR Positioning Status
+                    icon: mdi:radar
+                  - entity: sensor.garden_luba_va624unr_mowing_speed
+                    name: Current Movement Speed
+                    icon: mdi:speedometer
+
+          # ═══════════════════════════════════════════════════════════════════
+          # COLUMN 4: FABRICATION (3D PRINTER CAMERA)
+          # ═══════════════════════════════════════════════════════════════════
+          - cards:
+              - type: picture-glance
+                title: Bambu X1C 5 Maker Space
+                camera_image: camera.maker_space_x1c_5_camera
+                camera_view: auto
+                entities:
+                  - entity: light.maker_space_x1c_5_chamber_light
+                    icon: mdi:lightbulb
+                  - entity: sensor.maker_space_x1c_5_smart_plug_power
+                    icon: mdi:lightning-bolt
+                tap_action:
+                  action: navigate
+                  navigation_path: /imperial-manufacturing
+
+              - type: entities
+                title: Maker Space Telemetry
+                entities:
+                  - entity: sensor.maker_space_x1c_5_smart_plug_power
+                    name: Active Printer Power Draw
+                    icon: mdi:flash
+                  - entity: light.maker_space_x1c_5_chamber_light
+                    name: Chamber Lighting
+                    icon: mdi:lightbulb
+                  - entity: binary_sensor.flsuns1pro_motion_sensor
+                    name: Maker Space Motion
+                    icon: mdi:motion-sensor

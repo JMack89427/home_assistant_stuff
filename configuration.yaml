@@ -27,7 +27,7 @@ frontend:
 lovelace:
   resource_mode: yaml
   resources:
-    - url: /local/imperial-cards.js?v=41
+    - url: /local/imperial-cards.js?v=42
       type: module
     - url: /local/grow-room-cards.js?v=2
       type: module

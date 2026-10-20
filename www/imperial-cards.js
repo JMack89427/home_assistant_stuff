@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.11.0';
+  const VERSION = '2.12.0';
 
   const WX_ICONS = {
     'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
@@ -740,7 +740,7 @@
             display: block;
             width: 100%;
             box-sizing: border-box;
-            background: var(--primary-background-color, #111111);
+            background: var(--primary-background-color, #0a0f1d);
             min-height: 100vh;
           }
           .console-wrap {
@@ -892,41 +892,41 @@
           .chip {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 7px 14px;
+            gap: 9px;
+            padding: 8px 16px;
             border-radius: 9999px;
-            background: var(--card-background-color, rgba(255, 255, 255, 0.05));
-            border: 1px solid var(--divider-color, rgba(255, 255, 255, 0.12));
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            font-family: Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--card-background-color, rgba(20, 30, 51, 0.75));
+            border: 1px solid var(--divider-color, rgba(255, 255, 255, 0.08));
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-size: 13px;
             font-weight: 500;
-            color: var(--primary-text-color, #e0e0e0);
+            color: var(--primary-text-color, #f8fafc);
             cursor: pointer;
             white-space: nowrap;
             user-select: none;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             flex-shrink: 0;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
           }
           .chip:hover {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: var(--primary-color, #03a9f4);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            background: rgba(30, 41, 59, 0.95);
+            border-color: var(--primary-color, #38bdf8);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.2);
           }
           .chip:active {
-            transform: scale(0.96);
+            transform: scale(0.97);
           }
           .chip-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
             flex-shrink: 0;
-            background: var(--secondary-text-color, #888);
-            box-shadow: 0 0 6px currentColor;
-            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+            background: var(--secondary-text-color, #94a3b8);
+            box-shadow: 0 0 8px currentColor;
+            transition: background-color 0.25s ease, box-shadow 0.25s ease;
           }
           .chip-icon {
             --mdc-icon-size: 16px;
@@ -938,23 +938,23 @@
             flex-shrink: 0;
           }
           .chip-label {
-            opacity: 0.82;
+            opacity: 0.85;
             font-size: 12px;
+            font-weight: 500;
           }
           .chip-val {
-            font-weight: 700;
-            font-family: 'Roboto Mono', ui-monospace, monospace;
+            font-weight: 600;
             font-size: 12px;
           }
           @keyframes alarm-pulse {
-            0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7); }
-            70% { box-shadow: 0 0 0 8px rgba(229, 57, 53, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
           }
           .chip.alarm {
-            background: rgba(229, 57, 53, 0.25);
-            border-color: #e53935;
-            color: #ff5252;
+            background: rgba(239, 68, 68, 0.25);
+            border-color: #ef4444;
+            color: #f87171;
             animation: alarm-pulse 2s infinite;
           }
         </style>
@@ -1010,44 +1010,51 @@
       this._chipNodes.forEach(({ cfg, chip, dot, iconEl, label, val }) => {
         const stObj = this._hass.states[cfg.entity];
         let valText = stObj ? stObj.state : 'N/A';
-        let dotColor = '#888';
+        let dotColor = '#94a3b8';
         let iconName = cfg.icon || 'mdi:information';
 
         if (cfg.entity === 'binary_sensor.life_safety_alarm_active') {
           if (stObj && stObj.state === 'on') {
-            valText = 'ALARM ACTIVE';
-            dotColor = '#e53935';
+            valText = 'Alarm Active';
+            dotColor = '#ef4444';
             chip.classList.add('alarm');
             iconName = 'mdi:alert-octagon';
           } else {
-            valText = 'Safe';
-            dotColor = '#43a047';
+            valText = 'Secure';
+            dotColor = '#10b981';
             chip.classList.remove('alarm');
             iconName = 'mdi:shield-check';
           }
         } else if (cfg.entity && cfg.entity.startsWith('climate.')) {
-          const mode = stObj ? stObj.state : 'off';
+          const rawMode = stObj ? stObj.state.toLowerCase().replace('_', '/') : 'off';
+          const capMode = rawMode.charAt(0).toUpperCase() + rawMode.slice(1);
           const temp = stObj?.attributes?.temperature ? `${stObj.attributes.temperature}°F` : '';
-          valText = temp ? `${mode.toUpperCase()} · ${temp}` : mode.toUpperCase();
-          dotColor = mode === 'off' ? '#757575' : '#00acc1';
+          valText = temp ? `${capMode} · ${temp}` : capMode;
+          dotColor = rawMode === 'off' ? '#64748b' : '#38bdf8';
           iconName = 'mdi:thermostat';
         } else if (cfg.entity && cfg.entity.startsWith('input_boolean.')) {
           const isOn = stObj && stObj.state === 'on';
           valText = isOn ? 'Occupied' : 'Vacant';
-          dotColor = isOn ? (cfg.color || '#ff9800') : '#616161';
+          dotColor = isOn ? (cfg.color || '#f59e0b') : '#64748b';
           chip.style.borderColor = isOn ? dotColor : '';
         } else if (cfg.entity && cfg.entity.startsWith('weather.')) {
+          const rawWx = stObj ? stObj.state.toLowerCase().replace(/[-_]/g, ' ') : '';
+          const capWx = rawWx.charAt(0).toUpperCase() + rawWx.slice(1);
           const temp = stObj?.attributes?.temperature ? `${stObj.attributes.temperature}°F` : '';
-          valText = `${stObj ? stObj.state.toUpperCase() : ''} ${temp}`.trim();
-          dotColor = '#03a9f4';
+          valText = temp ? `${capWx} · ${temp}` : capWx;
+          dotColor = '#38bdf8';
         } else if (cfg.entity && cfg.entity.startsWith('lawn_mower.')) {
+          const mowerState = stObj ? stObj.state.toLowerCase() : 'off';
+          const capMower = mowerState.charAt(0).toUpperCase() + mowerState.slice(1);
           const bat = this._hass.states['sensor.garden_luba_va624unr_battery']?.state;
-          valText = `${stObj ? stObj.state.toUpperCase() : ''}${bat ? ` (${bat}%)` : ''}`;
-          dotColor = stObj?.state === 'mowing' ? '#76ff03' : '#00e676';
+          valText = `${capMower}${bat ? ` · ${bat}%` : ''}`;
+          dotColor = stObj?.state === 'mowing' ? '#10b981' : '#34d399';
         } else if (cfg.entity && cfg.entity.startsWith('vacuum.')) {
+          const vacState = stObj ? stObj.state.toLowerCase() : 'off';
+          const capVac = vacState.charAt(0).toUpperCase() + vacState.slice(1);
           const bat = this._hass.states['sensor.roborock_qrevo_curv_series_battery']?.state;
-          valText = `${stObj ? stObj.state.toUpperCase() : ''}${bat ? ` (${bat}%)` : ''}`;
-          dotColor = stObj?.state === 'cleaning' ? '#e040fb' : '#ba68c8';
+          valText = `${capVac}${bat ? ` · ${bat}%` : ''}`;
+          dotColor = stObj?.state === 'cleaning' ? '#a855f7' : '#c084fc';
         } else if (stObj && stObj.attributes && stObj.attributes.unit_of_measurement) {
           valText = `${stObj.state} ${stObj.attributes.unit_of_measurement}`;
           dotColor = cfg.color || '#ffa000';
