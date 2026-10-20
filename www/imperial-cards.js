@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  const VERSION = '2.10.0';
+  const VERSION = '2.11.0';
 
   const WX_ICONS = {
     'sunny':'mdi:weather-sunny','clear-night':'mdi:weather-night',
@@ -685,6 +685,390 @@
   }
 
   // ============================================================================
+  // imperial-responsive-console (adaptive 1-col phone, 2-col tablet, 4-col desktop)
+  // ============================================================================
+  class ImperialResponsiveConsole extends HTMLElement {
+    setConfig(c) {
+      if (!c.columns || !Array.isArray(c.columns)) {
+        throw new Error('imperial-responsive-console: "columns" array required');
+      }
+      this._c = c;
+      this._hass = null;
+      this._headerEls = [];
+      this._colEls = [];
+      this._footerEls = [];
+      if (!this.shadowRoot) this.attachShadow({ mode: 'open' });
+      this._setup();
+    }
+
+    async _setup() {
+      const helpers = window.loadCardHelpers ? await window.loadCardHelpers() : null;
+      if (!helpers) return;
+
+      this._headerEls = (this._c.header || []).map(cfg => helpers.createCardElement(cfg));
+      this._footerEls = (this._c.footer || []).map(cfg => helpers.createCardElement(cfg));
+      this._colEls = (this._c.columns || []).map(col => {
+        const cards = Array.isArray(col) ? col : (col.cards || []);
+        return cards.map(cfg => helpers.createCardElement(cfg));
+      });
+
+      this._render();
+      if (this._hass) this._passHass();
+    }
+
+    _passHass() {
+      const all = [
+        ...this._headerEls,
+        ...this._footerEls,
+        ...this._colEls.flat()
+      ];
+      all.forEach(el => {
+        if (el) el.hass = this._hass;
+      });
+    }
+
+    set hass(h) {
+      this._hass = h;
+      this._passHass();
+    }
+
+    _render() {
+      const numCols = this._colEls.length || 4;
+      this.shadowRoot.innerHTML = `
+        <style>
+          :host {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--primary-background-color, #111111);
+            min-height: 100vh;
+          }
+          .console-wrap {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 14px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+          }
+          .header-slot, .footer-slot {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+          }
+          .cols-grid {
+            display: grid;
+            gap: 16px;
+            width: 100%;
+            box-sizing: border-box;
+            align-items: start;
+          }
+          /* Desktop / Computer (> 1280px): Edge-to-edge 4 Columns */
+          @media (min-width: 1281px) {
+            .cols-grid {
+              grid-template-columns: repeat(${numCols}, minmax(0, 1fr));
+            }
+          }
+          /* Tablet (768px - 1280px): 2 Columns */
+          @media (min-width: 768px) and (max-width: 1280px) {
+            .console-wrap {
+              padding: 12px 14px;
+              gap: 14px;
+            }
+            .cols-grid {
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              gap: 14px;
+            }
+          }
+          /* Phone (< 768px): 1 Column */
+          @media (max-width: 767px) {
+            .console-wrap {
+              padding: 8px 6px;
+              gap: 12px;
+            }
+            .cols-grid {
+              grid-template-columns: 1fr;
+              gap: 12px;
+            }
+          }
+          .col {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 0;
+          }
+        </style>
+        <div class="console-wrap">
+          <div class="header-slot"></div>
+          <div class="cols-grid"></div>
+          <div class="footer-slot"></div>
+        </div>`;
+
+      const headerSlot = this.shadowRoot.querySelector('.header-slot');
+      const grid = this.shadowRoot.querySelector('.cols-grid');
+      const footerSlot = this.shadowRoot.querySelector('.footer-slot');
+
+      if (this._headerEls.length === 0) {
+        headerSlot.style.display = 'none';
+      } else {
+        this._headerEls.forEach(el => headerSlot.appendChild(el));
+      }
+
+      this._colEls.forEach((cards, i) => {
+        const colDiv = document.createElement('div');
+        colDiv.className = `col col-${i + 1}`;
+        cards.forEach(el => colDiv.appendChild(el));
+        grid.appendChild(colDiv);
+      });
+
+      if (this._footerEls.length === 0) {
+        footerSlot.style.display = 'none';
+      } else {
+        this._footerEls.forEach(el => footerSlot.appendChild(el));
+      }
+    }
+
+    getCardSize() { return 6; }
+    static getStubConfig() { return { columns: [[], [], [], []] }; }
+  }
+
+  // ============================================================================
+  // imperial-kpi-bar (glassmorphic responsive status chip rail)
+  // ============================================================================
+  class ImperialKpiBar extends HTMLElement {
+    setConfig(c) {
+      this._c = c || {};
+      this._chips = c.chips || [];
+      if (!this.shadowRoot) this.attachShadow({ mode: 'open' });
+      this._build();
+    }
+
+    set hass(h) {
+      this._hass = h;
+      this._update();
+    }
+
+    _navigate(path) {
+      window.history.pushState(null, '', path);
+      window.dispatchEvent(new CustomEvent('location-changed'));
+    }
+
+    _moreInfo(entityId) {
+      this.dispatchEvent(new CustomEvent('hass-more-info', {
+        bubbles: true,
+        composed: true,
+        detail: { entityId }
+      }));
+    }
+
+    _toggle(entityId) {
+      if (!this._hass || !entityId) return;
+      const domain = entityId.split('.')[0];
+      this._hass.callService(domain, 'toggle', { entity_id: entityId });
+    }
+
+    _build() {
+      this.shadowRoot.innerHTML = `
+        <style>
+          :host {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+          }
+          .kpi-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding: 4px 2px 8px 2px;
+            box-sizing: border-box;
+          }
+          .kpi-bar::-webkit-scrollbar {
+            display: none;
+          }
+          .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 14px;
+            border-radius: 9999px;
+            background: var(--card-background-color, rgba(255, 255, 255, 0.05));
+            border: 1px solid var(--divider-color, rgba(255, 255, 255, 0.12));
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-family: Roboto, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--primary-text-color, #e0e0e0);
+            cursor: pointer;
+            white-space: nowrap;
+            user-select: none;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+          }
+          .chip:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--primary-color, #03a9f4);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+          }
+          .chip:active {
+            transform: scale(0.96);
+          }
+          .chip-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: var(--secondary-text-color, #888);
+            box-shadow: 0 0 6px currentColor;
+            transition: background-color 0.2s ease, box-shadow 0.2s ease;
+          }
+          .chip-icon {
+            --mdc-icon-size: 16px;
+            width: 16px;
+            height: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+          }
+          .chip-label {
+            opacity: 0.82;
+            font-size: 12px;
+          }
+          .chip-val {
+            font-weight: 700;
+            font-family: 'Roboto Mono', ui-monospace, monospace;
+            font-size: 12px;
+          }
+          @keyframes alarm-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(229, 57, 53, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(229, 57, 53, 0); }
+          }
+          .chip.alarm {
+            background: rgba(229, 57, 53, 0.25);
+            border-color: #e53935;
+            color: #ff5252;
+            animation: alarm-pulse 2s infinite;
+          }
+        </style>
+        <div class="kpi-bar"></div>`;
+
+      const bar = this.shadowRoot.querySelector('.kpi-bar');
+      this._chipNodes = [];
+
+      this._chips.forEach(cfg => {
+        const chip = document.createElement('div');
+        chip.className = 'chip';
+
+        const dot = document.createElement('div');
+        dot.className = 'chip-dot';
+
+        const iconEl = document.createElement('ha-icon');
+        iconEl.className = 'chip-icon';
+        iconEl.setAttribute('icon', cfg.icon || 'mdi:information');
+
+        const label = document.createElement('span');
+        label.className = 'chip-label';
+        label.textContent = (cfg.name || '') + ':';
+
+        const val = document.createElement('span');
+        val.className = 'chip-val';
+        val.textContent = '...';
+
+        chip.appendChild(dot);
+        chip.appendChild(iconEl);
+        chip.appendChild(label);
+        chip.appendChild(val);
+
+        chip.addEventListener('click', () => {
+          if (cfg.navigate) {
+            this._navigate(cfg.navigate);
+          } else if (cfg.action === 'toggle' || (cfg.entity && cfg.entity.startsWith('input_boolean.'))) {
+            this._toggle(cfg.entity);
+          } else {
+            this._moreInfo(cfg.entity);
+          }
+        });
+
+        bar.appendChild(chip);
+        this._chipNodes.push({ cfg, chip, dot, iconEl, label, val });
+      });
+
+      if (this._hass) this._update();
+    }
+
+    _update() {
+      if (!this._hass || !this._chipNodes) return;
+
+      this._chipNodes.forEach(({ cfg, chip, dot, iconEl, label, val }) => {
+        const stObj = this._hass.states[cfg.entity];
+        let valText = stObj ? stObj.state : 'N/A';
+        let dotColor = '#888';
+        let iconName = cfg.icon || 'mdi:information';
+
+        if (cfg.entity === 'binary_sensor.life_safety_alarm_active') {
+          if (stObj && stObj.state === 'on') {
+            valText = 'ALARM ACTIVE';
+            dotColor = '#e53935';
+            chip.classList.add('alarm');
+            iconName = 'mdi:alert-octagon';
+          } else {
+            valText = 'Safe';
+            dotColor = '#43a047';
+            chip.classList.remove('alarm');
+            iconName = 'mdi:shield-check';
+          }
+        } else if (cfg.entity && cfg.entity.startsWith('climate.')) {
+          const mode = stObj ? stObj.state : 'off';
+          const temp = stObj?.attributes?.temperature ? `${stObj.attributes.temperature}°F` : '';
+          valText = temp ? `${mode.toUpperCase()} · ${temp}` : mode.toUpperCase();
+          dotColor = mode === 'off' ? '#757575' : '#00acc1';
+          iconName = 'mdi:thermostat';
+        } else if (cfg.entity && cfg.entity.startsWith('input_boolean.')) {
+          const isOn = stObj && stObj.state === 'on';
+          valText = isOn ? 'Occupied' : 'Vacant';
+          dotColor = isOn ? (cfg.color || '#ff9800') : '#616161';
+          chip.style.borderColor = isOn ? dotColor : '';
+        } else if (cfg.entity && cfg.entity.startsWith('weather.')) {
+          const temp = stObj?.attributes?.temperature ? `${stObj.attributes.temperature}°F` : '';
+          valText = `${stObj ? stObj.state.toUpperCase() : ''} ${temp}`.trim();
+          dotColor = '#03a9f4';
+        } else if (cfg.entity && cfg.entity.startsWith('lawn_mower.')) {
+          const bat = this._hass.states['sensor.garden_luba_va624unr_battery']?.state;
+          valText = `${stObj ? stObj.state.toUpperCase() : ''}${bat ? ` (${bat}%)` : ''}`;
+          dotColor = stObj?.state === 'mowing' ? '#76ff03' : '#00e676';
+        } else if (cfg.entity && cfg.entity.startsWith('vacuum.')) {
+          const bat = this._hass.states['sensor.roborock_qrevo_curv_series_battery']?.state;
+          valText = `${stObj ? stObj.state.toUpperCase() : ''}${bat ? ` (${bat}%)` : ''}`;
+          dotColor = stObj?.state === 'cleaning' ? '#e040fb' : '#ba68c8';
+        } else if (stObj && stObj.attributes && stObj.attributes.unit_of_measurement) {
+          valText = `${stObj.state} ${stObj.attributes.unit_of_measurement}`;
+          dotColor = cfg.color || '#ffa000';
+        } else if (cfg.unit) {
+          valText = `${stObj ? stObj.state : 'N/A'} ${cfg.unit}`;
+          dotColor = cfg.color || '#ffa000';
+        }
+
+        dot.style.backgroundColor = dotColor;
+        dot.style.color = dotColor;
+        iconEl.style.color = dotColor;
+        iconEl.setAttribute('icon', iconName);
+        val.textContent = valText;
+      });
+    }
+
+    getCardSize() { return 1; }
+    static getStubConfig() { return { chips: [] }; }
+  }
+
+  // ============================================================================
   // imperial-clock  (self-updating time/date display — no sensor needed)
   // ============================================================================
   class ImperialClock extends HTMLElement {
@@ -1123,13 +1507,15 @@
 
   // ── Register cards ─────────────────────────────────────────────────────────
   [
-    ['imperial-header',          ImperialHeader],
-    ['imperial-panel',           ImperialPanel],
-    ['imperial-readout',         ImperialReadout],
-    ['imperial-button',          ImperialButton],
-    ['imperial-printer-status',  ImperialPrinterStatus],
+    ['imperial-header',             ImperialHeader],
+    ['imperial-panel',              ImperialPanel],
+    ['imperial-readout',            ImperialReadout],
+    ['imperial-button',             ImperialButton],
+    ['imperial-printer-status',     ImperialPrinterStatus],
     ['imperial-fleet-grid',         ImperialFleetGrid],
     ['imperial-responsive-columns', ImperialResponsiveColumns],
+    ['imperial-responsive-console', ImperialResponsiveConsole],
+    ['imperial-kpi-bar',            ImperialKpiBar],
     ['imperial-clock',              ImperialClock],
     ['imperial-alert-panel',        ImperialAlertPanel],
     ['imperial-camera',             ImperialCamera],
@@ -1139,13 +1525,15 @@
 
   window.customCards = window.customCards || [];
   window.customCards.push(
-    { type: 'imperial-header',         name: 'Imperial Header',         description: 'Imperial section divider' },
-    { type: 'imperial-panel',          name: 'Imperial Panel',          description: 'Imperial entity list' },
-    { type: 'imperial-readout',        name: 'Imperial Readout',        description: 'Phosphor sensor display' },
-    { type: 'imperial-button',         name: 'Imperial Button',         description: 'Imperial command button' },
-    { type: 'imperial-printer-status', name: 'Imperial Printer Status', description: 'Printer fleet status block' },
+    { type: 'imperial-header',             name: 'Imperial Header',             description: 'Imperial section divider' },
+    { type: 'imperial-panel',              name: 'Imperial Panel',              description: 'Imperial entity list' },
+    { type: 'imperial-readout',            name: 'Imperial Readout',            description: 'Phosphor sensor display' },
+    { type: 'imperial-button',             name: 'Imperial Button',             description: 'Imperial command button' },
+    { type: 'imperial-printer-status',     name: 'Imperial Printer Status',     description: 'Printer fleet status block' },
     { type: 'imperial-fleet-grid',         name: 'Imperial Fleet Grid',         description: '2-col active/standby printer grid' },
     { type: 'imperial-responsive-columns', name: 'Imperial Responsive Columns', description: 'Responsive 2-col layout, stacks on mobile' },
+    { type: 'imperial-responsive-console', name: 'Imperial Responsive Console', description: 'Adaptive 1/2/4-col console layout for Phone, Tablet, PC' },
+    { type: 'imperial-kpi-bar',            name: 'Imperial KPI Bar',            description: 'Glassmorphic responsive status chip rail' },
     { type: 'imperial-clock',              name: 'Imperial Clock',              description: 'Self-updating time and date display' },
     { type: 'imperial-alert-panel',        name: 'Imperial Alert Panel',        description: 'Low battery and unavailable entity scanner' },
     { type: 'imperial-camera',             name: 'Imperial Camera',             description: 'Rotatable camera viewer' },

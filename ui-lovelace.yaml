@@ -1,15 +1,17 @@
 # ─────────────────────────────────────────────────────────────────────────────
-# ui-lovelace.yaml  —  Main Command Center Dashboard (Modern Sections Layout)
+# ui-lovelace.yaml  —  Main Command Center Dashboard (Adaptive Responsive Console)
 # ─────────────────────────────────────────────────────────────────────────────
-# Master household landing dashboard featuring:
-#   - Glance Badges: Safety, House Avg Temp & Humidity, HVAC, Weather, Occupancy
-#   - Conditional Critical Alerts: Smoke/CO active alarm & Dehumidifier tank full
-#   - Domain Command Portals: Direct navigation cards with live status for all 11
-#     specialized dashboards (Climate, Cameras, Manufacturing, Grow Room, Vacuums,
-#     Lawn & Pool, Safety, Meals, Media, Cat's Room, Brent's Room)
-#   - Quick Actions: Perimeter lighting, Good Night & Movie Mode routines, HVAC override
-#   - Live Surveillance: Perimeter camera glance tiles with motion sensors
-#   - Household Hub: Clock, Weather, Mealie dinner plan, Family calendar & System alerts
+# Master household landing dashboard featuring 3 responsive modes:
+#   - Computer (>1280px): Edge-to-edge 4-column command center utilizing 100% monitor width.
+#   - Tablet (768px - 1280px): Balanced 2-column layout.
+#   - Phone (<768px): Thumb-friendly 1-column layout with quick actions & portals first.
+#
+# Sections:
+#   - Header: Responsive Glassmorphic KPI Status Rail + Conditional Emergency Warnings
+#   - Column 1: Command Portals & Navigation (11 Subsystem Hubs) + Quick Occupancy Toggles
+#   - Column 2: Live Perimeter & Surveillance (Ring Doorbell, Grow Room, Luba Mower, Life Safety)
+#   - Column 3: Climate & Master Lighting (T6 Thermostat, House Metrics, Living Room Accent Lights, Routines)
+#   - Column 4: Fleet & Household Hub (Roborock Curv, Luba Mower, 3D Print Farm, Mealie Dinner, Calendar, Alerts)
 # ─────────────────────────────────────────────────────────────────────────────
 
 title: Overview
@@ -17,42 +19,11 @@ views:
   - title: Overview
     path: default_view
     icon: mdi:view-dashboard
-    type: sections
-    max_columns: 4
-    badges:
-      - entity: binary_sensor.life_safety_alarm_active
-        name: Safety
-        color: red
-      - entity: sensor.house_average_temperature
-        name: House Temp
-        icon: mdi:thermometer
-        color: orange
-      - entity: sensor.house_average_humidity
-        name: House Humidity
-        icon: mdi:water-percent
-        color: cyan
-      - entity: climate.t6_pro_z_wave_programmable_thermostat
-        name: HVAC
-        color: teal
-      - entity: weather.forecast_home_3
-        name: Weather
-        color: light-blue
-      - entity: input_boolean.cats_room_occupied
-        name: Cat's Room
-        icon: mdi:bed
-        color: amber
-      - entity: input_boolean.brent_room_occupied
-        name: Brent's Room
-        icon: mdi:bed
-        color: indigo
-
-    sections:
-      # ═══════════════════════════════════════════════════════════════════════
-      # SECTION 0: CONDITIONAL CRITICAL ALERTS
-      # ═══════════════════════════════════════════════════════════════════════
-      - type: grid
-        column_span: 4
-        cards:
+    panel: true
+    cards:
+      - type: custom:imperial-responsive-console
+        header:
+          # 1. Critical Alarm Active Banner (Conditional)
           - type: conditional
             conditions:
               - condition: state
@@ -63,17 +34,18 @@ views:
               content: >
                 <div style="background: var(--error-color, #e53935); color: #ffffff;
                 padding: 16px 20px; border-radius: 12px; font-weight: bold;
-                font-size: 1.2em; text-align: center; box-shadow: 0 4px 12px rgba(229,57,53,0.4);
-                cursor: pointer;">
-                🚨 CRITICAL ALARM ACTIVE — {{ states('sensor.life_safety_active_zones') }}
-                <div style="font-size: 0.8em; margin-top: 4px; font-weight: normal; opacity: 0.9;">
-                Click to open Safety Dashboard & Diagnostics
+                font-size: 1.2em; text-align: center; box-shadow: 0 4px 16px rgba(229,57,53,0.5);
+                cursor: pointer; letter-spacing: 0.5px;">
+                🚨 CRITICAL LIFE SAFETY ALARM ACTIVE — {{ states('sensor.life_safety_active_zones') }}
+                <div style="font-size: 0.85em; margin-top: 4px; font-weight: normal; opacity: 0.95;">
+                Click to open Life Safety Emergency Diagnostics Dashboard
                 </div>
                 </div>
               tap_action:
                 action: navigate
                 navigation_path: /life-safety
 
+          # 2. Dehumidifier Bucket Full Banner (Conditional)
           - type: conditional
             conditions:
               - condition: state
@@ -82,286 +54,442 @@ views:
             card:
               type: markdown
               content: >
-                <div style="background: var(--warning-color, #ffa000); color: #000000;
+                <div style="background: var(--warning-color, #ffa000); color: #111111;
                 padding: 12px 18px; border-radius: 10px; font-weight: bold;
-                font-size: 1.0em; text-align: center;">
-                💧 DEHUMIDIFIER TANK FULL — Empty the bucket to resume moisture extraction.
+                font-size: 1.05em; text-align: center; box-shadow: 0 3px 10px rgba(255,160,0,0.3);
+                cursor: pointer;">
+                💧 DEHUMIDIFIER TANK FULL — Empty bucket to resume moisture extraction
                 </div>
               tap_action:
                 action: navigate
                 navigation_path: /climate-control
 
-      # ═══════════════════════════════════════════════════════════════════════
-      # SECTION 1: DOMAIN COMMAND PORTALS (INTERACTIVE DASHBOARD HUB)
-      # ═══════════════════════════════════════════════════════════════════════
-      - type: grid
-        column_span: 2
-        cards:
-          - type: heading
-            heading: "COMMAND PORTALS"
-            heading_style: title
-            icon: mdi:view-dashboard-variant
-
-          - type: grid
-            columns: 2
-            square: false
-            cards:
-              - type: tile
-                entity: climate.t6_pro_z_wave_programmable_thermostat
-                name: Climate & Air
-                icon: mdi:thermostat
-                color: teal
-                tap_action:
-                  action: navigate
-                  navigation_path: /climate-control
-
-              - type: tile
-                entity: camera.front_door_live_view
-                name: Cameras & Motion
-                icon: mdi:cctv
-                color: blue
-                tap_action:
-                  action: navigate
-                  navigation_path: /cameras-hub
-
-              - type: tile
-                entity: sensor.maker_space_x1c_5_smart_plug_power
-                name: 3D Manufacturing
-                icon: mdi:printer-3d-nozzle
-                color: deep-orange
-                tap_action:
-                  action: navigate
-                  navigation_path: /imperial-manufacturing
-
-              - type: tile
-                entity: sensor.grow_room_inside_vpd
-                name: Grow Room
-                icon: mdi:sprout
-                color: light-green
-                tap_action:
-                  action: navigate
-                  navigation_path: /grow-room
-
-              - type: tile
-                entity: vacuum.roborock_qrevo_curv_series
-                name: Robot Vacuums
-                icon: mdi:robot-vacuum
-                color: purple
-                tap_action:
-                  action: navigate
-                  navigation_path: /robot-vacuums
-
-              - type: tile
-                entity: lawn_mower.garden_luba_va624unr
-                name: Lawn & Pool
-                icon: mdi:pool
-                color: cyan
-                tap_action:
-                  action: navigate
-                  navigation_path: /lawn-pool
-
-              - type: tile
-                entity: binary_sensor.life_safety_alarm_active
-                name: Life Safety
+          # 3. Glassmorphic Responsive KPI Status Rail
+          - type: custom:imperial-kpi-bar
+            chips:
+              - entity: binary_sensor.life_safety_alarm_active
+                name: Safety
                 icon: mdi:shield-check
-                color: green
-                tap_action:
-                  action: navigate
-                  navigation_path: /life-safety
-
-              - type: tile
-                entity: media_player.living_room
-                name: Whole-Home Audio
-                icon: mdi:speaker-multiple
-                color: pink
-                tap_action:
-                  action: navigate
-                  navigation_path: /media-hub
-
-              - type: tile
-                entity: input_boolean.cats_room_occupied
-                name: Cat's Room
-                icon: mdi:ceiling-fan
-                color: amber
-                tap_action:
-                  action: navigate
-                  navigation_path: /cadets-barracks
-
-              - type: tile
-                entity: input_boolean.brent_room_occupied
-                name: Brent's Room
+                navigate: /life-safety
+              - entity: sensor.house_average_temperature
+                name: House Temp
+                color: "#ff9800"
+                navigate: /climate-control
+              - entity: sensor.house_average_humidity
+                name: House Humidity
+                color: "#00bcd4"
+                navigate: /climate-control
+              - entity: climate.t6_pro_z_wave_programmable_thermostat
+                name: HVAC
+                color: "#26c6da"
+                navigate: /climate-control
+              - entity: weather.forecast_home_3
+                name: Weather
+                color: "#42a5f5"
+                action: more-info
+              - entity: lawn_mower.garden_luba_va624unr
+                name: Mower
+                icon: mdi:robot-mower
+                navigate: /lawn-pool
+              - entity: vacuum.roborock_qrevo_curv_series
+                name: Vacuum
+                icon: mdi:robot-vacuum
+                navigate: /robot-vacuums
+              - entity: input_boolean.cats_room_occupied
+                name: "Cat's Room"
                 icon: mdi:bed
-                color: indigo
-                tap_action:
-                  action: navigate
-                  navigation_path: /brent-room
+                color: "#ffb74d"
+                action: toggle
+              - entity: input_boolean.brent_room_occupied
+                name: "Brent's Room"
+                icon: mdi:bed
+                color: "#7e57c2"
+                action: toggle
 
-      # ═══════════════════════════════════════════════════════════════════════
-      # SECTION 2: QUICK ACTIONS & MASTER LIGHTING
-      # ═══════════════════════════════════════════════════════════════════════
-      - type: grid
-        column_span: 2
-        cards:
-          - type: heading
-            heading: "QUICK ACTIONS"
-            heading_style: title
-            icon: mdi:lightning-bolt
+        columns:
+          # ═══════════════════════════════════════════════════════════════════
+          # COLUMN 1: COMMAND PORTALS & NAVIGATION HUB
+          # ═══════════════════════════════════════════════════════════════════
+          - cards:
+              - type: custom:imperial-header
+                title: COMMAND PORTALS
+                subtitle: MASTER SUBSYSTEM MATRIX
+                icon: mdi:view-dashboard-variant
 
-          - type: grid
-            columns: 3
-            square: false
-            cards:
-              - type: tile
-                entity: light.front_light
-                name: Front Lamp
-                icon: mdi:outdoor-lamp
-                color: amber
+              # Quick Domain Hub Portals (2 columns of tiles)
+              - type: grid
+                columns: 2
+                square: false
+                cards:
+                  - type: tile
+                    entity: climate.t6_pro_z_wave_programmable_thermostat
+                    name: Climate & Air
+                    icon: mdi:thermostat
+                    color: teal
+                    tap_action:
+                      action: navigate
+                      navigation_path: /climate-control
 
-              - type: tile
-                entity: light.garage_light
-                name: Garage Flood
-                icon: mdi:light-flood-down
-                color: amber
+                  - type: tile
+                    entity: camera.front_door_live_view_2
+                    name: Cameras & Motion
+                    icon: mdi:cctv
+                    color: blue
+                    tap_action:
+                      action: navigate
+                      navigation_path: /cameras-hub
 
-              - type: tile
-                entity: light.side_light
-                name: Side Sconce
-                icon: mdi:wall-sconce-flat
-                color: amber
+                  - type: tile
+                    entity: sensor.maker_space_x1c_5_smart_plug_power
+                    name: 3D Manufacturing
+                    icon: mdi:printer-3d-nozzle
+                    color: deep-orange
+                    tap_action:
+                      action: navigate
+                      navigation_path: /imperial-manufacturing
 
-          - type: grid
-            columns: 2
-            square: false
-            cards:
-              - type: tile
-                entity: script.good_night
-                name: Good Night
-                icon: mdi:weather-night
-                color: deep-purple
-                tap_action:
-                  action: call-service
-                  service: script.good_night
+                  - type: tile
+                    entity: sensor.grow_room_inside_vpd
+                    name: Grow Room
+                    icon: mdi:sprout
+                    color: light-green
+                    tap_action:
+                      action: navigate
+                      navigation_path: /grow-room
 
-              - type: tile
-                entity: script.movie_mode
-                name: Movie Mode
-                icon: mdi:movie-open
-                color: indigo
-                tap_action:
-                  action: call-service
-                  service: script.movie_mode
+                  - type: tile
+                    entity: vacuum.roborock_qrevo_curv_series
+                    name: Robot Vacuums
+                    icon: mdi:robot-vacuum
+                    color: purple
+                    tap_action:
+                      action: navigate
+                      navigation_path: /robot-vacuums
 
-          - type: grid
-            columns: 2
-            square: false
-            cards:
-              - type: tile
-                entity: input_boolean.climate_manual_override
-                name: Climate Override
-                icon: mdi:hand-back-right
-                color: orange
+                  - type: tile
+                    entity: lawn_mower.garden_luba_va624unr
+                    name: Lawn & Pool
+                    icon: mdi:pool
+                    color: cyan
+                    tap_action:
+                      action: navigate
+                      navigation_path: /lawn-pool
 
-              - type: tile
-                entity: input_boolean.climate_sensor_bypass
-                name: Sensor Bypass
-                icon: mdi:thermometer-off
-                color: blue-grey
+                  - type: tile
+                    entity: binary_sensor.life_safety_alarm_active
+                    name: Life Safety
+                    icon: mdi:shield-check
+                    color: green
+                    tap_action:
+                      action: navigate
+                      navigation_path: /life-safety
 
-      # ═══════════════════════════════════════════════════════════════════════
-      # SECTION 3: LIVE SURVEILLANCE & PERIMETER GLANCE
-      # ═══════════════════════════════════════════════════════════════════════
-      - type: grid
-        column_span: 2
-        cards:
-          - type: heading
-            heading: "PERIMETER CAMERAS"
-            heading_style: title
-            icon: mdi:cctv
+                  - type: tile
+                    entity: media_player.living_room
+                    name: Whole-Home Audio
+                    icon: mdi:speaker-multiple
+                    color: pink
+                    tap_action:
+                      action: navigate
+                      navigation_path: /media-hub
 
-          - type: grid
-            columns: 2
-            square: false
-            cards:
+                  - type: tile
+                    entity: calendar.mealie_dinner
+                    name: Meals & Nutrition
+                    icon: mdi:silverware-fork-knife
+                    color: amber
+                    tap_action:
+                      action: navigate
+                      navigation_path: /meals-planner
+
+                  - type: tile
+                    entity: input_boolean.cats_room_occupied
+                    name: Cat's Room
+                    icon: mdi:ceiling-fan
+                    color: amber
+                    tap_action:
+                      action: navigate
+                      navigation_path: /cadets-barracks
+
+                  - type: tile
+                    entity: input_boolean.brent_room_occupied
+                    name: Brent's Room
+                    icon: mdi:bed
+                    color: indigo
+                    tap_action:
+                      action: navigate
+                      navigation_path: /brent-room
+
+              # Room Occupancy & HVAC Overrides
+              - type: entities
+                title: Room Occupancy & Overrides
+                entities:
+                  - entity: input_boolean.cats_room_occupied
+                    name: Cat's Room Occupied
+                    icon: mdi:bed
+                  - entity: input_boolean.brent_room_occupied
+                    name: Brent's Room Occupied
+                    icon: mdi:bed
+                  - entity: input_boolean.climate_manual_override
+                    name: Climate Manual Override
+                    icon: mdi:hand-back-right
+                  - entity: input_boolean.climate_sensor_bypass
+                    name: Climate Sensor Bypass
+                    icon: mdi:thermometer-off
+
+          # ═══════════════════════════════════════════════════════════════════
+          # COLUMN 2: LIVE SURVEILLANCE & PERIMETER SECURITY
+          # ═══════════════════════════════════════════════════════════════════
+          - cards:
+              - type: custom:imperial-header
+                title: SURVEILLANCE & PERIMETER
+                subtitle: REAL-TIME OPTICAL FEEDS
+                icon: mdi:cctv
+
+              # Ring Front Door Live Glance
               - type: picture-glance
                 title: Front Door
-                camera_image: camera.front_door_live_view
-                camera_view: auto
-                entities:
-                  - entity: switch.front_door_motion_detection
-                    icon: mdi:motion-sensor
-                tap_action:
-                  action: navigate
-                  navigation_path: /cameras-hub
-
-              - type: picture-glance
-                title: Doorbell
                 camera_image: camera.front_door_live_view_2
                 camera_view: auto
                 entities:
                   - entity: sensor.front_door_battery_2
                     icon: mdi:battery
+                  - entity: sensor.front_door_last_activity_2
+                    icon: mdi:clock-outline
                 tap_action:
                   action: navigate
                   navigation_path: /cameras-hub
 
+              # Grow Room Camera Glance
               - type: picture-glance
-                title: Front Yard
-                camera_image: camera.front_live_view
+                title: Grow Room Enclosure
+                camera_image: camera.grow_room_clear
                 camera_view: auto
                 entities:
-                  - entity: switch.front_motion_detection
-                    icon: mdi:motion-sensor
+                  - entity: sensor.grow_room_inside_air_temperature
+                    icon: mdi:thermometer
+                  - entity: sensor.grow_room_inside_air_relative_humidity
+                    icon: mdi:water-percent
+                  - entity: sensor.grow_room_inside_vpd
+                    icon: mdi:gauge
                 tap_action:
                   action: navigate
-                  navigation_path: /cameras-hub
+                  navigation_path: /grow-room
 
+              # Luba Vision Live Cam
               - type: picture-glance
-                title: Garage
-                camera_image: camera.garage_live_view
-                camera_view: auto
+                title: Lawn Mower Live Vision
+                camera_image: camera.yard_luba_va624unr_vision_camera
+                camera_view: live
                 entities:
-                  - entity: switch.garage_motion_detection
-                    icon: mdi:motion-sensor
+                  - entity: sensor.garden_luba_va624unr_battery
+                    icon: mdi:battery
+                  - entity: sensor.garden_luba_va624unr_mowing_speed
+                    icon: mdi:speedometer
                 tap_action:
                   action: navigate
-                  navigation_path: /cameras-hub
+                  navigation_path: /lawn-pool
 
-      # ═══════════════════════════════════════════════════════════════════════
-      # SECTION 4: HOUSEHOLD SCHEDULE, DINNER & SYSTEM ALERTS
-      # ═══════════════════════════════════════════════════════════════════════
-      - type: grid
-        column_span: 2
-        cards:
-          - type: heading
-            heading: "HOUSEHOLD & SYSTEM"
-            heading_style: title
-            icon: mdi:calendar-clock
+              # Life Safety Subsystem Status
+              - type: entities
+                title: Life Safety Status
+                entities:
+                  - entity: binary_sensor.life_safety_alarm_active
+                    name: Master Alarm Status
+                    icon: mdi:shield-check
+                  - entity: sensor.life_safety_active_zones
+                    name: Active Alarm Zones
+                    icon: mdi:alert-circle-outline
+                  - entity: sensor.life_safety_sensors_monitored
+                    name: Monitored Sensors
+                    icon: mdi:check-network
+                  - entity: binary_sensor.150633095484711_tank_full
+                    name: Dehumidifier Tank
+                    icon: mdi:water-alert
 
-          - type: custom:mealie-mealplan-card
-            title: "Tonight's Dinner"
-            config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
-            day_offset: 0
-            show_image: true
-            show_description: true
-            show_prep_time: false
-            show_perform_time: false
-            show_total_time: false
-            show_rating: false
-            show_servings: true
-            layout: horizontal
-            tap_action:
-              action: navigate
-              navigation_path: /meals-planner
+          # ═══════════════════════════════════════════════════════════════════
+          # COLUMN 3: ENVIRONMENT, CLIMATE & MASTER LIGHTING
+          # ═══════════════════════════════════════════════════════════════════
+          - cards:
+              - type: custom:imperial-header
+                title: ENVIRONMENT & LIGHTS
+                subtitle: HVAC & ACCENT LIGHTING
+                icon: mdi:thermostat-auto
 
-          - type: custom:imperial-alert-panel
-            title: System Alerts
-            battery_threshold: 20
+              # Main Thermostat
+              - type: thermostat
+                entity: climate.t6_pro_z_wave_programmable_thermostat
+                name: Front Room HVAC
 
-          - type: custom:calendar-card-pro
-            entities:
-              - calendar.jmack89427_gmail_com
-              - calendar.jcummings522_gmail_com
-              - calendar.catriona_cummings
-              - calendar.catriona_l_cummings_gmail_com
-              - calendar.chores
-            days_to_show: 7
+              # Multi-Room Environment Matrix
+              - type: grid
+                columns: 2
+                square: false
+                cards:
+                  - type: tile
+                    entity: sensor.house_average_temperature
+                    name: House Avg Temp
+                    icon: mdi:thermometer
+                    color: orange
+                  - type: tile
+                    entity: sensor.house_average_humidity
+                    name: House Humidity
+                    icon: mdi:water-percent
+                    color: cyan
+                  - type: tile
+                    entity: sensor.t6_pro_z_wave_programmable_thermostat_air_temperature
+                    name: Thermostat Sensor
+                    icon: mdi:home-thermometer
+                    color: amber
+                  - type: tile
+                    entity: sensor.grow_room_inside_vpd
+                    name: Grow Room VPD
+                    icon: mdi:sprout
+                    color: light-green
+
+              # Master Routines
+              - type: grid
+                columns: 2
+                square: false
+                cards:
+                  - type: tile
+                    entity: script.good_night
+                    name: Good Night
+                    icon: mdi:weather-night
+                    color: deep-purple
+                    tap_action:
+                      action: call-service
+                      service: script.good_night
+
+                  - type: tile
+                    entity: script.movie_mode
+                    name: Movie Mode
+                    icon: mdi:movie-open
+                    color: indigo
+                    tap_action:
+                      action: call-service
+                      service: script.movie_mode
+
+              # Living Room & Bedroom Accent Lights (Confirmed Live Entities!)
+              - type: grid
+                columns: 3
+                square: false
+                cards:
+                  - type: tile
+                    entity: light.couch_top
+                    name: Couch Top
+                    icon: mdi:sofa
+                    color: amber
+
+                  - type: tile
+                    entity: light.couch_bottom
+                    name: Couch Bottom
+                    icon: mdi:sofa
+                    color: amber
+
+                  - type: tile
+                    entity: light.cats_ceiling_fan_light
+                    name: Cat's Fan
+                    icon: mdi:ceiling-fan-light
+                    color: amber
+
+                  - type: tile
+                    entity: light.corner_top
+                    name: Corner Top
+                    icon: mdi:floor-lamp-torchiere
+                    color: amber
+
+                  - type: tile
+                    entity: light.corner_middle
+                    name: Corner Mid
+                    icon: mdi:floor-lamp
+                    color: amber
+
+                  - type: tile
+                    entity: light.corner_bottom
+                    name: Corner Bot
+                    icon: mdi:floor-lamp-outline
+                    color: amber
+
+          # ═══════════════════════════════════════════════════════════════════
+          # COLUMN 4: FLEET VITALS & HOUSEHOLD HUB
+          # ═══════════════════════════════════════════════════════════════════
+          - cards:
+              - type: custom:imperial-header
+                title: FLEET & HOUSEHOLD
+                subtitle: AUTONOMOUS AGENTS & SCHEDULE
+                icon: mdi:robot-industrial
+
+              # Robotic Fleet Status
+              - type: grid
+                columns: 2
+                square: false
+                cards:
+                  - type: tile
+                    entity: vacuum.roborock_qrevo_curv_series
+                    name: Roborock Curv
+                    icon: mdi:robot-vacuum
+                    color: purple
+                    tap_action:
+                      action: navigate
+                      navigation_path: /robot-vacuums
+
+                  - type: tile
+                    entity: lawn_mower.garden_luba_va624unr
+                    name: Luba Mower
+                    icon: mdi:robot-mower
+                    color: cyan
+                    tap_action:
+                      action: navigate
+                      navigation_path: /lawn-pool
+
+                  - type: tile
+                    entity: script.roborock_curv_clean_room_by_room
+                    name: Clean Room-by-Room
+                    icon: mdi:play-circle-outline
+                    color: deep-purple
+                    tap_action:
+                      action: call-service
+                      service: script.roborock_curv_clean_room_by_room
+
+                  - type: tile
+                    entity: sensor.maker_space_x1c_5_smart_plug_power
+                    name: 3D Farm Power
+                    icon: mdi:lightning-bolt
+                    color: deep-orange
+                    tap_action:
+                      action: navigate
+                      navigation_path: /imperial-manufacturing
+
+              # Mealie Dinner Planner
+              - type: custom:mealie-mealplan-card
+                title: "Tonight's Dinner"
+                config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
+                day_offset: 0
+                show_image: true
+                show_description: true
+                show_prep_time: false
+                show_perform_time: false
+                show_total_time: false
+                show_rating: false
+                show_servings: true
+                layout: horizontal
+                tap_action:
+                  action: navigate
+                  navigation_path: /meals-planner
+
+              # Family Schedule Calendar (Reliable Native Calendar Card)
+              - type: calendar
+                title: Family Schedule
+                entities:
+                  - calendar.jmack89427_gmail_com
+                  - calendar.jcummings522_gmail_com
+                  - calendar.chores
+                  - calendar.catriona_cummings
+                  - calendar.mealie_dinner
+                initial_view: list
+
+              # Imperial Alert & Battery Panel
+              - type: custom:imperial-alert-panel
+                title: System & Battery Alerts
+                battery_threshold: 20
