@@ -82,7 +82,7 @@ views:
                 </div>
               tap_action:
                 action: navigate
-                navigation_path: /safety
+                navigation_path: /life-safety
 
           - type: conditional
             conditions:
@@ -99,7 +99,7 @@ views:
                 </div>
               tap_action:
                 action: navigate
-                navigation_path: /climate
+                navigation_path: /climate-control
 
       # ═══════════════════════════════════════════════════════════════════════
       # SECTION 1: DOMAIN COMMAND PORTALS (INTERACTIVE DASHBOARD HUB)
@@ -123,7 +123,7 @@ views:
                 color: teal
                 tap_action:
                   action: navigate
-                  navigation_path: /climate
+                  navigation_path: /climate-control
 
               - type: tile
                 entity: camera.front_door_live_view
@@ -132,7 +132,7 @@ views:
                 color: blue
                 tap_action:
                   action: navigate
-                  navigation_path: /cameras
+                  navigation_path: /cameras-hub
 
               - type: tile
                 entity: sensor.maker_space_x1c_5_smart_plug_power
@@ -159,7 +159,7 @@ views:
                 color: purple
                 tap_action:
                   action: navigate
-                  navigation_path: /vacuums
+                  navigation_path: /robot-vacuums
 
               - type: tile
                 entity: lawn_mower.garden_luba_va624unr
@@ -177,7 +177,7 @@ views:
                 color: green
                 tap_action:
                   action: navigate
-                  navigation_path: /safety
+                  navigation_path: /life-safety
 
               - type: tile
                 entity: media_player.living_room
@@ -186,7 +186,7 @@ views:
                 color: pink
                 tap_action:
                   action: navigate
-                  navigation_path: /media
+                  navigation_path: /media-hub
 
               - type: tile
                 entity: input_boolean.cats_room_occupied
@@ -301,7 +301,7 @@ views:
                     icon: mdi:motion-sensor
                 tap_action:
                   action: navigate
-                  navigation_path: /cameras
+                  navigation_path: /cameras-hub
 
               - type: picture-glance
                 title: Doorbell
@@ -312,7 +312,7 @@ views:
                     icon: mdi:battery
                 tap_action:
                   action: navigate
-                  navigation_path: /cameras
+                  navigation_path: /cameras-hub
 
               - type: picture-glance
                 title: Front Yard
@@ -323,7 +323,7 @@ views:
                     icon: mdi:motion-sensor
                 tap_action:
                   action: navigate
-                  navigation_path: /cameras
+                  navigation_path: /cameras-hub
 
               - type: picture-glance
                 title: Garage
@@ -334,7 +334,7 @@ views:
                     icon: mdi:motion-sensor
                 tap_action:
                   action: navigate
-                  navigation_path: /cameras
+                  navigation_path: /cameras-hub
 
       # ═══════════════════════════════════════════════════════════════════════
       # SECTION 4: HOUSEHOLD SCHEDULE, DINNER & SYSTEM ALERTS
@@ -361,7 +361,7 @@ views:
             layout: horizontal
             tap_action:
               action: navigate
-              navigation_path: /meals
+              navigation_path: /meals-planner
 
           - type: custom:imperial-alert-panel
             title: System Alerts
