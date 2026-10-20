@@ -1,0 +1,70 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ui-cameras.yaml  —  Cameras dashboard (standalone)
+# ─────────────────────────────────────────────────────────────────────────────
+
+title: Cameras
+views:
+  - title: Cameras
+    path: cameras
+    panel: true
+    icon: mdi:cctv
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: picture-entity
+                entity: camera.front_door_live_view
+                name: Front Door
+                aspect_ratio: "3 / 4"
+              - type: picture-entity
+                entity: camera.front_door_live_view_2
+                name: Doorbell
+                aspect_ratio: "3 / 4"
+
+          - type: horizontal-stack
+            cards:
+              - type: picture-glance
+                title: Front
+                camera_image: camera.front_live_view
+                camera_view: auto
+                entities:
+                  - entity: switch.front_motion_detection
+                    icon: mdi:motion-sensor
+              - type: picture-glance
+                title: Garage
+                camera_image: camera.garage_live_view
+                camera_view: auto
+                entities:
+                  - entity: switch.garage_motion_detection
+                    icon: mdi:motion-sensor
+              - type: picture-glance
+                title: Side
+                camera_image: camera.side_live_view
+                camera_view: auto
+                entities:
+                  - entity: switch.side_motion_detection
+                    icon: mdi:motion-sensor
+
+          - type: entities
+            title: Motion Detection
+            entities:
+              - entity: switch.front_door_motion_detection
+                name: Front Door Motion
+                icon: mdi:shield-lock
+              - entity: switch.front_motion_detection
+                name: Front Motion
+                icon: mdi:shield-lock
+              - entity: switch.garage_motion_detection
+                name: Garage Motion
+                icon: mdi:shield-lock
+              - entity: switch.side_motion_detection
+                name: Side Motion
+                icon: mdi:shield-lock
+              - entity: sensor.front_door_battery_2
+                name: Doorbell Battery
+                icon: mdi:battery
+              - entity: sensor.front_door_last_activity_2
+                name: Doorbell Last Activity
+                icon: mdi:clock-outline

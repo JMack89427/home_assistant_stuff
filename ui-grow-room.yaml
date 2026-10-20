@@ -1,0 +1,128 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ui-grow-room.yaml  —  Grow Room dashboard (standalone)
+# ─────────────────────────────────────────────────────────────────────────────
+
+title: Grow Room
+resources:
+  - url: /local/grow-room-cards.js?v=2
+    type: module
+views:
+  - title: Grow Room
+    path: botanical-bay
+    icon: mdi:sprout
+    theme: brass_instrument
+    badges: []
+    type: sections
+    max_columns: 3
+    sections:
+
+      - type: grid
+        column_span: 3
+        cards:
+          - type: heading
+            heading: "BOTANICAL BAY // ENVIRONMENTAL CONTROL"
+            heading_style: subtitle
+          - type: heading
+            heading: GROW ROOM
+            heading_style: title
+            icon: mdi:sprout
+
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: LIVE
+            heading_style: subtitle
+
+          - type: picture-entity
+            entity: camera.grow_room_clear
+            camera_view: live
+            aspect_ratio: "16:9"
+            show_name: false
+            show_state: false
+            theme: brass_instrument_porthole
+            grid_options:
+              columns: full
+              rows: auto
+
+          - type: heading
+            heading: VITALS
+            heading_style: subtitle
+
+          - type: custom:grow-gauge-card
+            grid_options:
+              columns: full
+              rows: auto
+            gauges:
+              - entity: sensor.grow_room_inside_vpd
+                name: VPD
+                min: 0
+                max: 2.0
+                decimals: 2
+                ideal_min: 0.8
+                ideal_max: 1.2
+                status_entity: sensor.grow_room_vpd_status
+              - entity: sensor.grow_room_inside_temp_f
+                name: Temp
+                min: 50
+                max: 100
+                decimals: 1
+              - entity: sensor.grow_room_inside_humidity
+                name: Humidity
+                min: 0
+                max: 100
+                decimals: 1
+              - entity: sensor.grow_controller_soil_sensor_soil_moisture
+                name: Soil Moisture
+                min: 0
+                max: 100
+                decimals: 0
+                ideal_min: 40
+                ideal_max: 70
+                status_entity: sensor.grow_room_soil_status
+
+      - type: grid
+        column_span: 1
+        cards:
+          - type: custom:grow-equipment-card
+            title: EQUIPMENT
+            max: 10
+            grid_options:
+              columns: full
+              rows: auto
+            entities:
+              - entity: sensor.grow_controller_port_3_current_power
+                name: Lights
+                icon: mdi:lightbulb-on
+              - entity: sensor.grow_controller_port_4_current_power
+                name: Humidifier
+                icon: mdi:air-humidifier
+              - entity: sensor.grow_controller_port_5_current_power
+                name: Dehumidifier
+                icon: mdi:air-humidifier-off
+              - entity: sensor.grow_controller_port_6_current_power
+                name: Exhaust Fan
+                icon: mdi:fan
+              - entity: sensor.grow_controller_port_7_current_power
+                name: Oscillating Fan 1
+                icon: mdi:fan
+              - entity: sensor.grow_controller_port_8_current_power
+                name: Oscillating Fan 2
+                icon: mdi:fan
+
+          - type: statistics-graph
+            title: "SOIL MOISTURE — 14 DAY TREND"
+            days_to_show: 14
+            chart_type: line
+            stat_types:
+              - mean
+            entities:
+              - entity: sensor.grow_controller_soil_sensor_soil_moisture
+                name: Soil Moisture
+
+          - type: history-graph
+            title: "VPD HISTORY (INSIDE)"
+            hours_to_show: 24
+            entities:
+              - entity: sensor.grow_room_inside_vpd
+                name: VPD (kPa)

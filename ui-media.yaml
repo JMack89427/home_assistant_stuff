@@ -1,0 +1,26 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ui-media.yaml  —  Media dashboard (standalone)
+# ─────────────────────────────────────────────────────────────────────────────
+
+title: Media
+views:
+  - title: Media
+    path: media
+    icon: mdi:speaker-multiple
+    badges: []
+    cards:
+      - type: media-control
+        entity: media_player.living_room
+        name: Living Room
+
+      - type: media-control
+        entity: media_player.family_room
+        name: Family Room
+
+      - type: media-control
+        entity: media_player.crafting_room
+        name: Crafting Room
+
+      - type: media-control
+        entity: media_player.unnamed_room
+        name: Portable

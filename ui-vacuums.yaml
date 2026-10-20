@@ -1,0 +1,307 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ui-vacuums.yaml  —  Vacuums dashboard (standalone)
+# ─────────────────────────────────────────────────────────────────────────────
+
+title: Vacuums
+views:
+  - title: Vacuums
+    path: vacuums
+    icon: mdi:robot-vacuum
+    panel: true
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: markdown
+            content: "## Roborock Qrevo Curv"
+
+          - type: grid
+            columns: 4
+            square: false
+            cards:
+              - type: tile
+                entity: vacuum.roborock_qrevo_curv_series
+                name: Start
+                icon: mdi:play
+                tap_action:
+                  action: call-service
+                  service: vacuum.start
+                  service_data:
+                    entity_id: vacuum.roborock_qrevo_curv_series
+              - type: tile
+                entity: vacuum.roborock_qrevo_curv_series
+                name: Pause
+                icon: mdi:pause
+                tap_action:
+                  action: call-service
+                  service: vacuum.pause
+                  service_data:
+                    entity_id: vacuum.roborock_qrevo_curv_series
+              - type: tile
+                entity: vacuum.roborock_qrevo_curv_series
+                name: Stop
+                icon: mdi:stop
+                tap_action:
+                  action: call-service
+                  service: vacuum.stop
+                  service_data:
+                    entity_id: vacuum.roborock_qrevo_curv_series
+              - type: tile
+                entity: vacuum.roborock_qrevo_curv_series
+                name: Return to Base
+                icon: mdi:home-import-outline
+                tap_action:
+                  action: call-service
+                  service: vacuum.return_to_base
+                  service_data:
+                    entity_id: vacuum.roborock_qrevo_curv_series
+
+          - type: horizontal-stack
+            cards:
+              - type: vertical-stack
+                cards:
+                  - type: entities
+                    title: Status
+                    entities:
+                      - entity: sensor.roborock_qrevo_curv_series_status
+                        name: Status
+                        icon: mdi:information-outline
+                      - entity: sensor.roborock_qrevo_curv_series_battery
+                        name: Battery
+                        icon: mdi:battery
+                      - entity: sensor.roborock_qrevo_curv_series_current_room
+                        name: Current Room
+                        icon: mdi:map-marker
+                      - entity: binary_sensor.roborock_qrevo_curv_series_cleaning
+                        name: Cleaning
+                        icon: mdi:broom
+                      - entity: binary_sensor.roborock_qrevo_curv_series_charging
+                        name: Charging
+                        icon: mdi:lightning-bolt
+
+                  - type: entities
+                    title: Active Cleaning
+                    entities:
+                      - entity: sensor.roborock_qrevo_curv_series_cleaning_area
+                        name: Area Covered
+                        icon: mdi:texture-box
+                      - entity: sensor.roborock_qrevo_curv_series_cleaning_progress
+                        name: Progress
+                        icon: mdi:progress-check
+                      - entity: sensor.roborock_qrevo_curv_series_cleaning_time
+                        name: Cleaning Time
+                        icon: mdi:timer
+                      - entity: sensor.roborock_qrevo_curv_series_last_clean_begin
+                        name: Last Started
+                        icon: mdi:clock-start
+                      - entity: sensor.roborock_qrevo_curv_series_last_clean_end
+                        name: Last Finished
+                        icon: mdi:clock-end
+
+              - type: vertical-stack
+                cards:
+                  - type: entities
+                    title: Dock
+                    entities:
+                      - entity: binary_sensor.roborock_qrevo_curv_series_dock_clean_water_box
+                        name: Clean Water Supply
+                        icon: mdi:water
+                      - entity: binary_sensor.roborock_qrevo_curv_series_dock_dirty_water_box
+                        name: Waste Container
+                        icon: mdi:water-off
+                      - entity: binary_sensor.roborock_qrevo_curv_series_water_shortage
+                        name: Water Shortage
+                        icon: mdi:water-alert
+                      - entity: binary_sensor.roborock_qrevo_curv_series_mop_attached
+                        name: Mop Attached
+                        icon: mdi:mop
+                      - entity: binary_sensor.roborock_qrevo_curv_series_dock_mop_drying
+                        name: Mop Drying
+                        icon: mdi:tumble-dryer
+                      - entity: sensor.roborock_qrevo_curv_series_dock_mop_drying_remaining_time
+                        name: Drying Time Left
+                        icon: mdi:timer-sand
+
+                  - type: entities
+                    title: Maintenance
+                    entities:
+                      - entity: sensor.roborock_qrevo_curv_series_main_brush_time_left
+                        name: Main Brush
+                        icon: mdi:brush
+                      - entity: sensor.roborock_qrevo_curv_series_side_brush_time_left
+                        name: Side Brush
+                        icon: mdi:brush-variant
+                      - entity: sensor.roborock_qrevo_curv_series_filter_time_left
+                        name: Filter
+                        icon: mdi:air-filter
+                      - entity: sensor.roborock_qrevo_curv_series_sensor_time_left
+                        name: Sensors
+                        icon: mdi:leak
+                      - entity: sensor.roborock_qrevo_curv_series_dock_strainer_time_left
+                        name: Dock Strainer
+                        icon: mdi:filter
+
+              - type: vertical-stack
+                cards:
+                  - type: picture-entity
+                    entity: image.roborock_qrevo_curv_series_map_0
+                    name: Map
+                    show_name: false
+                    show_state: false
+
+                  - type: entities
+                    title: Lifetime Stats
+                    entities:
+                      - entity: sensor.roborock_qrevo_curv_series_total_cleaning_area
+                        name: Total Area
+                        icon: mdi:texture-box
+                      - entity: sensor.roborock_qrevo_curv_series_total_cleaning_time
+                        name: Total Time
+                        icon: mdi:timer
+                      - entity: sensor.roborock_qrevo_curv_series_total_cleaning_count
+                        name: Total Cleans
+                        icon: mdi:counter
+
+          - type: markdown
+            content: "## Roborock QR 798"
+
+          - type: grid
+            columns: 4
+            square: false
+            cards:
+              - type: tile
+                entity: vacuum.roborock_qr_798
+                name: Start
+                icon: mdi:play
+                tap_action:
+                  action: call-service
+                  service: vacuum.start
+                  service_data:
+                    entity_id: vacuum.roborock_qr_798
+              - type: tile
+                entity: vacuum.roborock_qr_798
+                name: Pause
+                icon: mdi:pause
+                tap_action:
+                  action: call-service
+                  service: vacuum.pause
+                  service_data:
+                    entity_id: vacuum.roborock_qr_798
+              - type: tile
+                entity: vacuum.roborock_qr_798
+                name: Stop
+                icon: mdi:stop
+                tap_action:
+                  action: call-service
+                  service: vacuum.stop
+                  service_data:
+                    entity_id: vacuum.roborock_qr_798
+              - type: tile
+                entity: vacuum.roborock_qr_798
+                name: Return to Base
+                icon: mdi:home-import-outline
+                tap_action:
+                  action: call-service
+                  service: vacuum.return_to_base
+                  service_data:
+                    entity_id: vacuum.roborock_qr_798
+
+          - type: horizontal-stack
+            cards:
+              - type: vertical-stack
+                cards:
+                  - type: entities
+                    title: Status
+                    entities:
+                      - entity: sensor.roborock_qr_798_status
+                        name: Status
+                        icon: mdi:information-outline
+                      - entity: sensor.roborock_qr_798_battery
+                        name: Battery
+                        icon: mdi:battery
+                      - entity: sensor.roborock_qr_798_current_room
+                        name: Current Room
+                        icon: mdi:map-marker
+                      - entity: binary_sensor.roborock_qr_798_cleaning
+                        name: Cleaning
+                        icon: mdi:broom
+                      - entity: binary_sensor.roborock_qr_798_charging
+                        name: Charging
+                        icon: mdi:lightning-bolt
+
+                  - type: entities
+                    title: Active Cleaning
+                    entities:
+                      - entity: sensor.roborock_qr_798_cleaning_area
+                        name: Area Covered
+                        icon: mdi:texture-box
+                      - entity: sensor.roborock_qr_798_cleaning_progress
+                        name: Progress
+                        icon: mdi:progress-check
+                      - entity: sensor.roborock_qr_798_cleaning_time
+                        name: Cleaning Time
+                        icon: mdi:timer
+
+              - type: vertical-stack
+                cards:
+                  - type: entities
+                    title: Dock
+                    entities:
+                      - entity: binary_sensor.roborock_qr_798_dock_clean_water_box
+                        name: Clean Water Supply
+                        icon: mdi:water
+                      - entity: binary_sensor.roborock_qr_798_dock_dirty_water_box
+                        name: Waste Container
+                        icon: mdi:water-off
+                      - entity: binary_sensor.roborock_qr_798_water_shortage
+                        name: Water Shortage
+                        icon: mdi:water-alert
+                      - entity: binary_sensor.roborock_qr_798_mop_attached
+                        name: Mop Attached
+                        icon: mdi:mop
+                      - entity: binary_sensor.roborock_qr_798_dock_mop_drying
+                        name: Mop Drying
+                        icon: mdi:tumble-dryer
+                      - entity: sensor.roborock_qr_798_dock_mop_drying_remaining_time
+                        name: Drying Time Left
+                        icon: mdi:timer-sand
+
+                  - type: entities
+                    title: Maintenance
+                    entities:
+                      - entity: sensor.roborock_qr_798_main_brush_time_left
+                        name: Main Brush
+                        icon: mdi:brush
+                      - entity: sensor.roborock_qr_798_side_brush_time_left
+                        name: Side Brush
+                        icon: mdi:brush-variant
+                      - entity: sensor.roborock_qr_798_filter_time_left
+                        name: Filter
+                        icon: mdi:air-filter
+                      - entity: sensor.roborock_qr_798_sensor_time_left
+                        name: Sensors
+                        icon: mdi:leak
+                      - entity: sensor.roborock_qr_798_dock_strainer_time_left
+                        name: Dock Strainer
+                        icon: mdi:filter
+
+              - type: vertical-stack
+                cards:
+                  - type: picture-entity
+                    entity: image.roborock_qr_798_map_0
+                    name: Map
+                    show_name: false
+                    show_state: false
+
+                  - type: entities
+                    title: Lifetime Stats
+                    entities:
+                      - entity: sensor.roborock_qr_798_total_cleaning_area
+                        name: Total Area
+                        icon: mdi:texture-box
+                      - entity: sensor.roborock_qr_798_total_cleaning_time
+                        name: Total Time
+                        icon: mdi:timer
+                      - entity: sensor.roborock_qr_798_total_cleaning_count
+                        name: Total Cleans
+                        icon: mdi:counter

@@ -1,0 +1,317 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ui-climate.yaml  —  Climate dashboard (standalone)
+# ─────────────────────────────────────────────────────────────────────────────
+
+title: Climate
+views:
+  - title: Climate
+    path: climate
+    icon: mdi:thermostat
+    panel: true
+    badges: []
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: entities
+                title: Climate Status — Front Room
+                entities:
+                  - entity: climate.t6_pro_z_wave_programmable_thermostat
+                    name: System Mode
+                    icon: mdi:thermostat
+                  - type: attribute
+                    entity: climate.t6_pro_z_wave_programmable_thermostat
+                    name: System Action
+                    icon: mdi:lightning-bolt
+                    attribute: hvac_action
+                  - entity: sensor.t6_pro_z_wave_programmable_thermostat_air_temperature
+                    name: Current Temp
+                    icon: mdi:thermometer
+                  - entity: sensor.t6_pro_z_wave_programmable_thermostat_humidity
+                    name: Current Humidity
+                    icon: mdi:water-percent
+                  - type: attribute
+                    entity: climate.t6_pro_z_wave_programmable_thermostat
+                    name: Fan Mode
+                    icon: mdi:fan
+                    attribute: fan_mode
+                  - entity: sensor.t6_fan_status
+                    name: Fan Status
+                    icon: mdi:fan-clock
+                  - entity: input_boolean.climate_manual_override
+                    name: Manual Override
+                    icon: mdi:hand-back-right
+                  - entity: input_boolean.climate_sensor_bypass
+                    name: Sensor Bypass
+                    icon: mdi:thermometer-off
+
+              - type: thermostat
+                entity: climate.t6_pro_z_wave_programmable_thermostat
+                name: Set Temperature
+
+              - type: vertical-stack
+                cards:
+                  - type: grid
+                    columns: 2
+                    square: false
+                    cards:
+                      - type: tile
+                        entity: climate.t6_pro_z_wave_programmable_thermostat
+                        name: "Off"
+                        icon: mdi:power-off
+                        tap_action:
+                          action: call-service
+                          service: climate.set_hvac_mode
+                          service_data:
+                            entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                            hvac_mode: "off"
+                      - type: tile
+                        entity: climate.t6_pro_z_wave_programmable_thermostat
+                        name: Heat
+                        icon: mdi:fire
+                        tap_action:
+                          action: call-service
+                          service: climate.set_hvac_mode
+                          service_data:
+                            entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                            hvac_mode: heat
+                      - type: tile
+                        entity: climate.t6_pro_z_wave_programmable_thermostat
+                        name: Cool
+                        icon: mdi:snowflake
+                        tap_action:
+                          action: call-service
+                          service: climate.set_hvac_mode
+                          service_data:
+                            entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                            hvac_mode: cool
+                      - type: tile
+                        entity: climate.t6_pro_z_wave_programmable_thermostat
+                        name: Heat + Cool
+                        icon: mdi:thermostat-auto
+                        tap_action:
+                          action: call-service
+                          service: climate.set_hvac_mode
+                          service_data:
+                            entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                            hvac_mode: heat_cool
+
+                  - type: grid
+                    columns: 3
+                    square: false
+                    cards:
+                      - type: tile
+                        entity: climate.t6_pro_z_wave_programmable_thermostat
+                        name: Fan Auto
+                        icon: mdi:fan-auto
+                        tap_action:
+                          action: call-service
+                          service: climate.set_fan_mode
+                          service_data:
+                            entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                            fan_mode: "Auto low"
+                      - type: tile
+                        entity: climate.t6_pro_z_wave_programmable_thermostat
+                        name: Fan Low
+                        icon: mdi:fan-speed-1
+                        tap_action:
+                          action: call-service
+                          service: climate.set_fan_mode
+                          service_data:
+                            entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                            fan_mode: Low
+                      - type: tile
+                        entity: climate.t6_pro_z_wave_programmable_thermostat
+                        name: Fan Circ
+                        icon: mdi:fan-chevron-up
+                        tap_action:
+                          action: call-service
+                          service: climate.set_fan_mode
+                          service_data:
+                            entity_id: climate.t6_pro_z_wave_programmable_thermostat
+                            fan_mode: Circulation
+
+          - type: horizontal-stack
+            cards:
+              - type: entities
+                title: Master Bedroom
+                entities:
+                  - entity: sensor.master_bedroom_primary_suite_temp_humidity_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                  - entity: sensor.master_bedroom_primary_suite_temp_humidity_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+
+              - type: entities
+                title: Basement Office
+                entities:
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+
+              - type: entities
+                title: Garage Freezer
+                entities:
+                  - entity: sensor.temperature_and_humidity_sensor_air_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                  - entity: sensor.temperature_and_humidity_sensor_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+
+              - type: entities
+                title: Front Room
+                entities:
+                  - entity: sensor.t6_pro_z_wave_programmable_thermostat_air_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                  - entity: sensor.t6_pro_z_wave_programmable_thermostat_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+
+          - type: horizontal-stack
+            cards:
+              - type: entities
+                title: Office
+                entities:
+                  - entity: sensor.ewelink_snzb_02p_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                  - entity: sensor.ewelink_snzb_02p_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+
+              - type: entities
+                title: Cat's Room
+                entities:
+                  - entity: sensor.cats_room_temp_humidity_sensor_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                  - entity: sensor.cats_room_temp_humidity_sensor_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+                  - entity: input_boolean.cats_room_occupied
+                    name: Occupied
+
+              - type: entities
+                title: Spare Bedroom
+                entities:
+                  - entity: sensor.spare_bedroom_temp_humidity_sensor_temperature
+                    name: Temperature
+                    icon: mdi:thermometer
+                  - entity: sensor.spare_bedroom_temp_humidity_sensor_humidity
+                    name: Humidity
+                    icon: mdi:water-percent
+                  - entity: input_boolean.brent_room_occupied
+                    name: Occupied
+
+              - type: entities
+                title: Maker Space
+                entities:
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_temperature_2
+                    name: Temperature
+                    icon: mdi:thermometer
+                  - entity: sensor.timmerflotte_temp_hmd_sensor_humidity_2
+                    name: Humidity
+                    icon: mdi:water-percent
+
+          - type: horizontal-stack
+            cards:
+              - type: entities
+                title: House Average
+                entities:
+                  - entity: sensor.house_average_temperature
+                    name: Avg Temperature
+                    icon: mdi:thermometer
+                  - entity: sensor.house_average_humidity
+                    name: Avg Humidity
+                    icon: mdi:water-percent
+
+          - type: markdown
+            content: "## Dehumidifier"
+
+          - type: horizontal-stack
+            cards:
+              - type: entities
+                title: Dehumidifier
+                entities:
+                  - entity: humidifier.150633095484711_humidifier
+                    name: System Power
+                    icon: mdi:power
+                  - type: attribute
+                    entity: humidifier.150633095484711_humidifier
+                    name: Current Humidity
+                    icon: mdi:water-percent
+                    attribute: current_humidity
+                    suffix: "%"
+                  - type: attribute
+                    entity: humidifier.150633095484711_humidifier
+                    name: Target Humidity
+                    icon: mdi:target
+                    attribute: humidity
+                    suffix: "%"
+                  - type: attribute
+                    entity: humidifier.150633095484711_humidifier
+                    name: Active Mode
+                    icon: mdi:cog
+                    attribute: mode
+
+              - type: grid
+                columns: 3
+                square: false
+                cards:
+                  - type: tile
+                    entity: humidifier.150633095484711_humidifier
+                    name: Manual
+                    icon: mdi:hand-back-right
+                    tap_action:
+                      action: call-service
+                      service: humidifier.set_mode
+                      service_data:
+                        entity_id: humidifier.150633095484711_humidifier
+                        mode: Manual
+                  - type: tile
+                    entity: humidifier.150633095484711_humidifier
+                    name: Auto
+                    icon: mdi:auto-fix
+                    tap_action:
+                      action: call-service
+                      service: humidifier.set_mode
+                      service_data:
+                        entity_id: humidifier.150633095484711_humidifier
+                        mode: Auto
+                  - type: tile
+                    entity: humidifier.150633095484711_humidifier
+                    name: Continuous
+                    icon: mdi:infinity
+                    tap_action:
+                      action: call-service
+                      service: humidifier.set_mode
+                      service_data:
+                        entity_id: humidifier.150633095484711_humidifier
+                        mode: Continuous
+                  - type: tile
+                    entity: humidifier.150633095484711_humidifier
+                    name: Clothes-Dry
+                    icon: mdi:tshirt-crew
+                    tap_action:
+                      action: call-service
+                      service: humidifier.set_mode
+                      service_data:
+                        entity_id: humidifier.150633095484711_humidifier
+                        mode: Clothes-Dry
+                  - type: tile
+                    entity: humidifier.150633095484711_humidifier
+                    name: Shoes-Dry
+                    icon: mdi:shoe-sneaker
+                    tap_action:
+                      action: call-service
+                      service: humidifier.set_mode
+                      service_data:
+                        entity_id: humidifier.150633095484711_humidifier
+                        mode: Shoes-Dry

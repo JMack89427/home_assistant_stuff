@@ -1,0 +1,108 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ui-meals.yaml  —  Meals dashboard (standalone)
+# ─────────────────────────────────────────────────────────────────────────────
+
+title: Meals
+resources:
+  - url: /hacsfiles/mealie-card/mealie-card.js
+    type: module
+views:
+  - title: Meals
+    path: meals
+    icon: mdi:silverware-fork-knife
+    badges: []
+    cards:
+      - type: custom:mealie-mealplan-card
+        title: "Today"
+        config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
+        day_offset: 0
+        show_image: true
+        show_description: true
+        show_prep_time: true
+        show_perform_time: false
+        show_total_time: true
+        show_rating: true
+        show_servings: true
+        layout: horizontal
+
+      - type: horizontal-stack
+        cards:
+          - type: custom:mealie-mealplan-card
+            title: "Tomorrow"
+            config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
+            day_offset: 1
+            show_image: true
+            show_description: false
+            show_prep_time: false
+            show_perform_time: false
+            show_total_time: false
+            show_rating: false
+            show_servings: true
+            layout: vertical
+
+          - type: custom:mealie-mealplan-card
+            title: "Day +2"
+            config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
+            day_offset: 2
+            show_image: true
+            show_description: false
+            show_prep_time: false
+            show_perform_time: false
+            show_total_time: false
+            show_rating: false
+            show_servings: false
+            layout: vertical
+
+          - type: custom:mealie-mealplan-card
+            title: "Day +3"
+            config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
+            day_offset: 3
+            show_image: true
+            show_description: false
+            show_prep_time: false
+            show_perform_time: false
+            show_total_time: false
+            show_rating: false
+            show_servings: false
+            layout: vertical
+
+      - type: horizontal-stack
+        cards:
+          - type: custom:mealie-mealplan-card
+            title: "Day +4"
+            config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
+            day_offset: 4
+            show_image: true
+            show_description: false
+            show_prep_time: false
+            show_perform_time: false
+            show_total_time: false
+            show_rating: false
+            show_servings: false
+            layout: vertical
+
+          - type: custom:mealie-mealplan-card
+            title: "Day +5"
+            config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
+            day_offset: 5
+            show_image: true
+            show_description: false
+            show_prep_time: false
+            show_perform_time: false
+            show_total_time: false
+            show_rating: false
+            show_servings: false
+            layout: vertical
+
+          - type: custom:mealie-mealplan-card
+            title: "Day +6"
+            config_entry_id: 01KRC45RGW4GTDF6KA325E97AB
+            day_offset: 6
+            show_image: true
+            show_description: false
+            show_prep_time: false
+            show_perform_time: false
+            show_total_time: false
+            show_rating: false
+            show_servings: false
+            layout: vertical
