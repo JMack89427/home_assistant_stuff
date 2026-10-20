@@ -12,20 +12,10 @@
 #   - Household Hub: Clock, Weather, Mealie dinner plan, Family calendar & System alerts
 # ─────────────────────────────────────────────────────────────────────────────
 
-title: Home
-resources:
-  - url: /local/imperial-cards.js?v=40
-    type: module
-  - url: /local/grow-room-cards.js?v=2
-    type: module
-  - url: /hacsfiles/calendar-card-pro/calendar-card-pro.js
-    type: module
-  - url: /hacsfiles/mealie-card/mealie-card.js
-    type: module
-
+title: Overview
 views:
-  - title: Command Center
-    path: home
+  - title: Overview
+    path: default_view
     icon: mdi:view-dashboard
     type: sections
     max_columns: 4

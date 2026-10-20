@@ -7,18 +7,18 @@ This project adheres to [Semantic Versioning](https://semver.org/) for major str
 
 ### Added
 
-- **Dashboard Architecture — "Exploded" Standalone Dashboards & Modern Sections Command Center**: Decomposed the monolithic 9-view `ui-lovelace.yaml` into dedicated, domain-specific standalone dashboards and rebuilt `ui-lovelace.yaml` as an overview Command Center.
+- **Dashboard Architecture — "Exploded" Standalone Dashboards & Default Overview Command Center**: Decomposed the monolithic 9-view `ui-lovelace.yaml` into dedicated, domain-specific standalone dashboards and promoted `ui-lovelace.yaml` to become Home Assistant's default root "Overview" dashboard (`/lovelace`), dropping the secondary "Home" (`imperial-dashboard`) sidebar entry.
   - **New Standalone Dashboards**:
-    - `ui-cameras.yaml` (`/cameras`): Perimeter and entry security cameras, motion sensors, battery/activity trackers.
-    - `ui-media.yaml` (`/media`): Whole-home audio media-controls across all 4 household Sonos zones (Living Room, Family Room, Crafting Room, and Portable).
-    - `ui-climate.yaml` (`/climate`): Whole-house HVAC thermostat, temperature offsets, manual override, sensor bypass, multi-room environment sensors, and Midea dehumidifier mode matrix.
-    - `ui-meals.yaml` (`/meals`): Weekly Mealie meal planner layout (Today, Tomorrow, Days +2 through +6).
-    - `ui-vacuums.yaml` (`/vacuums`): Roborock Qrevo Curv & Roborock QR 798 control tiles, live cleaning stats, maps, dock status, and maintenance consumable countdowns.
+    - `ui-cameras.yaml` (`/cameras-hub`): Perimeter and entry security cameras, motion sensors, battery/activity trackers.
+    - `ui-media.yaml` (`/media-hub`): Whole-home audio media-controls across all 4 household Sonos zones (Living Room, Family Room, Crafting Room, and Portable).
+    - `ui-climate.yaml` (`/climate-control`): Whole-house HVAC thermostat, temperature offsets, manual override, sensor bypass, multi-room environment sensors, and Midea dehumidifier mode matrix.
+    - `ui-meals.yaml` (`/meals-planner`): Weekly Mealie meal planner layout (Today, Tomorrow, Days +2 through +6).
+    - `ui-vacuums.yaml` (`/robot-vacuums`): Roborock Qrevo Curv & Roborock QR 798 control tiles, live cleaning stats, maps, dock status, and maintenance consumable countdowns.
     - `ui-lawn-pool.yaml` (`/lawn-pool`): Mammotion LUBA mower controls, zones, field settings, GPS/RTK tracker, blade maintenance, and Spino pool robot controls.
     - `ui-grow-room.yaml` (`/grow-room`): Botanical Bay environment with live camera porthole, custom SVG dial gauges (VPD, temp, humidity, soil), equipment load bars, and 14-day trends.
-    - `ui-safety.yaml` (`/safety`): First Alert SMCO410 smoke/CO detection matrix, dynamic alarm banner, maintenance sensors, firmware updates, and identify buttons.
-  - **Sidebar Registration (`configuration.yaml`)**: Registered all 8 new dashboards in `lovelace: dashboards:` with custom icons and friendly titles alongside existing `imperial-manufacturing`, `cadets-barracks`, and `brent-room`.
-  - **Command Center Dashboard Rebuild (`ui-lovelace.yaml`)**: Converted to Home Assistant's modern `sections` view format featuring top glance KPI badges (Safety alert, House Avg Temp/Humidity, HVAC, Weather, Bedroom Occupancies), conditional alarm/water banners, an interactive Command Portals grid linking into every domain with live status feedback, master outdoor lighting and scene action tiles, perimeter camera glance feeds, and a household hub (Mealie tonight's dinner, system-wide battery/offline alert scanner, family calendar). Pre-redesign full dashboard preserved as `ui-lovelace.full-9views.yaml.bak`.
+    - `ui-safety.yaml` (`/life-safety`): First Alert SMCO410 smoke/CO detection matrix, dynamic alarm banner, maintenance sensors, firmware updates, and identify buttons.
+  - **Sidebar Registration (`configuration.yaml`)**: Registered all 8 new dashboards in `lovelace: dashboards:` with custom icons and friendly titles alongside existing `imperial-manufacturing`, `cadets-barracks`, and `brent-room`. Configured `lovelace: mode: yaml` at root so Home Assistant's default landing page (`/lovelace`, Overview) directly renders `ui-lovelace.yaml`.
+  - **Overview Command Center Rebuild (`ui-lovelace.yaml`)**: Converted to Home Assistant's modern `sections` view format featuring top glance KPI badges (Safety alert, House Avg Temp/Humidity, HVAC, Weather, Bedroom Occupancies), conditional alarm/water banners, an interactive Command Portals grid linking into every domain with live status feedback, master outdoor lighting and scene action tiles, perimeter camera glance feeds, and a household hub (Mealie tonight's dinner, system-wide battery/offline alert scanner, family calendar). Pre-redesign full dashboard preserved as `ui-lovelace.full-9views.yaml.bak`.
 
 - **Cat's Room Occupancy Override & Dashboard Controls**: Added `input_boolean.cats_room_occupied` (default off, manual toggle, no auto-reset) to conditionally exclude Cat's Room from ceiling fan automations and climate/dehumidifier logic when occupied.
   - **Dashboard Controls (`ui-cadets-barracks.yaml`)**: Added a prominent "Room Occupied" Amber Tile card (`mdi:bed`) and a "Room Status" entities card in the dashboard's horizontal stack.
