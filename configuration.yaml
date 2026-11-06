@@ -31,6 +31,8 @@ lovelace:
       type: module
     - url: /local/grow-room-cards.js?v=2
       type: module
+    - url: /local/task-manager-card.js?v=1
+      type: module
     - url: /hacsfiles/calendar-card-pro/calendar-card-pro.js
       type: module
     - url: /hacsfiles/mealie-card/mealie-card.js
@@ -119,6 +121,14 @@ lovelace:
       icon: mdi:bed
       show_in_sidebar: true
       require_admin: false
+    chores-tasks:
+      mode: yaml
+      filename: ui-chores.yaml
+      title: Tasks & Chores
+      icon: mdi:checkbox-marked-circle-outline
+      show_in_sidebar: true
+      require_admin: false
+
 
 
 # ── HTTP ──────────────────────────────────────────────────────────────────────
@@ -141,6 +151,9 @@ sensor:
       - date
       - date_time
 
+# ── Household Task & Chore Manager ──────────────────────────────────────────
+task_manager:
+
 # ── Automations, Scripts, Scenes ─────────────────────────────────────────────
 automation: !include automations.yaml
 script:      !include scripts.yaml
@@ -151,3 +164,5 @@ logger:
   default: warning
   logs:
     homeassistant.components.automation: info
+    custom_components.task_manager: info
+

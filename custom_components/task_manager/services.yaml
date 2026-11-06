@@ -1,0 +1,233 @@
+create_task:
+  name: Create Task
+  description: Create a new household chore or one-off task.
+  fields:
+    title:
+      name: Title
+      description: Name or summary of the task.
+      required: true
+      example: "Water the Botanical Bay seedlings"
+      selector:
+        text:
+    description:
+      name: Description
+      description: Detailed instructions, notes, or checklists.
+      required: false
+      example: "Check pH/EC first before top-off."
+      selector:
+        text:
+          multiline: true
+    due_date:
+      name: Due Date
+      description: Target completion timestamp or date (ISO 8601).
+      required: false
+      example: "2026-11-06T18:00:00"
+      selector:
+        datetime:
+    assigned_to:
+      name: Assigned To
+      description: Household member assigned to complete the task.
+      required: false
+      example: "Jason Cummings"
+      selector:
+        text:
+    is_recurring:
+      name: Recurring
+      description: Whether the task repeats on a cadence.
+      required: false
+      default: false
+      selector:
+        boolean:
+    recurrence_cadence:
+      name: Recurrence Cadence
+      description: Repetition pattern (daily, weekly, monthly, custom).
+      required: false
+      default: "none"
+      selector:
+        select:
+          options:
+            - label: "None (One-off)"
+              value: "none"
+            - label: "Daily"
+              value: "daily"
+            - label: "Weekly"
+              value: "weekly"
+            - label: "Monthly"
+              value: "monthly"
+            - label: "Custom Interval"
+              value: "custom"
+    recurrence_interval:
+      name: Recurrence Interval
+      description: Step interval for repetition (e.g. 3 for every 3 days).
+      required: false
+      default: 1
+      selector:
+        number:
+          min: 1
+          max: 365
+          mode: box
+    recurrence_unit:
+      name: Recurrence Unit
+      description: Unit of recurrence when cadence is custom.
+      required: false
+      default: "days"
+      selector:
+        select:
+          options:
+            - label: "Days"
+              value: "days"
+            - label: "Weeks"
+              value: "weeks"
+            - label: "Months"
+              value: "months"
+    status:
+      name: Initial Status
+      description: Initial status of the task.
+      required: false
+      default: "todo"
+      selector:
+        select:
+          options:
+            - label: "To Do (Brown)"
+              value: "todo"
+            - label: "In Progress (Blue)"
+              value: "in_progress"
+            - label: "Complete (Green)"
+              value: "complete"
+
+update_task:
+  name: Update Task
+  description: Update properties of an existing task.
+  fields:
+    task_id:
+      name: Task ID
+      description: The unique ID of the task to update.
+      required: true
+      example: "task_seed_001"
+      selector:
+        text:
+    title:
+      name: Title
+      description: Updated title.
+      required: false
+      selector:
+        text:
+    description:
+      name: Description
+      description: Updated description or notes.
+      required: false
+      selector:
+        text:
+          multiline: true
+    due_date:
+      name: Due Date
+      description: Updated target due date.
+      required: false
+      selector:
+        datetime:
+    assigned_to:
+      name: Assigned To
+      description: Updated household assignee.
+      required: false
+      selector:
+        text:
+    is_recurring:
+      name: Recurring
+      description: Toggle recurrence.
+      required: false
+      selector:
+        boolean:
+    recurrence_cadence:
+      name: Recurrence Cadence
+      description: Cadence pattern.
+      required: false
+      selector:
+        select:
+          options:
+            - label: "None"
+              value: "none"
+            - label: "Daily"
+              value: "daily"
+            - label: "Weekly"
+              value: "weekly"
+            - label: "Monthly"
+              value: "monthly"
+            - label: "Custom"
+              value: "custom"
+    status:
+      name: Status
+      description: Updated status.
+      required: false
+      selector:
+        select:
+          options:
+            - label: "To Do"
+              value: "todo"
+            - label: "In Progress"
+              value: "in_progress"
+            - label: "Complete"
+              value: "complete"
+
+assign_task:
+  name: Assign Task
+  description: Assign an existing task to a household member.
+  fields:
+    task_id:
+      name: Task ID
+      description: The ID of the task.
+      required: true
+      selector:
+        text:
+    assigned_to:
+      name: Assignee
+      description: Household member name.
+      required: true
+      example: "Jason Cummings"
+      selector:
+        text:
+
+complete_task:
+  name: Complete Task
+  description: Mark a task as complete. If recurring, automatically reschedules next due date.
+  fields:
+    task_id:
+      name: Task ID
+      description: The ID of the task to complete.
+      required: true
+      selector:
+        text:
+
+set_status:
+  name: Set Task Status
+  description: Set the lifecycle status directly (To Do, In Progress, Complete).
+  fields:
+    task_id:
+      name: Task ID
+      description: The ID of the task.
+      required: true
+      selector:
+        text:
+    status:
+      name: Status
+      description: New status for the task.
+      required: true
+      selector:
+        select:
+          options:
+            - label: "To Do"
+              value: "todo"
+            - label: "In Progress"
+              value: "in_progress"
+            - label: "Complete"
+              value: "complete"
+
+delete_task:
+  name: Delete Task
+  description: Permanently remove a task.
+  fields:
+    task_id:
+      name: Task ID
+      description: The ID of the task to delete.
+      required: true
+      selector:
+        text:

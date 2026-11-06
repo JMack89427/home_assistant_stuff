@@ -1,0 +1,10 @@
+{
+  "domain": "task_manager",
+  "name": "Household Task & Chore Manager",
+  "codeowners": ["@JMack89427"],
+  "config_flow": true,
+  "documentation": "https://github.com/JMack89427/home_assistant_stuff",
+  "iot_class": "calculated",
+  "issue_tracker": "https://github.com/JMack89427/home_assistant_stuff/issues",
+  "version": "1.0.0"
+}

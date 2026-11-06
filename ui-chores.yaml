@@ -1,0 +1,39 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ui-chores.yaml  —  Household Tasks & Chore Management Dashboard
+# ─────────────────────────────────────────────────────────────────────────────
+
+title: Tasks & Chores
+resources:
+  - url: /local/task-manager-card.js?v=1
+    type: module
+
+views:
+  - title: Tasks & Chores
+    path: chores
+    icon: mdi:checkbox-marked-circle-outline
+    badges: []
+    cards:
+      # Main Task & Chore Manager Card with All Controls
+      - type: custom:task-manager-card
+        title: "Household Task & Chore Manager"
+        show_legend: true
+        show_assignee_filter: true
+        show_add_button: true
+        default_assignee: "ALL"
+
+      # Dedicated Assignee Split View (Side-by-Side or Stack)
+      - type: horizontal-stack
+        cards:
+          - type: custom:task-manager-card
+            title: "Jason's Tasks"
+            show_legend: true
+            show_assignee_filter: false
+            show_add_button: true
+            default_assignee: "Jason Cummings"
+
+          - type: custom:task-manager-card
+            title: "Jill's Tasks"
+            show_legend: true
+            show_assignee_filter: false
+            show_add_button: true
+            default_assignee: "Jill Cummings"
