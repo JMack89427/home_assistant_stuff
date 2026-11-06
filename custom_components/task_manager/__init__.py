@@ -7,6 +7,7 @@ from typing import Any
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import discovery
 from homeassistant.helpers.typing import ConfigType
 
 from .const import DOMAIN
@@ -42,8 +43,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     if DOMAIN in config:
         # Load sensor platform via discovery if YAML configured
         hass.async_create_task(
-            hass.helpers.discovery.async_load_platform(
-                Platform.SENSOR, DOMAIN, {}, config
+            discovery.async_load_platform(
+                hass, Platform.SENSOR, DOMAIN, {}, config
             )
         )
 
